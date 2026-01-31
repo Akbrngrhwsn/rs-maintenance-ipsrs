@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Procurement extends Model
+{
+    protected $fillable = ['report_id', 'items', 'status', 'director_note'];
+
+    // Mengubah JSON 'items' menjadi array
+    protected $casts = [
+        'items' => 'array',
+    ];
+
+    public function report()
+    {
+        return $this->belongsTo(Report::class);
+    }
+
+    // Human-readable label for status, localized to Indonesian
+    public function getStatusLabelAttribute()
+    {
+        $map = [
+            'submitted_to_manager' => 'Menunggu Konfirmasi Manager',
+            'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
+            'submitted_to_director' => 'Menunggu ACC',
+            'approved_by_director' => 'Disetujui',
+            'rejected' => 'Ditolak',
+            'draft' => 'Draft',
+            'pending' => 'Menunggu',
+        ];
+
+        return $map[$this->status] ?? ucfirst(str_replace('_', ' ', $this->status));
+    }
+
+    
+}
