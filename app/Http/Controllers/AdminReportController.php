@@ -325,4 +325,43 @@ public function exportSingleProcurement($id)
         }
         return $total;
     }
+
+    public function exportMonthlyPdf(Request $request) // Tambahkan Request $request di sini
+    {
+        // Ambil input 'month' dari form modal yang dikirim (format YYYY-MM)
+        $monthInput = $request->input('month', date('Y-m'));
+        
+        $startDate = \Carbon\Carbon::parse($monthInput)->startOfMonth();
+        $endDate = \Carbon\Carbon::parse($monthInput)->endOfMonth();
+
+        $reports = \App\Models\Report::with('room')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $validator = \Illuminate\Support\Facades\Auth::user()->name;
+        
+        // Perbaikan: gunakan $startDate, bukan $startOfMonth yang tidak didefinisikan
+        $dateString = $startDate->locale('id')->translatedFormat('F Y');
+
+        // Generate isi QR Code
+        $qrData = "Validated by: " . $validator . "\n" .
+                "Report: Monthly Maintenance\n" .
+                "Period: " . $dateString . "\n" .
+                "Total Reports: " . $reports->count();
+
+        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+            ->size(200)
+            ->margin(1)
+            ->generate($qrData));
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.monthly_report', [
+            'reports' => $reports,
+            'startDate' => $startDate,
+            'validator' => $validator,
+            'qrCode' => $qrCode
+        ]);
+
+        return $pdf->download('Laporan_Bulanan_' . $startDate->format('M_Y') . '.pdf');
+    }
 }

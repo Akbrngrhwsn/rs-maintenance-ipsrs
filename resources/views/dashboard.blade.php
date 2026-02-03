@@ -184,57 +184,86 @@
                     </form>
                 </div>
                 
-                {{-- Form Ekspor PDF Harian (Optional Position) --}}
                 <div class="px-6 pt-4 pb-0">
-                    <div class="flex items-center justify-end gap-3">
-                        <form action="{{ route('admin.export.daily') }}" method="GET" class="flex gap-2 items-center">
-                            <input type="hidden" name="date" value="{{ request('date', date('Y-m-d')) }}">
-                            <button type="submit" class="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 font-bold">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                </svg>
-                                Cetak Laporan Harian (PDF)
-                            </button>
-                        </form>
+    <div class="flex items-center justify-end gap-3">
+        
+        {{-- Form Ekspor PDF Harian --}}
+        <form action="{{ route('admin.export.daily') }}" method="GET" class="flex gap-2 items-center">
+            <input type="hidden" name="date" value="{{ request('date', date('Y-m-d')) }}">
+            {{-- UPDATED: Tombol disamakan stylenya dengan yang lain (Solid Button) --}}
+            <button type="submit" class="text-sm bg-blue-600 text-white px-3 py-1 rounded-lg font-bold hover:bg-blue-700">
+                Export Laporan Harian (PDF)
+            </button>
+        </form>
 
-                        {{-- Button opens modal to select Month + Week for weekly report export --}}
-                        <div class="flex items-center gap-2">
-                            <button id="open-weekly-export" type="button" class="text-sm bg-amber-600 text-white px-3 py-1 rounded-lg font-bold hover:bg-amber-700">
-                                Export Laporan Mingguan (PDF)
-                            </button>
+        {{-- Button opens modal to select Month + Week for weekly report export --}}
+        <div class="flex items-center gap-2">
+            <button id="open-weekly-export" type="button" class="text-sm bg-amber-600 text-white px-3 py-1 rounded-lg font-bold hover:bg-amber-700">
+                Export Laporan Mingguan (PDF)
+            </button>
+        </div>
+
+        <div id="weekly-export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-gray-900 opacity-60"></div>
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden m-4">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h3 class="font-bold text-lg text-gray-800">Unduh Laporan Mingguan</h3>
+                    <button type="button" onclick="closeWeeklyModal()" class="text-gray-400 hover:text-red-500">✕</button>
+                </div>
+                <form action="{{ route('admin.procurements.export.weekly') }}" method="GET">
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Pilih Bulan</label>
+                            <input id="export-month" type="month" name="month" value="{{ date('Y-m') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
+                            <p class="text-xs text-gray-400 mt-2">Contoh: 2026-01 untuk Januari 2026</p>
                         </div>
 
-                        <!-- Modal: Select Month & Week -->
-                        <div id="weekly-export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-                            <div class="absolute inset-0 bg-gray-900 opacity-60"></div>
-                            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden m-4">
-                                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                                    <h3 class="font-bold text-lg text-gray-800">Unduh Laporan Mingguan</h3>
-                                    <button type="button" onclick="closeWeeklyModal()" class="text-gray-400 hover:text-red-500">✕</button>
-                                </div>
-                                <form action="{{ route('admin.procurements.export.weekly') }}" method="GET">
-                                    <div class="p-6 space-y-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700">Pilih Bulan</label>
-                                            <input id="export-month" type="month" name="month" value="{{ date('Y-m') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-                                            <p class="text-xs text-gray-400 mt-2">Contoh: 2026-01 untuk Januari 2026</p>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700">Minggu ke</label>
-                                            <select id="export-week" name="week" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                                                <!-- options filled by JS -->
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                                        <button type="button" onclick="closeWeeklyModal()" class="bg-white border px-3 py-2 rounded text-sm">Batal</button>
-                                        <button type="submit" class="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold">Unduh Mingguan (PDF)</button>
-                                    </div>
-                                </form>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Minggu ke</label>
+                            <select id="export-week" name="week" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                </select>
                         </div>
                     </div>
+                    <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                        <button type="button" onclick="closeWeeklyModal()" class="bg-white border px-3 py-2 rounded text-sm">Batal</button>
+                        <button type="submit" class="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold">Unduh Mingguan (PDF)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Tombol untuk membuka Modal Bulanan --}}
+        <div class="flex items-center gap-2">
+            <button id="open-monthly-export" type="button" class="text-sm bg-green-600 text-white px-3 py-1 rounded-lg font-bold hover:bg-green-700">
+                Export Laporan Bulanan (PDF)
+            </button>
+        </div>
+
+        <div id="monthly-export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-gray-900 opacity-60"></div>
+            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden m-4">
+                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h3 class="font-bold text-lg text-gray-800">Unduh Laporan Bulanan</h3>
+                    <button type="button" onclick="closeMonthlyModal()" class="text-gray-400 hover:text-red-500">✕</button>
+                </div>
+                <form action="{{ route('admin.export.monthly') }}" method="GET">
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Pilih Bulan & Tahun</label>
+                            <input type="month" name="month" value="{{ date('Y-m') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required />
+                            <p class="text-xs text-gray-400 mt-2">Data laporan akan difilter berdasarkan bulan yang dipilih.</p>
+                        </div>
+                    </div>
+                    <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                        <button type="button" onclick="closeMonthlyModal()" class="bg-white border px-3 py-2 rounded text-sm">Batal</button>
+                        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Unduh Bulanan (PDF)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+</div>
                 </div>
 
                 <div class="overflow-x-auto p-6 pt-2">
@@ -493,4 +522,26 @@
             });
         });
     </script>
+
+    <script>
+    const monthlyModal = document.getElementById('monthly-export-modal');
+    const btnOpenMonthly = document.getElementById('open-monthly-export');
+
+    // Buka Modal
+    btnOpenMonthly.addEventListener('click', () => {
+        monthlyModal.classList.remove('hidden');
+    });
+
+    // Tutup Modal
+    function closeMonthlyModal() {
+        monthlyModal.classList.add('hidden');
+    }
+
+    // Tutup jika klik di luar modal area
+    window.addEventListener('click', (e) => {
+        if (e.target === monthlyModal) {
+            closeMonthlyModal();
+        }
+    });
+</script>
 </x-app-layout>

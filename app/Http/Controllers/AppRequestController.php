@@ -10,6 +10,7 @@ use App\Models\Report;
 use App\Models\Procurement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AppRequestController extends Controller
 {
@@ -574,4 +575,33 @@ class AppRequestController extends Controller
 
         return back()->with('success', 'Fitur berhasil dihapus.');
     }
+
+    public function exportMonthlyAppsPdf(\Illuminate\Http\Request $request)
+{
+    $monthInput = $request->input('month', date('Y-m'));
+    $startDate = \Carbon\Carbon::parse($monthInput)->startOfMonth();
+    $endDate = \Carbon\Carbon::parse($monthInput)->endOfMonth();
+
+    // Perbaikan: Gunakan created_at atau updated_at karena completed_at tidak ada di tabel app_requests
+    $apps = \App\Models\AppRequest::with(['user', 'features'])
+        ->whereBetween('created_at', [$startDate, $endDate])
+        ->orWhereBetween('updated_at', [$startDate, $endDate])
+        ->get();
+
+    $validator = \Illuminate\Support\Facades\Auth::user()->name;
+    
+    $qrData = "Validated by: " . $validator . "\nPeriod: " . $startDate->format('F Y');
+    $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+        ->size(200)
+        ->generate($qrData));
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.monthly_apps_report', [
+        'apps' => $apps,
+        'startDate' => $startDate,
+        'validator' => $validator,
+        'qrCode' => $qrCode
+    ]);
+
+    return $pdf->download('Laporan_Aplikasi_' . $startDate->format('M_Y') . '.pdf');
+}
 }

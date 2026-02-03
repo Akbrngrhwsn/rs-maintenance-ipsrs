@@ -20,31 +20,43 @@
                 </div>
             @endif
 
-            {{-- FORM REQUEST APLIKASI (Hanya Manager) --}}
+           {{-- FORM REQUEST APLIKASI (Hanya Manager) --}}
             @if(Auth::user()->role === 'manager')
             <div class="bg-white p-6 overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-indigo-500">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900">Ajukan Aplikasi Baru</h3>
                 </div>
 
-                <form action="{{ route('apps.store') }}" method="POST">
-                    @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Aplikasi</label>
-                            <input type="text" name="nama_aplikasi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Contoh: E-Presensi">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
-                            <input type="text" name="deskripsi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Contoh: Untuk mempermudah absensi karyawan...">
-                        </div>
-                    </div>
-                    <div class="mt-4 text-right">
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow transition">
-                            Kirim ke Direktur
-                        </button>
-                    </div>
-                </form>
+                <form action="{{ route('apps.store') }}" method="POST" class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    @csrf
+    <div class="space-y-4">
+        {{-- Nama Aplikasi --}}
+        <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Aplikasi</label>
+            <input type="text" name="nama_aplikasi" required 
+                   class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                   placeholder="Contoh: E-Presensi Karyawan">
+        </div>
+
+        {{-- Deskripsi (Full Width) --}}
+        <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Deskripsi Singkat</label>
+            <textarea name="deskripsi" required rows="3" 
+                      class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" 
+                      placeholder="Jelaskan fungsi utama aplikasi ini..."></textarea>
+        </div>
+    </div>
+
+    {{-- Tombol Aksi --}}
+    <div class="mt-6 flex justify-end">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-150 ease-in-out flex items-center gap-2">
+            <span>Kirim ke Direktur</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            </svg>
+        </button>
+    </div>
+</form>
             </div>
             @endif
 

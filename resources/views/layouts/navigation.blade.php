@@ -29,6 +29,9 @@
                         <x-nav-link :href="route('admin.procurements.index')" :active="request()->routeIs('admin.procurements.*')" class="text-sm font-bold tracking-tight">
                             {{ __('Daftar Pengadaan') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')">
+                            {{ __('Catatan Tim IT') }}
+                        </x-nav-link>
                     @endif
 
                     {{-- === RAPAT: Visible for any logged in user === --}}

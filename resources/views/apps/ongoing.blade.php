@@ -2,7 +2,16 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-bold text-xl text-gray-800">{{ __('Proyek Sedang Berjalan') }}</h2>
-            <div class="flex">
+            <div class="flex gap-2">
+                {{-- Tombol Laporan Bulanan Baru --}}
+                <button type="button" onclick="openAppMonthlyModal()"
+                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow hover:bg-indigo-700 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Laporan Bulanan
+                </button>
+
                 <a href="{{ route('apps.pending') }}"
                 class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition">
                     ← Request Aplikasi
@@ -20,8 +29,10 @@
                         <span class="bg-blue-100 text-blue-800 text-[10px] font-mono px-2 py-1 rounded">{{ $app->ticket_number }}</span>
                         <span class="text-xs font-bold text-gray-400">{{ $app->created_at->format('d M Y') }}</span>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-1">{{ $app->nama_aplikasi }}</h3>
-                    <p class="text-sm text-gray-600 mb-4 h-10 overflow-hidden">{{ Str::limit($app->deskripsi, 60) }}</p>
+                    {{-- Gunakan app_name jika nama_aplikasi error --}}
+                    <h3 class="text-lg font-bold text-gray-800 mb-1">{{ $app->nama_aplikasi ?? $app->app_name }}</h3>
+                    {{-- Gunakan description jika deskripsi error --}}
+                    <p class="text-sm text-gray-600 mb-4 h-10 overflow-hidden">{{ Str::limit($app->deskripsi ?? $app->description, 60) }}</p>
                     
                     {{-- Progress Bar Mini --}}
                     <div class="mb-4">
@@ -44,4 +55,46 @@
             @endforelse
         </div>
     </div>
+
+    {{-- MODAL POP-UP --}}
+    <div id="app-monthly-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full m-4 overflow-hidden relative">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-lg text-gray-800">Unduh Laporan Bulanan</h3>
+                <button type="button" onclick="closeAppMonthlyModal()" class="text-gray-400 hover:text-red-500">✕</button>
+            </div>
+            
+            <form action="{{ route('admin.apps.export.monthly') }}" method="GET">
+                <div class="p-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Bulan & Tahun</label>
+                    <input type="month" name="month" value="{{ date('Y-m') }}" 
+                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required />
+                </div>
+                
+                <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                    <button type="button" onclick="closeAppMonthlyModal()" class="bg-white border px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 shadow-md transition">Unduh PDF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- SCRIPT MODAL --}}
+    <script>
+        function openAppMonthlyModal() {
+            document.getElementById('app-monthly-modal').classList.remove('hidden');
+        }
+
+        function closeAppMonthlyModal() {
+            document.getElementById('app-monthly-modal').classList.add('hidden');
+        }
+
+        // Tutup modal jika klik di luar area modal
+        window.onclick = function(event) {
+            let modal = document.getElementById('app-monthly-modal');
+            if (event.target == modal) {
+                closeAppMonthlyModal();
+            }
+        }
+    </script>
 </x-app-layout>

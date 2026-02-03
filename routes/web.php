@@ -11,6 +11,7 @@ use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ITNoteController;
 
 // === USER 1: PUBLIC (Tanpa Login) ===
 Route::get('/', [PublicReportController::class, 'index'])->name('public.home');
@@ -100,7 +101,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/procurements/export-monthly', [AdminReportController::class, 'exportProcurementsMonthly'])->name('admin.procurements.export.monthly');
 
         Route::delete('/admin/rooms/{id}', [AdminRoomsController::class, 'destroy'])->name('admin.rooms.destroy');
+
+        Route::get('/admin/reports/export-monthly', [AdminReportController::class, 'exportMonthlyPdf'])->name('admin.export.monthly');
     
+        Route::get('/admin/apps/export-monthly', [AppRequestController::class, 'exportMonthlyAppsPdf'])->name('admin.apps.export.monthly');
+
+    });
+
+    Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/admin/it-notes', [ITNoteController::class, 'index'])->name('it-notes.index');
+    Route::post('/admin/it-notes', [ITNoteController::class, 'store'])->name('it-notes.store');
+    Route::get('/admin/it-notes/export', [ITNoteController::class, 'exportPdf'])->name('it-notes.export');
     });
 
     // --- GROUP APP REQUEST (Project Aplikasi) - UPDATED ---

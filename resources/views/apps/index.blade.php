@@ -20,32 +20,36 @@
             @endif
 
             @if(in_array(Auth::user()->role, ['manager', 'direktur']))
-            <div class="bg-white p-6 overflow-hidden shadow-sm sm:rounded-lg border-l-4 {{ Auth::user()->role === 'direktur' ? 'border-red-500' : 'border-indigo-500' }}">
-                
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold">Ajukan Aplikasi Baru</h3>
-                </div>
+    <div class="bg-white p-6 overflow-hidden shadow-sm sm:rounded-lg border-l-4 {{ Auth::user()->role === 'direktur' ? 'border-red-500' : 'border-indigo-500' }}">
+        
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold">Ajukan Aplikasi Baru</h3>
+        </div>
 
-                <form action="{{ route('apps.store') }}" method="POST">
-                    @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Nama Aplikasi</label>
-                            <input type="text" name="nama_aplikasi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
-                            <input type="text" name="deskripsi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Contoh: Untuk mempermudah antrian pasien...">
-                        </div>
-                    </div>
-                    <div class="mt-4 text-right">
-                        <button type="submit" class="text-white px-4 py-2 rounded shadow font-bold {{ Auth::user()->role === 'direktur' ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700' }}">
-                            {{ Auth::user()->role === 'direktur' ? 'Kirim Langsung ke Admin IT' : 'Kirim ke Direktur' }}
-                        </button>
-                    </div>
-                </form>
+        <form action="{{ route('apps.store') }}" method="POST">
+            @csrf
+            {{-- Mengubah grid-cols-2 menjadi grid-cols-1 agar Nama dan Deskripsi tersusun atas-bawah --}}
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nama Aplikasi</label>
+                    <input type="text" name="nama_aplikasi" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
+                    {{-- PERUBAHAN: Menggunakan textarea --}}
+                    <textarea name="deskripsi" required rows="4" 
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
+                        placeholder="Contoh: Untuk mempermudah antrian pasien..."></textarea>
+                </div>
             </div>
-            @endif
+            <div class="mt-4 text-right">
+                <button type="submit" class="text-white px-4 py-2 rounded shadow font-bold {{ Auth::user()->role === 'direktur' ? 'bg-red-600 hover:bg-red-700' : 'bg-indigo-600 hover:bg-indigo-700' }}">
+                    {{ Auth::user()->role === 'direktur' ? 'Kirim Langsung ke Admin IT' : 'Kirim ke Direktur' }}
+                </button>
+            </div>
+        </form>
+    </div>
+@endif
 
             @foreach($projects as $app)
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
