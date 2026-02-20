@@ -128,14 +128,14 @@
                                     <td class="px-6 py-4 align-top text-center">
                                         @php
                                             $statusClass = match($proc->status) {
-                                                'submitted_to_manager' => 'bg-amber-100 text-amber-700 border-amber-200',
+                                                'submitted_to_kepala_ruang' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'submitted_to_bendahara' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'approved_by_director' => 'bg-green-100 text-green-700 border-green-200',
                                                 'rejected' => 'bg-red-100 text-red-700 border-red-200',
                                                 default => 'bg-gray-100 text-gray-700 border-gray-200',
                                             };
                                             $statusLabel = match($proc->status) {
-                                                'submitted_to_manager' => 'Menunggu Konfirmasi Manager',
+                                                'submitted_to_kepala_ruang' => 'Menunggu Konfirmasi Kepala Ruang',
                                                 'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
                                                 'approved_by_director' => 'Disetujui',
                                                 'rejected' => 'Ditolak',
@@ -152,7 +152,7 @@
                                     </td>
 
                                     <td class="px-6 py-4 align-top text-center">
-                                        @if($proc->status === 'submitted_to_manager')
+                                        @if($proc->status === 'submitted_to_kepala_ruang')
                                             <a href="{{ route('procurement.edit', $proc->id) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                                 Edit
                                             </a>

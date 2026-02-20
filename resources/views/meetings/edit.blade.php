@@ -17,10 +17,10 @@
         <div class="mb-3">
             <label class="block font-bold">Divisi</label>
             @php
-                $roles = ['admin','direktur','manager','bendahara','staff'];
+                $roles = ['admin','direktur','kepala_ruang','bendahara','staff'];
                 $isAdmin = Auth::user() && Auth::user()->role === 'admin';
-                $selectedRole = in_array($meeting->division_role, $roles) ? $meeting->division_role : 'manager';
-                $selectedRoom = $selectedRole === 'manager' ? $meeting->division_role : '';
+                $selectedRole = in_array($meeting->division_role, $roles) ? $meeting->division_role : 'kepala_ruang';
+                $selectedRoom = $selectedRole === 'kepala_ruang' ? $meeting->division_role : '';
             @endphp
             @if($isAdmin)
                 <select id="division_role_role" class="w-full border px-2 py-1">
@@ -33,11 +33,11 @@
                         <option value="{{ $r->name }}" {{ $selectedRoom === $r->name ? 'selected' : '' }}>{{ $r->name }}</option>
                     @endforeach
                 </select>
-                <input type="hidden" name="division_role" id="division_role_input" value="{{ $selectedRole === 'manager' ? $selectedRoom : $selectedRole }}" />
+                <input type="hidden" name="division_role" id="division_role_input" value="{{ $selectedRole === 'kepala_ruang' ? $selectedRoom : $selectedRole }}" />
             @else
                 @php
                     $divisionDisplay = Auth::user()->role;
-                    if(Auth::user()->role === 'manager' && Auth::user()->room) {
+                    if(Auth::user()->role === 'kepala_ruang' && Auth::user()->room) {
                         $divisionDisplay = Auth::user()->room->name;
                     }
                 @endphp
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if(!roleSelect) return;
     function updateHidden(){
         var role = roleSelect.value;
-        if(role === 'manager'){
+        if(role === 'kepala_ruang'){
             roomSelect.style.display = '';
             roomSelect.removeAttribute('aria-hidden');
             hidden.value = roomSelect.value || '';

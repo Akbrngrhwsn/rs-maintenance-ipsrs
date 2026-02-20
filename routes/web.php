@@ -39,20 +39,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/bendahara/reports', [AppRequestController::class, 'bendaharaReports'])->name('bendahara.reports');
     Route::get('/bendahara/procurements', [AppRequestController::class, 'bendaharaProcurements'])->name('bendahara.procurements.index');
 
-    // Export routes for Director and Manager (PDF) - reuse AdminReportController methods
+    // Export routes for Director and Kepala Ruang (PDF) - reuse AdminReportController methods
     Route::get('/director/procurements/export-weekly', [\App\Http\Controllers\AdminReportController::class, 'exportProcurementsWeekly'])->name('director.procurements.export.weekly');
     Route::get('/director/procurement/{id}/export', [\App\Http\Controllers\AdminReportController::class, 'exportSingleProcurement'])->name('director.procurements.export.single');
 
-    Route::get('/manager/procurements/export-weekly', [\App\Http\Controllers\AdminReportController::class, 'exportProcurementsWeekly'])->name('manager.procurements.export.weekly');
-    Route::get('/manager/procurement/{id}/export', [\App\Http\Controllers\AdminReportController::class, 'exportSingleProcurement'])->name('manager.procurements.export.single');
+    Route::get('/kepala-ruang/procurements/export-weekly', [\App\Http\Controllers\AdminReportController::class, 'exportProcurementsWeekly'])->name('kepala-ruang.procurements.export.weekly');
+    Route::get('/kepala-ruang/procurement/{id}/export', [\App\Http\Controllers\AdminReportController::class, 'exportSingleProcurement'])->name('kepala-ruang.procurements.export.single');
 
-    // --- KHUSUS MANAGER: Dashboard Sendiri ---
-    Route::get('/manager/apps', [AppRequestController::class, 'managerIndex'])->name('manager.apps.index');
-    // Manager: Daftar Pengadaan (lihat pengadaan yang diajukan ke Manager)
-    Route::get('/manager/procurements', [AppRequestController::class, 'managerProcurements'])->name('manager.procurements.index');
-    // Manager: ACC pengadaan (teruskan ke Bendahara)
-    Route::patch('/manager/procurement/{id}/approve', [AppRequestController::class, 'managerApproveProcurement'])->name('manager.procurements.approve');
-    Route::patch('/manager/procurement/{id}/reject', [AppRequestController::class, 'managerRejectProcurement'])->name('manager.procurements.reject');
+    // --- KHUSUS : Dashboard Sendiri ---
+    Route::get('/kepala-ruang/apps', [AppRequestController::class, 'kepalaRuangIndex'])->name('kepala-ruang.apps.index');
+    // Mana: Daftar Pengadaan (lihat pengadaan yang diajukan ke Manar)
+    Route::get('/kepala-ruang/procurements', [AppRequestController::class, 'kepalaRuangProcurements'])->name('kepala-ruang.procurements.index');
+    // Mana: ACC pengadaan (teruskan ke Bendahara)
+    Route::patch('/kepala-ruang/procurement/{id}/approve', [AppRequestController::class, 'kepalaRuangApproveProcurement'])->name('kepala-ruang.procurements.approve');
+    Route::patch('/kepala-ruang/procurement/{id}/reject', [AppRequestController::class, 'kepalaRuangRejectProcurement'])->name('kepala-ruang.procurements.reject');
 
     // Bendahara: ACC pengadaan (teruskan ke Direktur)
     Route::patch('/bendahara/procurement/{id}/approve', [AppRequestController::class, 'bendaharaApproveProcurement'])->name('bendahara.procurements.approve');
@@ -76,7 +76,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/admin/procurement/{id}/edit', [ProcurementController::class, 'edit'])->name('procurement.edit');
         Route::patch('/admin/procurement/{id}', [ProcurementController::class, 'update'])->name('procurement.update');
 
-        //User Management
+        //User Manament
         Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserManagementController::class, 'store'])->name('admin.users.store');
         Route::patch('/admin/users/{id}/role', [UserManagementController::class, 'updateRole'])->name('admin.users.update');
@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
         // Di dalam group middleware EnsureUserIsAdmin
         Route::get('/admin/reports/export-daily', [AdminReportController::class, 'exportDailyPdf'])->name('admin.export.daily');
 
-        // Admin: Manage Rooms and assign managers
+        // Admin: Manag Rooms and assign kepala ruang
         Route::get('/admin/rooms', [AdminRoomsController::class, 'index'])->name('admin.rooms.index');
         Route::post('/admin/rooms', [AdminRoomsController::class, 'store'])->name('admin.rooms.store');
         Route::patch('/admin/rooms/{id}', [AdminRoomsController::class, 'update'])->name('admin.rooms.update');
@@ -132,7 +132,7 @@ Route::middleware('auth')->group(function () {
         
         // --- ACTION ROUTES (Form Submit & Process) ---
         
-        // Khusus Manager: Buat Request
+        // Khusus Kepala Ruang: Buat Request
         Route::post('/create', [AppRequestController::class, 'store'])->name('apps.store');
         
         // Khusus Direktur: Approve

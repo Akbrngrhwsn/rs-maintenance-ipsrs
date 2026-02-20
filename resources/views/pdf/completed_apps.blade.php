@@ -36,7 +36,7 @@
         <thead>
             <tr>
                 <th>Judul Aplikasi</th>
-                <th>Pemohon (Manager)</th>
+                <th>Pemohon (Kepala Ruang)</th>
                 <th>Tanggal Selesai</th>
                 <th>Catatan Admin</th>
             </tr>

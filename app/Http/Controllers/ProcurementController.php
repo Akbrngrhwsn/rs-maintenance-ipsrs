@@ -53,14 +53,14 @@ class ProcurementController extends Controller
         $existing = Procurement::where('report_id', $id)->latest()->first();
         if ($existing) {
             $existing->items = $request->items;
-            $existing->status = 'submitted_to_manager';
+            $existing->status = 'submitted_to_kepala_ruang';
             $existing->director_note = null; // clear previous rejection note
             $existing->save();
         } else {
             Procurement::create([
                 'report_id' => $id,
                 'items' => $request->items, // Data array barang disimpan ke JSON
-                'status' => 'submitted_to_manager'
+                'status' => 'submitted_to_kepala_ruang'
             ]);
         }
 
@@ -79,7 +79,7 @@ class ProcurementController extends Controller
         $proc->items = $request->items;
         // when admin edits, reset status to submitted_to_director if it was rejected
         if($proc->status === 'rejected') {
-            $proc->status = 'submitted_to_manager';
+            $proc->status = 'submitted_to_kepala_ruang';
             $proc->director_note = null;
         }
         $proc->save();

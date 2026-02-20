@@ -19,7 +19,7 @@ class UserManagementController extends Controller
         return view('admin.users.index', compact('users', 'rooms'));
     }
 
-    // Assign a room to a manager (or remove assignment)
+    // Assign a room to a man (or remove assignment)
     public function assignRoom(Request $request, $id)
     {
         $request->validate([
@@ -28,22 +28,22 @@ class UserManagementController extends Controller
 
         $user = User::findOrFail($id);
 
-        // Only allow assigning if user is a manager
-        if ($user->role !== 'manager') {
-            return back()->with('error', 'Hanya pengguna dengan role Manager yang dapat ditetapkan ke ruangan.');
+        // Only allow assigning if user is a manag
+        if ($user->role !== 'kepala_ruang') {
+            return back()->with('error', 'Hanya pengguna dengan role Kepala Ruang yang dapat ditetapkan ke ruangan.');
         }
 
-        // Remove this user as manager from any rooms they currently manage
-        Room::where('manager_id', $user->id)->update(['manager_id' => null]);
+        // Remove this user as kepala ruang from any rooms they currently manage
+        Room::where('kepala_ruang_id', $user->id)->update(['kepala_ruang_id' => null]);
 
         if ($request->room_id) {
             $room = Room::findOrFail($request->room_id);
-            // Overwrite previous manager (if any)
-            $room->manager_id = $user->id;
+            // Overwrite previous kepala ruang (if any)
+            $room->kepala_ruang_id = $user->id;
             $room->save();
         }
 
-        return back()->with('success', "Manager {$user->name} berhasil diperbarui untuk ruangan.");
+        return back()->with('success', "Kepala Ruang {$user->name} berhasil diperbarui untuk ruangan.");
     }
 
     // Admin: create new user from admin UI
@@ -53,7 +53,7 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,direktur,manager,bendahara,staff',
+            'role' => 'required|in:admin,direktur,kepala_ruang,bendahara,staff',
             'room_id' => 'nullable|exists:rooms,id',
         ]);
 
@@ -64,10 +64,10 @@ class UserManagementController extends Controller
             'role' => $request->role,
         ]);
 
-        // If role is manager and room selected, assign the room to this manager
-        if ($request->role === 'manager' && $request->room_id) {
-            // Remove previous manager assignment for that room (if any)
-            Room::where('id', $request->room_id)->update(['manager_id' => $user->id]);
+        
+        if ($request->role === 'kepala_ruang' && $request->room_id) {
+            // Remove previou assignment for that room (if any)
+            Room::where('id', $request->room_id)->update(['kepala_ruang_id' => $user->id]);
         }
 
         return back()->with('success', "User {$user->name} berhasil dibuat.");
@@ -76,7 +76,7 @@ class UserManagementController extends Controller
     public function updateRole(Request $request, $id)
     {
         $request->validate([
-            'role' => 'required|in:admin,direktur,manager,bendahara,staff', // Tambahkan bendahara
+            'role' => 'required|in:admin,direktur,kepala_ruang,bendahara,staff', // Tambahkan bendahara
         ]);
 
         $user = User::findOrFail($id);

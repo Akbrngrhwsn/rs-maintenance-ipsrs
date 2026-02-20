@@ -36,7 +36,7 @@
                     <thead>
                         <tr class="text-left bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
                             <th class="py-3 px-2">Nama Ruangan</th>
-                            <th class="py-3 px-2">Manager</th>
+                            <th class="py-3 px-2">kepala ruang</th>
                             <th class="py-3 px-2 text-center">Status</th>
                             <th class="py-3 px-2">Aksi</th>
                         </tr>
@@ -72,26 +72,26 @@
                                 </div>
                             </td>
 
-                            {{-- KOLOM 2: Manager (Tidak Berubah) --}}
-                            <td class="py-3 px-2 align-middle">{{ $room->manager?->name ?? '-' }}</td>
+                            {{-- KOLOM 2: kepala ruang (Tidak Berubah) --}}
+                            <td class="py-3 px-2 align-middle">{{ $room->kepala_ruang?->name ?? '-' }}</td>
 
-                            {{-- KOLOM 3: Jumlah Manager (Tidak Berubah) --}}
+                            {{-- KOLOM 3: Jumlah kepala ruang (Tidak Berubah) --}}
                             <td class="py-3 px-2 text-center align-middle">
-                                <span class="px-2 py-1 rounded-full text-xs font-bold {{ $room->manager ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $room->managers_count > 0 ? 'Terisi' : 'Kosong' }}
+                                <span class="px-2 py-1 rounded-full text-xs font-bold {{ $room->kepala_ruang ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $room->kepala_ruangs_count > 0 ? 'Terisi' : 'Kosong' }}
                                 </span>
                             </td>
 
-                            {{-- KOLOM 4: Aksi (Update Manager & Hapus) --}}
+                            {{-- KOLOM 4: Aksi (Update kepala ruang & Hapus) --}}
                             <td class="py-3 px-2 align-middle">
                                 <div class="flex items-center gap-2">
-                                    {{-- Form Update Manager --}}
+                                    {{-- Form Update kepala ruang --}}
                                     <form method="POST" action="{{ route('admin.rooms.update', $room->id) }}" class="flex items-center gap-2">
                                         @csrf @method('PATCH')
-                                        <select name="manager_id" class="text-sm rounded border-gray-300 py-1 px-2 w-40 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
-                                            <option value="">-- Set Manager --</option>
-                                            @foreach($managers as $m)
-                                                <option value="{{ $m->id }}" @if($room->manager_id == $m->id) selected @endif>
+                                        <select name="kepala_ruang_id" class="text-sm rounded border-gray-300 py-1 px-2 w-40 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
+                                            <option value="">-- Set kepala ruang --</option>
+                                            @foreach($kepala_ruangs as $m)
+                                                <option value="{{ $m->id }}" @if($room->kepala_ruang_id == $m->id) selected @endif>
                                                     {{ Str::limit($m->name, 15) }}
                                                 </option>
                                             @endforeach

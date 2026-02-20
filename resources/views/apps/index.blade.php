@@ -19,7 +19,7 @@
                 </div>
             @endif
 
-            @if(in_array(Auth::user()->role, ['manager', 'direktur']))
+            @if(in_array(Auth::user()->role, ['kepala_ruang', 'direktur']))
     <div class="bg-white p-6 overflow-hidden shadow-sm sm:rounded-lg border-l-4 {{ Auth::user()->role === 'direktur' ? 'border-red-500' : 'border-indigo-500' }}">
         
         <div class="flex justify-between items-center mb-4">

@@ -42,7 +42,7 @@
 
                 @php
                     $divisionDisplay = $meeting->division_role;
-                    if (!$divisionDisplay && optional($meeting->creator)->role === 'manager' && optional($meeting->creator->room)->name) {
+                    if (!$divisionDisplay && optional($meeting->creator)->role === 'kepala_ruang' && optional($meeting->creator->room)->name) {
                         $divisionDisplay = $meeting->creator->room->name;
                     }
                     if (!$divisionDisplay) {

@@ -13,11 +13,11 @@ class MeetingController extends Controller
 {
     /**
      * Determine the division filter value for the given user.
-     * Returns room name for managers when available, otherwise the user's role.
+     * Returns room name for when available, otherwise the user's role.
      */
     private function getUserDivision($user)
     {
-        if ($user->role === 'manager' && isset($user->room) && $user->room && $user->room->name) {
+        if ($user->role === 'kepala_ruang' && isset($user->room) && $user->room && $user->room->name) {
             return $user->room->name;
         }
         return $user->role;
@@ -32,9 +32,9 @@ class MeetingController extends Controller
         // Prefer filtering by division_role if the column exists; otherwise fall back to ownership (created_by)
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                // For managers, stored division may be the room name rather than the literal 'manager'
+                // For 
                 $divisionFilter = $user->role;
-                if ($user->role === 'manager' && isset($user->room) && $user->room && $user->room->name) {
+                if ($user->role === 'kepala_ruang' && isset($user->room) && $user->room && $user->room->name) {
                     $divisionFilter = $user->room->name;
                 }
                 $query->where('division_role', $divisionFilter);
@@ -63,10 +63,10 @@ class MeetingController extends Controller
 
         $user = Auth::user();
         // Determine division value:
-        // - If user is manager and has a room, use the room name
+        // - If user isand has a room, use the room name
         // - If admin and provided a division_role, allow it
         // - Otherwise use the user's role
-        if ($user->role === 'manager' && isset($user->room) && $user->room && $user->room->name) {
+        if ($user->role === 'kepala_ruang' && isset($user->room) && $user->room && $user->room->name) {
             $division = $user->room->name;
         } elseif ($user->role === 'admin' && $request->filled('division_role')) {
             $division = $request->input('division_role');

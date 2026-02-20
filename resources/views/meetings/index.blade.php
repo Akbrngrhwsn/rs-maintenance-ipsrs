@@ -54,7 +54,7 @@
                                     <select id="division_role_role" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         <option value="admin">admin</option>
                                         <option value="direktur">direktur</option>
-                                        <option value="manager">manager</option>
+                                        <option value="kepala ruang">kepala ruang</option>
                                         <option value="bendahara">bendahara</option>
                                         <option value="staff">staff</option>
                                     </select>
@@ -67,7 +67,7 @@
                                 @else
                                     @php
                                         $divisionDisplay = Auth::user()->role;
-                                        if(Auth::user()->role === 'manager' && Auth::user()->room) {
+                                        if(Auth::user()->role === 'kepala_ruang' && Auth::user()->room) {
                                             $divisionDisplay = Auth::user()->room->name;
                                         }
                                     @endphp
@@ -179,7 +179,7 @@
 
         function updateHidden(){
             var role = roleSelect.value;
-            if(role === 'manager'){
+            if(role === 'kepala_ruang'){
                 roomSelect.style.display = 'block';
                 roomSelect.removeAttribute('aria-hidden');
                 hidden.value = roomSelect.value || '';

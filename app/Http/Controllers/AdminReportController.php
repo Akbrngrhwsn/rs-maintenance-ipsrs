@@ -278,7 +278,7 @@ public function exportSingleProcurement($id)
     };
 
     // 4. LOGIKA ESTAFET QR CODE
-    // Status Flow: submitted_to_manager -> submitted_to_bendahara -> submitted_to_director -> approved_by_director
+    // Status Flow: submitted_to_ -> submitted_to_bendahara -> submitted_to_director -> approved_by_director
     
     $s = $procurement->status; // Simpan status ke variabel pendek biar rapi
 
@@ -286,11 +286,11 @@ public function exportSingleProcurement($id)
     $infoAdmin = "Diajukan oleh Admin IT. Tiket: " . ($procurement->report->ticket_number ?? '-') . ". Tgl: " . $procurement->created_at->format('d/m/Y');
     $qrAdmin = $generateQr($infoAdmin);
 
-    // B. QR Manager
-    // Muncul jika status SUDAH MELEWATI Manager (artinya ada di Bendahara, Direktur, atau Selesai)
-    $qrManager = null;
+    // B. QR
+    // Muncul jika status SUDAH MELEWATI  (artinya ada di Bendahara, Direktur, atau Selesai)
+    $qrkepala_ruang = null;
     if (in_array($s, ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'])) {
-        $qrManager = $generateQr("Divalidasi Manager Unit. ID: " . $procurement->id);
+        $qrkepala_ruang = $generateQr("Divalidasi Kepala ruang Unit. ID: " . $procurement->id);
     }
 
     // C. QR Bendahara
@@ -309,7 +309,7 @@ public function exportSingleProcurement($id)
 
     // 5. Load View
     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.procurement_single', compact(
-        'procurement', 'qrAdmin', 'qrManager', 'qrBendahara', 'qrDirektur'
+        'procurement', 'qrAdmin', 'qrkepala_ruang', 'qrBendahara', 'qrDirektur'
     ));
     
     return $pdf->download('laporan-pengadaan-' . $procurement->id . '.pdf');

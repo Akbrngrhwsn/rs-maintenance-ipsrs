@@ -24,8 +24,8 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{-- Tombol Buat Request (Hanya Manager/Direktur) --}}
-            @if(in_array(Auth::user()->role, ['manager', 'direktur']))
+            {{-- Tombol Buat Request (Hanya kepala ruang/Direktur) --}}
+            @if(in_array(Auth::user()->role, ['kepala_ruang', 'direktur']))
             <div class="mb-6 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
     <h3 class="font-bold mb-4 text-gray-800">Ajukan Request Baru</h3>
     <form action="{{ route('apps.store') }}" method="POST" class="space-y-4">

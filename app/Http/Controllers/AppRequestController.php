@@ -29,8 +29,8 @@ class AppRequestController extends Controller
         // Ambil yang statusnya masih menunggu (Pending Direktur atau Approved/Menunggu Admin)
         $query = AppRequest::with('user')->whereIn('status', ['pending_director', 'approved']);
         
-        // Manager hanya melihat miliknya
-        if($role == 'manager') {
+        //  hanya melihat miliknya
+        if($role == 'kepala_ruang') {
             $query->where('user_id', Auth::id());
         }
 
@@ -46,7 +46,7 @@ class AppRequestController extends Controller
         // Ambil yang statusnya 'in_progress' atau 'completed'
         $query = AppRequest::with('user')->whereIn('status', ['in_progress', 'completed']);
         
-        if($role == 'manager') {
+        if($role == 'kepala_ruang') {
             $query->where('user_id', Auth::id());
         }
 
@@ -60,8 +60,8 @@ class AppRequestController extends Controller
         // Eager load features dan user
         $project = AppRequest::with(['features', 'user'])->findOrFail($id);
         
-        // Proteksi: Manager tidak boleh intip proyek manager lain
-        if(Auth::user()->role == 'manager' && $project->user_id != Auth::id()) {
+        // Proteksitidak boleh intip proyeklain
+        if(Auth::user()->role == 'kepala_ruang' && $project->user_id != Auth::id()) {
             abort(403, 'Anda tidak memiliki akses ke proyek ini.');
         }
 
@@ -69,7 +69,7 @@ class AppRequestController extends Controller
         // Ambil daftar proyek ringkas untuk navigasi cepat
         $query = AppRequest::select('id', 'nama_aplikasi', 'ticket_number');
         
-        if(Auth::user()->role == 'manager') {
+        if(Auth::user()->role == 'kepala_ruang') {
             $query->where('user_id', Auth::id());
         }
         
@@ -78,10 +78,10 @@ class AppRequestController extends Controller
         return view('apps.show', compact('project', 'allProjects'));
     }
 
-    // === MANAGER: Form Input Request ===
+    // === KEPALA RUANG: Form Input Request ===
     public function store(Request $request)
     {
-        if (!in_array(Auth::user()->role, ['manager', 'direktur'])) {
+        if (!in_array(Auth::user()->role, ['kepala_ruang', 'direktur'])) {
             abort(403, 'Akses ditolak.');
         }
 
@@ -99,9 +99,9 @@ class AppRequestController extends Controller
         ]);
 
         // === PERUBAHAN DI SINI ===
-        // Jika Manager, kembali ke Dashboard Manager
-        if (Auth::user()->role === 'manager') {
-            return redirect()->route('manager.apps.index')
+        // Jika Kepala Ruang, kembali ke Dashboard Kepala Ruang
+        if (Auth::user()->role === 'kepala_ruang') {
+            return redirect()->route('kepala-ruang.apps.index')
                 ->with('success', 'Pengajuan berhasil dikirim ke Direktur.');
         }
 
@@ -130,13 +130,13 @@ class AppRequestController extends Controller
 
     // === LOGIKA LAIN (Existing) ===
 
-    public function managerIndex(Request $request)
+    public function kepalaRuangIndex(Request $request)
     {
-        if(Auth::user()->role !== 'manager') abort(403);
+        if(Auth::user()->role !== 'kepala_ruang') abort(403);
         
         $projects = AppRequest::where('user_id', Auth::id())->latest()->get(); // Project biarkan get() atau paginate juga boleh
         
-        // Pagination Laporan untuk Manager
+        // Pagination Laporan untuk Kepala Ruang
         $query = Report::orderByRaw("CASE 
             WHEN status = 'Belum Diproses' THEN 1 
             WHEN status = 'Diproses' THEN 2 
@@ -150,7 +150,7 @@ class AppRequestController extends Controller
         // Ganti get() dengan paginate
         $reports = $query->paginate(10, ['*'], 'reports_page');
 
-        return view('manager.index', compact('projects', 'reports'));
+        return view('kepala_ruang.index', compact('projects', 'reports'));
     }
 
     public function approve(Request $request, $id)
@@ -352,32 +352,32 @@ class AppRequestController extends Controller
         return view('bendahara.procurements', compact('procurements', 'tab'));
     }
 
-    // Manager: Lihat daftar pengadaan yang diajukan ke Manager
-    public function managerProcurements(Request $request)
+    // kepala_ruang: Lihat daftar pengadaan yang diajukan ke 
+    public function kepalaRuangProcurements(Request $request)
     {
-        if(Auth::user()->role !== 'manager') abort(403);
+        if(Auth::user()->role !== 'kepala_ruang') abort(403);
 
         $tab = $request->get('tab', 'pending'); // 'pending' or 'history'
 
         $query = Procurement::with('report');
 
-        // Hanya pengadaan untuk ruangan yang dikelola manager ini
+        // Hanya pengadaan untuk ruangan yang dikelola  ini
         $room = Auth::user()->room; // hasOne Room
         if ($room) {
             $query->whereHas('report', function($q) use ($room) {
                 $q->where('room_id', $room->id);
             });
         } else {
-            // Jika manager belum punya ruangan, kembalikan kosong
+            // Jika belum punya ruangan, kembalikan kosong
             $procurements = collect();
-            return view('manager.procurements', compact('procurements', 'tab'));
+            return view('kepala_ruang.procurements', compact('procurements', 'tab'));
         }
 
         if($tab === 'history') {
             $query->whereIn('status', ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'rejected']);
         } else {
-            // Pending for manager means status submitted_to_manager
-            $query->where('status', 'submitted_to_manager');
+            // Pending for 
+            $query->where('status', 'submitted_to_kepala_ruang');
         }
 
         if ($request->filled('date')) {
@@ -404,7 +404,7 @@ class AppRequestController extends Controller
 
         $procurements = $query->latest()->get();
 
-        return view('manager.procurements', compact('procurements', 'tab'));
+        return view('kepala_ruang.procurements', compact('procurements', 'tab'));
     }
 
     // Direktur: ACC sebuah pengadaan
@@ -432,14 +432,14 @@ class AppRequestController extends Controller
         return back()->with('success', 'Pengadaan berhasil ditolak.');
     }
 
-    // Manager: ACC sebuah pengadaan (teruskan ke Bendahara)
-    public function managerApproveProcurement($id)
+    // : ACC sebuah pengadaan (teruskan ke Bendahara)
+    public function kepalaRuangApproveProcurement($id)
     {
-        if(Auth::user()->role !== 'manager') abort(403);
+        if(Auth::user()->role !== 'kepala_ruang') abort(403);
 
         $proc = Procurement::with('report')->findOrFail($id);
 
-        // Validasi: pastikan procurement untuk ruangan manager ini
+        // Validasi: pastikan procurement untuk r
         $room = Auth::user()->room;
         if (!$room || $proc->report->room_id != $room->id) {
             abort(403, 'Anda tidak berwenang memproses pengadaan untuk ruangan ini.');
@@ -451,13 +451,13 @@ class AppRequestController extends Controller
         return back()->with('success', 'Pengadaan berhasil diteruskan ke Bendahara.');
     }
 
-    public function managerRejectProcurement(Request $request, $id)
+    public function kepalaRuangRejectProcurement(Request $request, $id)
     {
-        if(Auth::user()->role !== 'manager') abort(403);
+        if(Auth::user()->role !== 'kepala_ruang') abort(403);
 
         $proc = Procurement::with('report')->findOrFail($id);
 
-        // Validasi: pastikan procurement untuk ruangan manager ini
+        // Validasi: pastikan procurement untuk ruangan ini
         $room = Auth::user()->room;
         if (!$room || $proc->report->room_id != $room->id) {
             abort(403, 'Anda tidak berwenang memproses pengadaan untuk ruangan ini.');
@@ -467,7 +467,7 @@ class AppRequestController extends Controller
         $proc->director_note = $request->catatan ?? null;
         $proc->save();
 
-        return back()->with('success', 'Pengadaan berhasil ditolak oleh Manager.');
+        return back()->with('success', 'Pengadaan berhasil ditolak oleh kepala ruang.');
     }
 
     // Bendahara: ACC sebuah pengadaan (teruskan ke Direktur)

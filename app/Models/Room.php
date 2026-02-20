@@ -9,11 +9,11 @@ class Room extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'manager_id'];
+    protected $fillable = ['name', 'kepala_ruang_id'];
 
-    public function manager()
+    public function kepala_ruang()
     {
-        return $this->belongsTo(User::class, 'manager_id');
+        return $this->belongsTo(User::class, 'kepala_ruang_id');
     }
 
     public function reports()

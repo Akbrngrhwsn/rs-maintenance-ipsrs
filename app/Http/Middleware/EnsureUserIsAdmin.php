@@ -18,8 +18,8 @@ class EnsureUserIsAdmin
     {
         // Cek Login & Role
         if (Auth::check() && Auth::user()->role !== 'admin') {
-            // Jika Manager/Direktur mencoba akses, alihkan ke Project Aplikasi
-            if (in_array(Auth::user()->role, ['manager', 'direktur'])) {
+            // Jika Manag/Direktur mencoba akses, alihkan ke Project Aplikasi
+            if (in_array(Auth::user()->role, ['kepala_ruang', 'direktur'])) {
                 return redirect()->route('apps.index'); 
             }
             // User lain (misal staff biasa) kembalikan ke tracking publik

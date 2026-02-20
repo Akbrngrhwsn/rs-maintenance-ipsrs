@@ -93,9 +93,9 @@
 
                                 if (currentPendingApps > lastPendingApps) {
                                     title = '📩 Pengajuan Baru';
-                                    message = 'Manager mengajukan aplikasi baru.';
+                                    message = 'Kepala ruang mengajukan aplikasi baru.';
                                     shouldNotify = true;
-                                    if(currentPath.includes('/manager/apps')) needReload = true;
+                                    if(currentPath.includes('/kepala-ruang/apps')) needReload = true;
                                 }
 
                                 if (currentPendingProc > lastPendingProc) {
@@ -110,8 +110,8 @@
                                 lastCounts.pending_procurements = currentPendingProc;
                             }
 
-                            // === LOGIKA MANAGER (BARU) ===
-                            else if (data.role === 'manager') {
+                            // === LOGIKA  (BARU) ===
+                            else if (data.role === 'kepala_ruang') {
                                 const currentPendingProc = data.counts.pending_procurements || 0;
                                 const lastPendingProc = lastCounts.pending_procurements || 0;
 
@@ -119,8 +119,8 @@
                                     title = '📋 Validasi Pengadaan';
                                     message = 'Admin IT mengajukan pengadaan baru.';
                                     shouldNotify = true;
-                                    // Auto reload jika di halaman validasi manager
-                                    if(currentPath.includes('/manager/procurements')) needReload = true;
+                                    // Auto reload jika di halaman valid
+                                    if(currentPath.includes('/kepala-ruang/procurements')) needReload = true;
                                 }
 
                                 lastCounts.pending_procurements = currentPendingProc;
@@ -133,7 +133,7 @@
 
                                 if (currentPendingProc > lastPendingProc) {
                                     title = '💰 Validasi Keuangan';
-                                    message = 'Manager menyetujui pengadaan. Menunggu cek anggaran.';
+                                    message = 'Kepala ruang menyetujui pengadaan. Menunggu cek anggaran.';
                                     shouldNotify = true;
                                     // Auto reload jika di halaman validasi bendahara
                                     if(currentPath.includes('/bendahara/procurements')) needReload = true;

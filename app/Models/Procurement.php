@@ -22,7 +22,7 @@ class Procurement extends Model
     public function getStatusLabelAttribute()
     {
         $map = [
-            'submitted_to_manager' => 'Menunggu Konfirmasi Manager',
+            'submitted_to_kepala_ruang' => 'Menunggu Konfirmasi Kepala Ruang',
             'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
             'submitted_to_director' => 'Menunggu ACC',
             'approved_by_director' => 'Disetujui',

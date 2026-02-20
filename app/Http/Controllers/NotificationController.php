@@ -42,13 +42,13 @@ class NotificationController extends Controller
 
             if($pendingApps > 0 || $pendingProcurements > 0) $response['has_notification'] = true;
         }
-        // --- MANAGER (BARU) ---
-        elseif ($role === 'manager') {
-            // Manager memantau pengadaan dari Admin IT, tapi hanya untuk ruangan yang dikelolanya
+        // --- MANA(BARU) ---
+        elseif ($role === 'kepala_ruang') {
+            // Manmemantau pengadaan dari Admin IT, tapi hanya untuk ruangan yang dikelolanya
             $room = $user->room; // hasOne(Room::class)
 
             if ($room) {
-                $pendingProcurements = Procurement::where('status', 'submitted_to_manager')
+                $pendingProcurements = Procurement::where('status', 'submitted_to_kepala_ruang')
                     ->whereHas('report', function ($q) use ($room) {
                         $q->where('room_id', $room->id);
                     })->count();
@@ -64,7 +64,7 @@ class NotificationController extends Controller
         }
         // --- BENDAHARA (UPDATE) ---
         elseif ($role === 'bendahara') {
-            // Bendahara memantau pengadaan dari Manager
+            // Bendahara memantau pengadaan dari
             $pendingProcurements = Procurement::where('status', 'submitted_to_bendahara')->count();
             
             $response['counts'] = [

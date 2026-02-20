@@ -147,20 +147,20 @@
                 @endif
             </td>
 
-            {{-- 2. MANAGER UNIT --}}
+            {{-- 2. KEPALA RUANG UNIT --}}
             <td width="25%" class="text-center" style="border: none; vertical-align: top;">
                 <p class="text-bold" style="margin-bottom: 5px;">Mengetahui</p>
-                @if(isset($qrManager) && $qrManager)
-                    <img src="data:image/png;base64, {{ $qrManager }}" alt="QR Manager" style="width: 70px; height: 70px;">
+                @if(isset($qrkepala_ruang) && $qrkepala_ruang)
+                    <img src="data:image/png;base64, {{ $qrkepala_ruang }}" alt="QR Kepala Ruang" style="width: 70px; height: 70px;">
                     <br>
-                    <span style="font-size: 9pt;">Manager Unit</span><br>
+                    <span style="font-size: 9pt;">Kepala Ruang</span><br>
                     <span style="font-size: 8pt;" class="text-green">(Tervalidasi)</span>
                 @else
                     <div class="status-box">
                         @if($procurement->status == 'rejected')
                             <span class="text-bold text-red" style="font-size: 9pt;">DITOLAK</span>
                         @else
-                            {{-- Jika status submitted_to_manager --}}
+                            {{-- Jika status submitted_to_kepala_ruang --}}
                             <span class="italic text-gray" style="font-size: 9pt;">Menunggu<br>Persetujuan</span>
                         @endif
                     </div>
@@ -179,8 +179,8 @@
                     <div class="status-box">
                         @if($procurement->status == 'rejected')
                              <span class="text-gray">-</span>
-                        @elseif($procurement->status == 'submitted_to_manager')
-                             <span class="italic text-gray" style="font-size: 8pt;">Menunggu<br>Manager</span>
+                        @elseif($procurement->status == 'submitted_to_kepala_ruang')
+                             <span class="italic text-gray" style="font-size: 8pt;">Menunggu<br>Kepala Ruang</span>
                         @else
                              {{-- Status submitted_to_bendahara --}}
                              <span class="italic text-gray" style="font-size: 9pt;">Menunggu<br>Verifikasi</span>
@@ -204,7 +204,7 @@
                         @elseif($procurement->status == 'submitted_to_director')
                              <span class="italic text-gray" style="font-size: 9pt;">Menunggu<br>Persetujuan</span>
                         @else
-                             {{-- Masih di Manager atau Bendahara --}}
+                             {{-- Masih di Kepala ruang atau Bendahara --}}
                              <span class="italic text-gray" style="font-size: 8pt;">Menunggu<br>Validasi Sblmnya</span>
                         @endif
                     </div>

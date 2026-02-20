@@ -14,19 +14,19 @@
                 <div class="p-6 border-b border-gray-100">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('manager.procurements.index', array_merge(request()->all(), ['tab' => 'pending'])) }}" class="px-3 py-1 rounded-md {{ (isset($tab) && $tab==='pending') || !isset($tab) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' }}">Belum Disetujui</a>
-                            <a href="{{ route('manager.procurements.index', array_merge(request()->all(), ['tab' => 'history'])) }}" class="px-3 py-1 rounded-md {{ isset($tab) && $tab==='history' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' }}">Riwayat</a>
+                            <a href="{{ route('kepala-ruang.procurements.index', array_merge(request()->all(), ['tab' => 'pending'])) }}" class="px-3 py-1 rounded-md {{ (isset($tab) && $tab==='pending') || !isset($tab) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' }}">Belum Disetujui</a>
+                            <a href="{{ route('kepala-ruang.procurements.index', array_merge(request()->all(), ['tab' => 'history'])) }}" class="px-3 py-1 rounded-md {{ isset($tab) && $tab==='history' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' }}">Riwayat</a>
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <form method="GET" action="{{ route('manager.procurements.index') }}" class="flex items-center gap-2">
+                            <form method="GET" action="{{ route('kepala-ruang.procurements.index') }}" class="flex items-center gap-2">
                                 <input type="hidden" name="tab" value="{{ $tab ?? 'pending' }}">
                                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Search tiket/ruangan/nama/merk" class="text-sm border-gray-300 rounded-md px-3 py-1">
                                 <input type="date" name="date" value="{{ request('date') }}" class="text-sm border-gray-300 rounded-md px-2 py-1">
                                 <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded-md text-sm">Cari</button>
                             </form>
 
-                            <form action="{{ route('manager.procurements.export.weekly') }}" method="GET" class="flex items-center gap-2">
+                            <form action="{{ route('kepala-ruang.procurements.export.weekly') }}" method="GET" class="flex items-center gap-2">
                                 <input type="date" name="date" value="{{ request('date', date('Y-m-d')) }}" class="text-sm border-gray-300 rounded-md px-2 py-1">
                                 <button type="submit" class="px-3 py-1 bg-amber-600 text-white rounded-md text-sm">Export Mingguan (PDF)</button>
                             </form>
@@ -118,7 +118,7 @@
                                                         </tfoot>
                                                     </table>
                                                     <div class="mt-4">
-                                                        <a href="{{ route('manager.procurements.export.single', $proc->id) }}" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">
+                                                        <a href="{{ route('kepala-ruang.procurements.export.single', $proc->id) }}" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">
                                                             Export Pengadaan (PDF)
                                                         </a>
                                                     </div>
@@ -130,14 +130,14 @@
                                     <td class="px-6 py-4 align-top text-center">
                                         @php
                                             $statusClass = match($proc->status) {
-                                                'submitted_to_manager' => 'bg-amber-100 text-amber-700 border-amber-200',
+                                                'submitted_to_kepala_ruang' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'submitted_to_bendahara' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'approved_by_director' => 'bg-green-100 text-green-700 border-green-200',
                                                 'rejected' => 'bg-red-100 text-red-700 border-red-200',
                                                 default => 'bg-gray-100 text-gray-700 border-gray-200',
                                             };
                                             $statusLabel = match($proc->status) {
-                                                'submitted_to_manager' => 'Menunggu Konfirmasi Manager',
+                                                'submitted_to_kepala_ruang' => 'Menunggu Konfirmasi Kepala Ruang',
                                                 'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
                                                 'approved_by_director' => 'Disetujui',
                                                 'rejected' => 'Ditolak',
@@ -154,9 +154,9 @@
                                     </td>
 
                                     <td class="px-6 py-4 align-top text-center">
-                                        @if($proc->status == 'submitted_to_manager')
+                                        @if($proc->status == 'submitted_to_kepala_ruang')
                                             <div class="flex items-center justify-center gap-2">
-                                                <form action="{{ route('manager.procurements.approve', $proc->id) }}" method="POST">
+                                                <form action="{{ route('kepala-ruang.procurements.approve', $proc->id) }}" method="POST">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" 
@@ -177,7 +177,7 @@
                                                             <h3 class="font-bold text-lg text-gray-800">Alasan Penolakan</h3>
                                                             <button type="button" onclick="document.getElementById('reject-modal-{{ $proc->id }}').classList.add('hidden')" class="text-gray-400 hover:text-red-500">✕</button>
                                                         </div>
-                                                        <form action="{{ route('manager.procurements.reject', $proc->id) }}" method="POST">
+                                                        <form action="{{ route('kepala-ruang.procurements.reject', $proc->id) }}" method="POST">
                                                             @csrf
                                                             @method('PATCH')
                                                             <div class="p-6">

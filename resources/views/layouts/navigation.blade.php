@@ -85,13 +85,13 @@
                         </x-nav-link>
                     @endif
 
-                    {{-- === 4. MENU MANAGER === --}}
-                    @if(Auth::check() && Auth::user()->role === 'manager')
-                        <x-nav-link :href="route('manager.procurements.index')" :active="request()->routeIs('manager.procurements.*')" class="text-sm font-bold tracking-tight">
+                    {{-- === 4. MENU kepala_ruang === --}}
+                    @if(Auth::check() && Auth::user()->role === 'kepala_ruang')
+                        <x-nav-link :href="route('kepala-ruang.procurements.index')" :active="request()->routeIs('kepala-ruang.procurements.*')" class="text-sm font-bold tracking-tight">
                             {{ __('Validasi Pengadaan') }}
-                            <span id="badge-manager-procurements" class="ml-2 px-2 py-0.5 text-xs rounded-full bg-red-600 text-white hidden">0</span>
+                            <span id="badge-kepala-ruang-procurements" class="ml-2 px-2 py-0.5 text-xs rounded-full bg-red-600 text-white hidden">0</span>
                         </x-nav-link>
-                        <x-nav-link :href="route('manager.apps.index')" :active="request()->routeIs('manager.apps.index')" class="text-sm font-bold tracking-tight">
+                        <x-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="text-sm font-bold tracking-tight">
                             {{ __('Form Request Aplikasi') }}
                         </x-nav-link>
                         <x-nav-link :href="route('apps.index')" :active="request()->routeIs('apps.*')" class="text-sm font-bold tracking-tight">
@@ -146,7 +146,7 @@
                                     $roleColors = [
                                         'admin' => 'bg-purple-100 text-purple-800',
                                         'direktur' => 'bg-blue-100 text-blue-800',
-                                        'manager' => 'bg-yellow-100 text-yellow-800',
+                                        'kepala_ruang' => 'bg-yellow-100 text-yellow-800',
                                         'staff' => 'bg-gray-100 text-gray-800',
                                         'bendahara' => 'bg-green-100 text-green-800',
                                     ];
@@ -154,7 +154,7 @@
                                 <div class="mt-2">
                                     <span class="px-2 py-1 rounded-full text-xs font-bold {{ $roleColors[Auth::user()->role] ?? 'bg-gray-100 text-gray-800' }}">{{ ucfirst(Auth::user()->role) }}</span>
                                 </div>
-                                @if(Auth::user()->role === 'manager' && Auth::user()->room)
+                                @if(Auth::user()->role === 'kepala_ruang' && Auth::user()->room)
                                     <div class="mt-2 text-sm text-gray-600">{{ Auth::user()->room->name }}</div>
                                 @endif
                             </div>
@@ -254,12 +254,12 @@
                     </x-responsive-nav-link>
                 @endif
 
-                {{-- MANAGER MOBILE --}}
-                @if(Auth::user()->role === 'manager')
-                    <x-responsive-nav-link :href="route('manager.procurements.index')" :active="request()->routeIs('manager.procurements.*')" class="rounded-lg font-bold">
+                {{-- KEPALA RUANG MOBILE --}}
+                @if(Auth::user()->role === 'kepala_ruang')
+                    <x-responsive-nav-link :href="route('kepala-ruang.procurements.index')" :active="request()->routeIs('kepala-ruang.procurements.*')" class="rounded-lg font-bold">
                         {{ __('Validasi Pengadaan') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('manager.apps.index')" :active="request()->routeIs('manager.apps.index')" class="rounded-lg font-bold">
+                    <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold">
                         {{ __('Form Request Aplikasi') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('apps.index')" :active="request()->routeIs('apps.*')" class="rounded-lg font-bold">
@@ -298,7 +298,7 @@
                             $roleColors = [
                                 'admin' => 'bg-purple-100 text-purple-800',
                                 'direktur' => 'bg-blue-100 text-blue-800',
-                                'manager' => 'bg-yellow-100 text-yellow-800',
+                                'kepala_ruang' => 'bg-yellow-100 text-yellow-800',
                                 'staff' => 'bg-gray-100 text-gray-800',
                                 'bendahara' => 'bg-green-100 text-green-800',
                             ];
@@ -306,8 +306,8 @@
                         <div class="mt-1">
                             <span class="px-2 py-0.5 rounded-full text-xs font-bold {{ $roleColors[Auth::user()->role] ?? 'bg-gray-100 text-gray-800' }}">{{ ucfirst(Auth::user()->role) }}</span>
                         </div>
-                        @if(Auth::user()->role === 'manager' && Auth::user()->room)
-                            <div class="text-sm text-gray-500">Manager Ruangan: {{ Auth::user()->room->name }}</div>
+                        @if(Auth::user()->role === 'kepala_ruang' && Auth::user()->room)
+                            <div class="text-sm text-gray-500">Kepala Ruangan: {{ Auth::user()->room->name }}</div>
                         @endif
                     </div>
                 </div>

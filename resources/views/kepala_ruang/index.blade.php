@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Manager') }}
+            {{ __('Dashboard Kepala Ruang') }}
         </h2>
     </x-slot>
 
@@ -20,8 +20,8 @@
                 </div>
             @endif
 
-           {{-- FORM REQUEST APLIKASI (Hanya Manager) --}}
-            @if(Auth::user()->role === 'manager')
+           {{-- FORM REQUEST APLIKASI (Hanya Kepala Ruang) --}}
+            @if(Auth::user()->role === 'kepala_ruang')
             <div class="bg-white p-6 overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-indigo-500">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900">Ajukan Aplikasi Baru</h3>

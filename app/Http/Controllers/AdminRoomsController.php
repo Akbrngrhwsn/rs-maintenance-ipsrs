@@ -10,12 +10,12 @@ class AdminRoomsController extends Controller
 {
     public function index()
     {
-        $rooms = Room::with('manager')->orderBy('name')->get()->map(function ($r) {
-            $r->managers_count = $r->manager ? 1 : 0;
+        $rooms = Room::with('kepala_ruang')->orderBy('name')->get()->map(function ($r) {
+            $r->kepala_ruangs_count = $r->kepala_ruang ? 1 : 0;
             return $r;
         });
-        $managers = User::where('role', 'manager')->orderBy('name')->get();
-        return view('admin.rooms', compact('rooms', 'managers'));
+        $kepala_ruangs = User::where('role', 'kepala_ruang')->orderBy('name')->get();
+        return view('admin.rooms', compact('rooms', 'kepala_ruangs'));
     }
 
     public function store(Request $request)
@@ -29,7 +29,7 @@ class AdminRoomsController extends Controller
         return back()->with('success', 'Ruangan baru berhasil ditambahkan.');
     }
 
-    // === UPDATE (Dimodifikasi untuk Handle Nama & Manager) ===
+    // === UPDATE (Dimodifikasi untuk Handle Nama &) ===
     public function update(Request $request, $id)
     {
         $room = Room::findOrFail($id);
@@ -44,13 +44,13 @@ class AdminRoomsController extends Controller
             $pesan = 'Nama ruangan diperbarui.';
         }
 
-        // B. Jika Request Update Manager
-        if ($request->has('manager_id')) {
+        // B. Jika Request
+        if ($request->has('kepala_ruang_id')) {
             $request->validate([
-                'manager_id' => 'nullable|exists:users,id',
+                'kepala_ruang_id' => 'nullable|exists:users,id',
             ]);
-            $room->manager_id = $request->manager_id;
-            $pesan = 'Manager ruangan diperbarui.';
+            $room->kepala_ruang_id = $request->kepala_ruang_id;
+            $pesan = 'kepala_ruang ruangan diperbarui.';
         }
 
         $room->save();

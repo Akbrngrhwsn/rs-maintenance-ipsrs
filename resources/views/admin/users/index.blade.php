@@ -39,7 +39,7 @@
                             <label class="block text-sm font-bold mb-1">Role</label>
                             <select name="role" id="new_user_role" class="w-full border rounded px-3 py-2">
                                 <option value="staff">Staff</option>
-                                <option value="manager">Manager</option>
+                                <option value="kepala_ruang">Kepala Ruang</option>
                                 <option value="direktur">Direktur</option>
                                 <option value="admin">Admin IT</option>
                                 <option value="bendahara">Bendahara</option>
@@ -47,8 +47,8 @@
                             <x-input-error :messages="$errors->get('role')" class="mt-1" />
                         </div>
 
-                        <div class="md:col-span-4" id="manager_room_select" style="display:none;">
-                            <label class="block text-sm font-bold mb-1">Pilih Ruangan untuk Manager</label>
+                        <div class="md:col-span-4" id="kepala_ruang_room_select" style="display:none;">
+                            <label class="block text-sm font-bold mb-1">Pilih Ruangan untuk Kepala Ruang</label>
                             <select name="room_id" class="w-1/2 border rounded px-3 py-2">
                                 <option value="">-- Tidak Ada --</option>
                                 @foreach($rooms as $r)
@@ -67,9 +67,9 @@
                 <script>
                     (function(){
                         const roleSel = document.getElementById('new_user_role');
-                        const roomBlock = document.getElementById('manager_room_select');
+                        const roomBlock = document.getElementById('kepala_ruang_room_select');
                         function update(){
-                            if(roleSel.value === 'manager') roomBlock.style.display = 'block'; else roomBlock.style.display = 'none';
+                            if(roleSel.value === 'kepala_ruang') roomBlock.style.display = 'block'; else roomBlock.style.display = 'none';
                         }
                         roleSel.addEventListener('change', update);
                         update();
@@ -98,7 +98,7 @@
                                             $colors = [
                                                 'admin' => 'bg-purple-100 text-purple-800',
                                                 'direktur' => 'bg-blue-100 text-blue-800',
-                                                'manager' => 'bg-yellow-100 text-yellow-800',
+                                                'kepala_ruang' => 'bg-yellow-100 text-yellow-800',
                                                 'staff' => 'bg-gray-100 text-gray-800',
                                                 'bendahara' => 'bg-green-100 text-green-800',
                                             ];
@@ -112,7 +112,7 @@
                                             @csrf @method('PATCH')
                                             <select name="role" class="text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1">
                                                 <option value="staff" {{ $user->role == 'staff' ? 'selected' : '' }}>Staff</option>
-                                                <option value="manager" {{ $user->role == 'manager' ? 'selected' : '' }}>Manager</option>
+                                                <option value="kepala_ruang" {{ $user->role == 'kepala_ruang' ? 'selected' : '' }}>Kepala Ruang</option>
                                                 <option value="direktur" {{ $user->role == 'direktur' ? 'selected' : '' }}>Direktur</option>
                                                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin IT</option>
                                                 <option value="bendahara" {{ $user->role == 'bendahara' ? 'selected' : '' }}>Bendahara</option>
@@ -123,16 +123,16 @@
                                         </form>
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        @if($user->role === 'manager')
+                                        @if($user->role === 'kepala_ruang')
                                             <form action="{{ route('admin.users.assignRoom', $user->id) }}" method="POST" class="flex items-center justify-center gap-2">
                                                 @csrf @method('PATCH')
                                                 <select name="room_id" class="text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-1">
                                                     <option value="">-- Tidak Ada --</option>
                                                     @foreach($rooms as $r)
-                                                        <option value="{{ $r->id }}" {{ $r->manager_id == $user->id ? 'selected' : '' }}>{{ $r->name }}</option>
+                                                        <option value="{{ $r->id }}" {{ $r->kepala_ruang_id == $user->id ? 'selected' : '' }}>{{ $r->name }}</option>
                                                     @endforeach
                                                 </select>
-                                                <button type="submit" class="bg-green-600 text-white p-1.5 rounded hover:bg-green-700 transition" title="Tetapkan Manager ke Ruangan">
+                                                <button type="submit" class="bg-green-600 text-white p-1.5 rounded hover:bg-green-700 transition" title="Tetapkan Kepala ke Ruangan">
                                                     Simpan
                                                 </button>
                                             </form>
