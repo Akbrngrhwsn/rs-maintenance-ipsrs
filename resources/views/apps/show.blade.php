@@ -401,54 +401,182 @@
                     @endif
                 </div>
 
-                {{-- Management actions: only show approval/reject controls when at management step --}}
-                @if(Auth::user()->role === 'management' && $project->status === 'submitted_to_management')
+                {{-- Management actions: show approval controls when at management step or when app is approved but procurement still pending --}}
+                @if(Auth::user()->role === 'management' && ($project->status === 'submitted_to_management' || ($project->status === 'approved' && $project->needs_procurement && ($project->procurement_approval_status === 'pending' || is_null($project->procurement_approval_status)))))
                     <div class="mt-6 border-t pt-6">
-                        <h4 class="font-bold mb-3">Tindakan Management</h4>
-                        <form action="{{ route('apps.management_approve', $project->id) }}" method="POST" class="flex items-center gap-3">
-                            @csrf @method('PATCH')
-                            <input type="text" name="catatan_management" placeholder="Catatan (opsional)" class="flex-1 text-sm border-gray-300 rounded-lg px-3 py-2">
-                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold">ACC</button>
-                        </form>
+                        <h4 class="font-bold mb-4">Tindakan Management</h4>
+                        
+                        <!-- PERUBAHAN: Pemisahan persetujuan aplikasi dan pengadaan -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Approval Aplikasi (hanya tampil jika status masih submitted_to_management) -->
+                            @if($project->status === 'submitted_to_management')
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <h5 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Persetujuan Aplikasi
+                                    </h5>
+                                    <form action="{{ route('apps.management_approve', $project->id) }}" method="POST" class="space-y-3">
+                                        @csrf @method('PATCH')
+                                        <input type="text" name="catatan_management" placeholder="Catatan aplikasi (opsional)" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2">
+                                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition">
+                                            ✓ Setujui Aplikasi
+                                        </button>
+                                    </form>
 
-                        <form action="{{ route('apps.management_reject', $project->id) }}" method="POST" class="mt-3">
-                            @csrf @method('PATCH')
-                            <div class="flex gap-2">
-                                <input type="text" name="catatan_management" placeholder="Catatan penolakan (opsional)" class="flex-1 text-sm border-gray-300 rounded-lg px-3 py-2">
-                                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold">Tolak</button>
-                            </div>
-                        </form>
-                    </div>
-                @endif
-                {{-- Bendahara actions: show only ACC / Tolak buttons (no heading or notice) --}}
-                @if(Auth::user()->role === 'bendahara' && $project->status === 'submitted_to_bendahara')
-                    @php $proc = \App\Models\Procurement::where('app_request_id', $project->id)->first(); @endphp
-                    <div class="mt-6 border-t pt-6">
-                        <div class="flex items-center gap-3">
-                            @if(!$proc)
-                                <form action="{{ route('apps.bendahara_approve', $project->id) }}" method="POST" class="inline-block">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold">ACC</button>
-                                </form>
+                                    <form action="{{ route('apps.management_reject', $project->id) }}" method="POST" class="mt-3">
+                                        @csrf @method('PATCH')
+                                        <input type="text" name="catatan_management" placeholder="Catatan penolakan (opsional)" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2 mb-3">
+                                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">Tolak Aplikasi</button>
+                                    </form>
+                                </div>
+                            @endif
 
-                                <form action="{{ route('apps.bendahara_reject', $project->id) }}" method="POST" class="inline-block">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold">Tolak</button>
-                                </form>
-                            @else
-                                <form action="{{ route('bendahara.procurements.approve', $proc->id) }}" method="POST" class="inline-block mr-2">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold">ACC</button>
-                                </form>
+                            <!-- Approval Pengadaan (jika ada dan belum disetujui) -->
+                            @if($project->needs_procurement && ($project->procurement_approval_status === 'pending' || is_null($project->procurement_approval_status)))
+                                <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                                    <h5 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                        </svg>
+                                        Persetujuan Pengadaan
+                                    </h5>
+                                    <p class="text-xs text-amber-700 mb-3 bg-amber-100 p-2 rounded">
+                                        📌 Anda dapat menyetujui aplikasi terlebih dahulu sambil menunggu proses pengadaan.
+                                    </p>
+                                    
+                                    <!-- Approval Pengadaan -->
+                                    <form action="{{ route('management.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
+                                        @csrf @method('PATCH')
+                                        <input type="text" name="catatan_management_procurement" placeholder="Catatan pengadaan (opsional)" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2">
+                                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">
+                                            ✓ Lanjutkan Pengadaan
+                                        </button>
+                                    </form>
 
-                                <form action="{{ route('bendahara.procurements.reject', $proc->id) }}" method="POST" class="inline-block">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold">Tolak</button>
-                                </form>
+                                    <!-- Reject Pengadaan -->
+                                    <form action="{{ route('management.app.procurement.reject', $project->id) }}" method="POST" class="mt-3">
+                                        @csrf @method('PATCH')
+                                        <input type="text" name="catatan_management_procurement" placeholder="Alasan penolakan pengadaan" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2 mb-3">
+                                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">Tolak Pengadaan</button>
+                                    </form>
+                                </div>
+                            @elseif($project->needs_procurement && $project->procurement_approval_status && $project->procurement_approval_status !== 'pending')
+                                <!-- Status Pengadaan (jika sudah disetujui atau ditolak) -->
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <h5 class="font-bold text-blue-800 mb-2 flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Status Pengadaan
+                                    </h5>
+                                    <div class="text-sm">
+                                        <strong>Status:</strong> {{ $project->procurement_approval_status_label }}
+                                    </div>
+                                </div>
                             @endif
                         </div>
                     </div>
                 @endif
+
+                {{-- Direktur: Approval Aplikasi (setelah management approve) dan Pengadaan (independen) --}}
+                @if(Auth::user()->role === 'direktur' && ($project->status === 'submitted_to_director' || ($project->status === 'approved' && $project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director')))
+                    <div class="mt-6 border-t pt-6">
+                        <h4 class="font-bold mb-4">Tindakan Direktur</h4>
+                        
+                        <!-- PERUBAHAN: Pemisahan persetujuan aplikasi dan pengadaan di level Direktur -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Approval Aplikasi (hanya tampil jika status masih submitted_to_director) -->
+                            @if($project->status === 'submitted_to_director')
+                                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                    <h5 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Persetujuan Aplikasi
+                                    </h5>
+                                    <form action="{{ route('apps.approve', $project->id) }}" method="POST" class="space-y-3">
+                                        @csrf @method('PATCH')
+                                        <input type="text" name="catatan" placeholder="Catatan aplikasi (opsional)" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2">
+                                        <button type="submit" name="status" value="terima" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition">
+                                            ✓ Setujui Aplikasi
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('apps.approve', $project->id) }}" method="POST" class="mt-3">
+                                        @csrf @method('PATCH')
+                                        <input type="text" name="catatan" placeholder="Alasan penolakan (opsional)" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2 mb-3">
+                                        <button type="submit" name="status" value="tolak" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">Tolak Aplikasi</button>
+                                    </form>
+                                </div>
+                            @endif
+
+                            <!-- Approval Pengadaan (jika ada dan sudah diapprove bendahara) -->
+                            @if($project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director')
+                                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                                    <h5 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                        </svg>
+                                        Persetujuan Pengadaan
+                                        <span class="ml-auto text-xs bg-indigo-200 px-2 py-1 rounded">Final Approval</span>
+                                    </h5>
+                                    <p class="text-xs text-indigo-700 mb-3 bg-indigo-100 p-2 rounded">
+                                        ✓ Pengadaan sudah disetujui Bendahara. Silakan berikan approval akhir.
+                                    </p>
+                                    
+                                    <!-- Approval Pengadaan -->
+                                    <form action="{{ route('director.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">
+                                            ✓ Setujui Pengadaan
+                                        </button>
+                                    </form>
+
+                                    <!-- Reject Pengadaan -->
+                                    <form action="{{ route('director.app.procurement.reject', $project->id) }}" method="POST" class="mt-3">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">Tolak Pengadaan</button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Bendahara: Hanya approval pengadaan (jika ada dan dari management) --}}
+                @if(Auth::user()->role === 'bendahara' && $project->procurement_approval_status === 'submitted_to_bendahara')
+                    <div class="mt-6 border-t pt-6">
+                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold text-yellow-800 mb-3 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                                Validasi Pengadaan
+                            </h4>
+                            <p class="text-xs text-yellow-700 mb-3 bg-yellow-100 p-2 rounded">
+                                📋 Silakan validasi detail pengadaan dan teruskan ke Direktur untuk persetujuan akhir.
+                            </p>
+                            
+                            <!-- Approve Pengadaan -->
+                            <form action="{{ route('bendahara.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
+                                @csrf @method('PATCH')
+                                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition">
+                                    ✓ Validasi & Teruskan ke Direktur
+                                </button>
+                            </form>
+
+                            <!-- Reject Pengadaan -->
+                            <form action="{{ route('bendahara.app.procurement.reject', $project->id) }}" method="POST" class="mt-3">
+                                @csrf @method('PATCH')
+                                <input type="text" name="catatan" placeholder="Alasan penolakan (opsional)" class="block w-full text-sm border-gray-300 rounded-lg px-3 py-2 mb-3">
+                                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">Tolak Pengadaan</button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+
             {{-- FITUR & CHECKLIST --}}
             @if(in_array($project->status, ['in_progress', 'completed']))
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

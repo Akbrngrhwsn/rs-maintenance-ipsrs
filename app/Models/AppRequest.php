@@ -27,6 +27,36 @@ class AppRequest extends Model
         return round(($done / $total) * 100);
     }
 
+    // Status label untuk app request approval
+    public function getStatusLabelAttribute() {
+        $map = [
+            'submitted_to_admin' => 'Menunggu Konfirmasi Admin IT',
+            'submitted_to_management' => 'Menunggu Konfirmasi Management',
+            'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
+            'submitted_to_director' => 'Menunggu Persetujuan Direktur',
+            'pending_director' => 'Menunggu Direktur',
+            'approved' => 'Disetujui',
+            'in_progress' => 'Sedang Dikerjakan',
+            'completed' => 'Selesai',
+            'rejected' => 'Ditolak',
+            'draft' => 'Draft',
+        ];
+        return $map[$this->status] ?? ucfirst(str_replace('_', ' ', $this->status));
+    }
+
+    // Status label untuk procurement approval (jika ada pengadaan)
+    public function getProcurementApprovalStatusLabelAttribute() {
+        $map = [
+            'pending' => 'Belum Diajukan',
+            'submitted_to_management' => 'Menunggu Management',
+            'submitted_to_bendahara' => 'Menunggu Bendahara',
+            'submitted_to_director' => 'Menunggu Direktur',
+            'approved' => 'Disetujui',
+            'rejected' => 'Ditolak',
+        ];
+        return $map[$this->procurement_approval_status] ?? ucfirst(str_replace('_', ' ', $this->procurement_approval_status));
+    }
+
     // === TAMBAHAN: Auto Generate Ticket ===
     protected static function boot()
     {

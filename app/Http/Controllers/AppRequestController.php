@@ -122,6 +122,7 @@ class AppRequestController extends Controller
                 'deskripsi' => $request->deskripsi,
                 'needs_procurement' => $needsProcurement,
                 'procurement_estimate' => null,
+                'procurement_approval_status' => 'pending', // Selalu pending saat pertama kali dibuat
             ];
             if (\Illuminate\Support\Facades\Schema::hasColumn('app_requests', 'requested_items')) {
                 $createData['requested_items'] = $requestedItems;
@@ -191,15 +192,114 @@ class AppRequestController extends Controller
         if(Auth::user()->role !== 'direktur') abort(403);
 
         $app = AppRequest::findOrFail($id);
-        $app->update([
-            'status' => $request->status == 'terima' ? 'approved' : 'rejected',
-            'catatan_direktur' => $request->catatan
-        ]);
+        
+        // Hanya approve aplikasi, tidak terpengaruh pengadaan
+        if ($request->status == 'terima') {
+            $app->status = 'approved';
+            $message = 'Pengajuan aplikasi berhasil disetujui.';
+        } else {
+            $app->status = 'rejected';
+            $message = 'Pengajuan aplikasi berhasil ditolak.';
+        }
+        
+        if ($request->filled('catatan')) {
+            $app->catatan_direktur = $request->catatan;
+        }
+        
+        $app->save();
 
-        return back()->with('success', 'Status pengajuan diperbarui.');
+        return back()->with('success', $message);
+    }
+
+    // Director: Approve/Reject pengadaan (setelah bendahara approve)
+    public function directorApproveProcurementForApp(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'direktur') abort(403);
+
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        if($app->procurement_approval_status !== 'submitted_to_director') {
+            return back()->with('error', 'Status pengadaan tidak valid untuk persetujuan Direktur.');
+        }
+
+        // Direktur approve pengadaan
+        $app->procurement_approval_status = 'approved';
+        $app->save();
+
+        return back()->with('success', 'Pengajuan pengadaan berhasil disetujui oleh Direktur.');
+    }
+
+    public function directorRejectProcurementForApp(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'direktur') abort(403);
+
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        if($app->procurement_approval_status !== 'submitted_to_director') {
+            return back()->with('error', 'Status pengadaan tidak valid untuk penolakan Direktur.');
+        }
+
+        // Direktur reject pengadaan
+        $app->procurement_approval_status = 'rejected';
+        $app->save();
+
+        return back()->with('success', 'Pengajuan pengadaan berhasil ditolak oleh Direktur.');
+    }
+
+    // Bendahara: Approve pengadaan di level AppRequest
+    public function bendaharaApproveProcurementForApp(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'bendahara') abort(403);
+
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        if($app->procurement_approval_status !== 'submitted_to_bendahara') {
+            return back()->with('error', 'Status pengadaan tidak valid untuk persetujuan Bendahara.');
+        }
+
+        // Bendahara approve - teruskan ke Direktur
+        $app->procurement_approval_status = 'submitted_to_director';
+        $app->save();
+
+        return back()->with('success', 'Pengajuan pengadaan berhasil disetujui dan diteruskan ke Direktur.');
+    }
+
+    // Bendahara: Reject pengadaan di level AppRequest
+    public function bendaharaRejectProcurementForApp(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'bendahara') abort(403);
+
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        if($app->procurement_approval_status !== 'submitted_to_bendahara') {
+            return back()->with('error', 'Status pengadaan tidak valid untuk penolakan Bendahara.');
+        }
+
+        // Bendahara reject pengadaan
+        $app->procurement_approval_status = 'rejected';
+        $app->save();
+
+        return back()->with('success', 'Pengajuan pengadaan berhasil ditolak oleh Bendahara.');
     }
 
     // Management: Approve or forward app request
+    // PERUBAHAN: Memisahkan persetujuan aplikasi dan pengadaan
     public function managementApprove(Request $request, $id)
     {
         if(Auth::user()->role !== 'management') abort(403);
@@ -211,16 +311,13 @@ class AppRequestController extends Controller
             $app->catatan_management = $request->catatan_management;
         }
 
-        // If needs_procurement, forward to Bendahara, else to Director
-        if($app->needs_procurement) {
-            $app->status = 'submitted_to_bendahara';
-        } else {
-            $app->status = 'submitted_to_director';
-        }
+        // PERUBAHAN: Aplikasi approval terlepas dari procurement
+        // Aplikasi selalu lanjut ke Direktur untuk persetujuan
+        $app->status = 'submitted_to_director';
 
         $app->save();
 
-        return back()->with('success', 'Pengajuan berhasil diteruskan sesuai alur persetujuan.');
+        return back()->with('success', 'Pengajuan aplikasi berhasil diteruskan ke Direktur untuk persetujuan.');
     }
 
     public function managementReject(Request $request, $id)
@@ -237,6 +334,53 @@ class AppRequestController extends Controller
         $app->save();
 
         return back()->with('success', 'Pengajuan berhasil ditolak oleh Management.');
+    }
+    
+    // Management: Approve procurement separately
+    // PERUBAHAN: Pengadaan langsung diteruskan ke Bendahara (tidak tertahan di management)
+    public function managementApproveProcurementForApp(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'management') abort(403);
+
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        // Update procurement approval status langsung ke Bendahara
+        $app->procurement_approval_status = 'submitted_to_bendahara';
+        
+        if ($request->filled('catatan_management_procurement') && \Illuminate\Support\Facades\Schema::hasColumn('app_requests', 'catatan_management_procurement')) {
+            $app->catatan_management_procurement = $request->catatan_management_procurement;
+        }
+
+        $app->save();
+
+        return back()->with('success', 'Pengajuan pengadaan berhasil diteruskan ke Bendahara untuk validasi.');
+    }
+
+    // Management: Reject procurement separately
+    public function managementRejectProcurementForApp(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'management') abort(403);
+
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        // Hanya reject procurement, aplikasi tetap approved
+        $app->procurement_approval_status = 'rejected';
+        
+        if ($request->filled('catatan_management_procurement') && \Illuminate\Support\Facades\Schema::hasColumn('app_requests', 'catatan_management_procurement')) {
+            $app->catatan_management_procurement = $request->catatan_management_procurement;
+        }
+
+        $app->save();
+
+        return back()->with('success', 'Pengajuan pengadaan berhasil ditolak oleh Management.');
     }
 
     public function adminReview(Request $request, $id)
