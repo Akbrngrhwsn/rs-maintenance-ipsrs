@@ -24,26 +24,26 @@ Route::middleware('auth')->group(function () {
     // --- FITUR UMUM (Notifikasi & Profile) ---
     Route::get('/notifications/check', [NotificationController::class, 'check'])->name('notifications.check');
 
-    Route::get('/management/procurements', [AppRequestController::class, 'managementProcurements'])->name('management.procurements');
-    Route::patch('/management/procurements/{id}/approve', [AppRequestController::class, 'managementApproveProcurement'])->name('management.procurements.approve');
-    Route::patch('/management/procurements/{id}/reject', [AppRequestController::class, 'managementRejectProcurement'])->name('management.procurements.reject');
+    Route::get('/management/procurements', [ProcurementController::class, 'managementIndex'])->name('management.procurements');
+    Route::patch('/management/procurements/{id}/approve', [ProcurementController::class, 'managementApprove'])->name('management.procurements.approve');
+    Route::patch('/management/procurements/{id}/reject', [ProcurementController::class, 'managementReject'])->name('management.procurements.reject');
     
     // Perubahan: Routes untuk management approval pengadaan di level AppRequest
     Route::patch('/management/app/{id}/procurement/approve', [AppRequestController::class, 'managementApproveProcurementForApp'])->name('management.app.procurement.approve');
     Route::patch('/management/app/{id}/procurement/reject', [AppRequestController::class, 'managementRejectProcurementForApp'])->name('management.app.procurement.reject');
     
     Route::get('/management/reports', [AppRequestController::class, 'managementReports'])->name('management.reports');
-
+    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // --- KHUSUS DIREKTUR: Monitoring Laporan ---
     Route::get('/director/reports', [AppRequestController::class, 'directorReports'])->name('director.reports');
-    // Direktur: Daftar Pengadaan (ACC pengajuan dari Admin IT)
-    Route::get('/director/procurements', [AppRequestController::class, 'directorProcurements'])->name('director.procurements.index');
-    Route::patch('/director/procurement/{id}/approve', [AppRequestController::class, 'directorApproveProcurement'])->name('director.procurements.approve');
-    Route::patch('/director/procurement/{id}/reject', [AppRequestController::class, 'directorRejectProcurement'])->name('director.procurements.reject');
+    // Direktur: Daftar Pengadaan (ACC pengajuan dari Bendahara)
+    Route::get('/director/procurements', [ProcurementController::class, 'directorIndex'])->name('director.procurements.index');
+    Route::patch('/director/procurement/{id}/approve', [ProcurementController::class, 'directorApprove'])->name('director.procurements.approve');
+    Route::patch('/director/procurement/{id}/reject', [ProcurementController::class, 'directorReject'])->name('director.procurements.reject');
     
     // Perubahan: Routes untuk direktur approval pengadaan di level AppRequest (setelah bendahara approve)
     Route::patch('/director/app/{id}/procurement/approve', [AppRequestController::class, 'directorApproveProcurementForApp'])->name('director.app.procurement.approve');
@@ -51,30 +51,30 @@ Route::middleware('auth')->group(function () {
 
     // --- KHUSUS BENDAHARA: Monitoring Laporan & Pengadaan ---
     Route::get('/bendahara/reports', [AppRequestController::class, 'bendaharaReports'])->name('bendahara.reports');
-    Route::get('/bendahara/procurements', [AppRequestController::class, 'bendaharaProcurements'])->name('bendahara.procurements.index');
+    Route::get('/bendahara/procurements', [ProcurementController::class, 'bendaharaIndex'])->name('bendahara.procurements.index');
     
     // Perubahan: Routes untuk bendahara approval pengadaan di level AppRequest
     Route::patch('/bendahara/app/{id}/procurement/approve', [AppRequestController::class, 'bendaharaApproveProcurementForApp'])->name('bendahara.app.procurement.approve');
     Route::patch('/bendahara/app/{id}/procurement/reject', [AppRequestController::class, 'bendaharaRejectProcurementForApp'])->name('bendahara.app.procurement.reject');
 
-    // Export routes for Director and Kepala Ruang (PDF) - reuse AdminReportController methods
+    // Export routes for Director and Kepala Ruang (PDF) - use ProcurementController for procurements
     Route::get('/director/procurements/export-weekly', [\App\Http\Controllers\AdminReportController::class, 'exportProcurementsWeekly'])->name('director.procurements.export.weekly');
-    Route::get('/director/procurement/{id}/export', [\App\Http\Controllers\AdminReportController::class, 'exportSingleProcurement'])->name('director.procurements.export.single');
+    Route::get('/director/procurement/{id}/export', [ProcurementController::class, 'downloadProcurementReportPdf'])->name('director.procurements.export.single');
 
     Route::get('/kepala-ruang/procurements/export-weekly', [\App\Http\Controllers\AdminReportController::class, 'exportProcurementsWeekly'])->name('kepala-ruang.procurements.export.weekly');
-    Route::get('/kepala-ruang/procurement/{id}/export', [\App\Http\Controllers\AdminReportController::class, 'exportSingleProcurement'])->name('kepala-ruang.procurements.export.single');
+    Route::get('/kepala-ruang/procurement/{id}/export', [ProcurementController::class, 'downloadProcurementReportPdf'])->name('kepala-ruang.procurements.export.single');
 
-    // --- KHUSUS : Dashboard Sendiri ---
+    // --- KHUSUS KEPALA RUANG: Dashboard Sendiri ---
     Route::get('/kepala-ruang/apps', [AppRequestController::class, 'kepalaRuangIndex'])->name('kepala-ruang.apps.index');
-    // Mana: Daftar Pengadaan (lihat pengadaan yang diajukan ke Manar)
-    Route::get('/kepala-ruang/procurements', [AppRequestController::class, 'kepalaRuangProcurements'])->name('kepala-ruang.procurements.index');
-    // Mana: ACC pengadaan (teruskan ke Bendahara)
-    Route::patch('/kepala-ruang/procurement/{id}/approve', [AppRequestController::class, 'kepalaRuangApproveProcurement'])->name('kepala-ruang.procurements.approve');
-    Route::patch('/kepala-ruang/procurement/{id}/reject', [AppRequestController::class, 'kepalaRuangRejectProcurement'])->name('kepala-ruang.procurements.reject');
+    // Kepala Ruang: Daftar Pengadaan (lihat pengadaan yang diajukan ke departemennya)
+    Route::get('/kepala-ruang/procurements', [ProcurementController::class, 'kepalaRuangIndex'])->name('kepala-ruang.procurements.index');
+    // Kepala Ruang: ACC pengadaan (teruskan ke Management)
+    Route::patch('/kepala-ruang/procurement/{id}/approve', [ProcurementController::class, 'kepalaRuangApprove'])->name('kepala-ruang.procurements.approve');
+    Route::patch('/kepala-ruang/procurement/{id}/reject', [ProcurementController::class, 'kepalaRuangReject'])->name('kepala-ruang.procurements.reject');
 
     // Bendahara: ACC pengadaan (teruskan ke Direktur)
-    Route::patch('/bendahara/procurement/{id}/approve', [AppRequestController::class, 'bendaharaApproveProcurement'])->name('bendahara.procurements.approve');
-    Route::patch('/bendahara/procurement/{id}/reject', [AppRequestController::class, 'bendaharaRejectProcurement'])->name('bendahara.procurements.reject');
+    Route::patch('/bendahara/procurement/{id}/approve', [ProcurementController::class, 'bendaharaApprove'])->name('bendahara.procurements.approve');
+    Route::patch('/bendahara/procurement/{id}/reject', [ProcurementController::class, 'bendaharaReject'])->name('bendahara.procurements.reject');
 
     // --- GROUP KHUSUS ADMIN IT (Dashboard & Pengadaan) ---
     // Diproteksi oleh Middleware EnsureUserIsAdmin
@@ -115,7 +115,7 @@ Route::middleware('auth')->group(function () {
 
         // Export Pengadaan (PDF)
         Route::get('/admin/procurements/export-weekly', [AdminReportController::class, 'exportProcurementsWeekly'])->name('admin.procurements.export.weekly');
-        Route::get('/admin/procurement/{id}/export', [AdminReportController::class, 'exportSingleProcurement'])->name('admin.procurements.export.single');
+        Route::get('/admin/procurement/{id}/export', [ProcurementController::class, 'downloadProcurementReportPdf'])->name('admin.procurements.export.single');
         // Export Bulanan (PDF)
         Route::get('/admin/procurements/export-monthly', [AdminReportController::class, 'exportProcurementsMonthly'])->name('admin.procurements.export.monthly');
 

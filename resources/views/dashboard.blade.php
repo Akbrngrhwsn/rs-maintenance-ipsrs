@@ -453,7 +453,7 @@
                                                                 </div>
                                                             @endif
                                                             <div class="mt-3">
-                                                                <a href="{{ route('admin.procurements.export.single', $report->procurement->id) }}" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-green-700">
+                                                                <a href="{{ route('admin.procurements.export.single', $report->procurement->id) }}" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-green-700">
                                                                     Export Pengadaan (PDF)
                                                                 </a>
                                                             </div>

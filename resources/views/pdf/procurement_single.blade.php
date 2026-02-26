@@ -40,7 +40,7 @@
             $kopFile = public_path('images/KOPSurat.jfif');
         @endphp
         @if(file_exists($kopFile))
-            <img src="{{ $kopFile }}" alt="Kop Surat" style="width:100%; max-height:110px; object-fit:contain;" />
+            <img src="{{ $kopFile }}" alt="Kop Surat" style="width:100%; max-height:110px;" />
         @else
             <div style="font-size:16px; font-weight:bold;">{{ config('app.name', 'RS Maintenance') }}</div>
             <div style="font-size:12px;">Laporan Pengadaan Barang & Jasa</div>
@@ -150,8 +150,8 @@
                 {{-- 1. ADMIN IT (Pengaju) --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Diajukan Oleh</p>
-                    @if(isset($qrAdmin) && $qrAdmin)
-                        <img src="data:image/png;base64, {{ $qrAdmin }}" class="qr-img">
+                    @if(isset($qrAdmin) && !empty($qrAdmin))
+                        <img src="data:image/png;base64,{{ $qrAdmin }}" style="width: 65px; height: 65px;" />
                         <br><span style="font-size: 8pt;">Admin IT</span>
                     @endif
                 </td>
@@ -159,12 +159,12 @@
                 {{-- 2. KEPALA RUANG --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Mengetahui</p>
-                    @if(isset($qrkepala_ruang) && $qrkepala_ruang)
-                        <img src="data:image/png;base64, {{ $qrkepala_ruang }}" class="qr-img">
+                    @if(isset($qrkepala_ruang) && !empty($qrkepala_ruang))
+                        <img src="data:image/png;base64,{{ $qrkepala_ruang }}" style="width: 65px; height: 65px;" />
                         <br><span style="font-size: 8pt;">Kepala Ruang</span>
                     @else
-                        <div class="status-box">
-                            <span class="italic text-gray" style="font-size: 8pt;">
+                        <div style="height: 65px; display: table-cell; vertical-align: middle; text-align: center;">
+                            <span style="font-style: italic; color: #757575; font-size: 8pt;">
                                 @if($procurement->status == 'rejected') - @else Menunggu @endif
                             </span>
                         </div>
@@ -174,13 +174,12 @@
                 {{-- 3. MANAGEMENT (BARU) --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Validasi</p>
-                    @if(isset($qrManagement) && $qrManagement)
-                        <img src="data:image/png;base64, {{ $qrManagement }}" class="qr-img">
+                    @if(isset($qrManagement) && !empty($qrManagement))
+                        <img src="data:image/png;base64,{{ $qrManagement }}" style="width: 65px; height: 65px;" />
                         <br><span style="font-size: 8pt;">Management</span>
-                        
                     @else
-                        <div class="status-box">
-                            <span class="italic text-gray" style="font-size: 8pt;">
+                        <div style="height: 65px; display: table-cell; vertical-align: middle; text-align: center;">
+                            <span style="font-style: italic; color: #757575; font-size: 8pt;">
                                 @if($procurement->status == 'submitted_to_management')
                                     Menunggu<br>Management
                                 @else
@@ -194,12 +193,12 @@
                 {{-- 4. BENDAHARA --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Verifikasi</p>
-                    @if(isset($qrBendahara) && $qrBendahara)
-                        <img src="data:image/png;base64, {{ $qrBendahara }}" class="qr-img">
+                    @if(isset($qrBendahara) && !empty($qrBendahara))
+                        <img src="data:image/png;base64,{{ $qrBendahara }}" style="width: 65px; height: 65px;" />
                         <br><span style="font-size: 8pt;">Bendahara</span>
                     @else
-                        <div class="status-box">
-                            <span class="italic text-gray" style="font-size: 8pt;">
+                        <div style="height: 65px; display: table-cell; vertical-align: middle; text-align: center;">
+                            <span style="font-style: italic; color: #757575; font-size: 8pt;">
                                 @if($procurement->status == 'submitted_to_bendahara')
                                     Menunggu<br>Bendahara
                                 @else
@@ -213,12 +212,12 @@
                 {{-- 5. DIREKTUR --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Menyetujui</p>
-                    @if(isset($qrDirektur) && $qrDirektur)
-                        <img src="data:image/png;base64, {{ $qrDirektur }}" class="qr-img">
+                    @if(isset($qrDirektur) && !empty($qrDirektur))
+                        <img src="data:image/png;base64,{{ $qrDirektur }}" style="width: 65px; height: 65px;" />
                         <br><span style="font-size: 8pt;">Direktur Utama</span>
                     @else
-                        <div class="status-box">
-                            <span class="italic text-gray" style="font-size: 8pt;">
+                        <div style="height: 65px; display: table-cell; vertical-align: middle; text-align: center;">
+                            <span style="font-style: italic; color: #757575; font-size: 8pt;">
                                 @if($procurement->status == 'submitted_to_director')
                                     Menunggu<br>Direktur
                                 @else

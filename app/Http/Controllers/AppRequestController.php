@@ -130,7 +130,18 @@ class AppRequestController extends Controller
             $createData['status'] = $statusAwal;
             $createData['catatan_direktur'] = $catatanDirektur;
 
-            \App\Models\AppRequest::create($createData);
+            $appRequest = \App\Models\AppRequest::create($createData);
+            
+            // Generate QR codes for each role and store them
+            $baseUrl = route('apps.show', $appRequest->id);
+            $qrCodes = [
+                'qr_kepala_ruang' => base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=kepala_ruang')),
+                'qr_admin_it' => base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=admin_it')),
+                'qr_management' => base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=management')),
+                'qr_bendahara' => base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=bendahara')),
+                'qr_direktur' => base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=direktur'))
+            ];
+            $appRequest->update($qrCodes);
 
         // === PERUBAHAN DI SINI ===
         // Jika Kepala Ruang, kembali ke Dashboard Kepala Ruang
@@ -602,338 +613,37 @@ class AppRequestController extends Controller
         return view('bendahara.reports', compact('activeReports', 'historyReports'));
     }
 
-    // Direktur: Lihat daftar pengadaan yang diajukan oleh Admin IT
-    public function directorProcurements(Request $request)
+    // Direktur: Lihat daftar pengadaan yang diajukan dari level AppRequest (setelah management approve)
+    // Catatan: Pengadaan biasa (dari Report model) sudah dipindahkan ke ProcurementController
+    
+    // Management: Lihat daftar laporan kerusakan
+    public function managementReports(Request $request)
     {
-        if(Auth::user()->role !== 'direktur') abort(403);
+        if(Auth::user()->role !== 'management') abort(403);
 
-        $tab = $request->get('tab', 'pending'); // 'pending' or 'history'
+        // Laporan Aktif (Pending & Proses)
+        $activeReports = Report::whereIn('status', ['Belum Diproses', 'Diproses'])
+            ->orderByRaw("CASE WHEN status = 'Belum Diproses' THEN 1 ELSE 2 END")
+            ->orderBy('urgency', 'desc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(10, ['*'], 'active_page');
 
-        $query = Procurement::with('report');
-
-        if($tab === 'history') {
-            $query->whereIn('status', ['approved_by_director', 'rejected']);
-        } else {
-            $query->where('status', 'submitted_to_director');
-        }
-
-        // If a single exact date is provided, filter to that date only
+        // Laporan Riwayat
+        $historyQuery = Report::whereIn('status', ['Selesai', 'Tidak Selesai', 'Ditolak']);
         if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->date);
-        } else {
-            if ($request->filled('start_date')) {
-                $query->whereDate('created_at', '>=', $request->start_date);
-            }
-            if ($request->filled('end_date')) {
-                $query->whereDate('created_at', '<=', $request->end_date);
-            }
+            $historyQuery->whereDate('created_at', $request->date);
         }
-
         if ($request->filled('search')) {
             $term = $request->search;
-            $query->where(function($q) use ($term) {
-                $q->where('items', 'LIKE', "%{$term}%")
-                  ->orWhereHas('report', function($r) use ($term) {
-                      $r->where('ticket_number', 'LIKE', "%{$term}%")
-                        ->orWhere('ruangan', 'LIKE', "%{$term}%");
-                  });
+            $historyQuery->where(function($q) use ($term) {
+                $q->where('ticket_number', 'LIKE', "%{$term}%")
+                ->orWhere('ruangan', 'LIKE', "%{$term}%");
             });
         }
 
-        $procurements = $query->latest()->get();
+        $historyReports = $historyQuery->latest()->paginate(10, ['*'], 'history_page');
 
-        return view('director.procurements', compact('procurements', 'tab'));
-    }
-
-    // Bendahara: Lihat daftar pengadaan yang diajukan oleh Admin IT (untuk validasi bendahara)
-    public function bendaharaProcurements(Request $request)
-    {
-        if(Auth::user()->role !== 'bendahara') abort(403);
-
-        $tab = $request->get('tab', 'pending'); // 'pending' or 'history'
-
-        $query = Procurement::with('report');
-
-        if($tab === 'history') {
-            $query->whereIn('status', ['approved_by_director', 'rejected']);
-        } else {
-            $query->where('status', 'submitted_to_bendahara');
-        }
-
-        if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->date);
-        } else {
-            if ($request->filled('start_date')) {
-                $query->whereDate('created_at', '>=', $request->start_date);
-            }
-            if ($request->filled('end_date')) {
-                $query->whereDate('created_at', '<=', $request->end_date);
-            }
-        }
-
-        if ($request->filled('search')) {
-            $term = $request->search;
-            $query->where(function($q) use ($term) {
-                $q->where('items', 'LIKE', "%{$term}%")
-                  ->orWhereHas('report', function($r) use ($term) {
-                      $r->where('ticket_number', 'LIKE', "%{$term}%")
-                        ->orWhere('ruangan', 'LIKE', "%{$term}%");
-                  });
-            });
-        }
-
-        $procurements = $query->latest()->get();
-
-        return view('bendahara.procurements', compact('procurements', 'tab'));
-    }
-
-    // kepala_ruang: Lihat daftar pengadaan yang diajukan ke 
-    public function kepalaRuangProcurements(Request $request)
-    {
-        if(Auth::user()->role !== 'kepala_ruang') abort(403);
-
-        $tab = $request->get('tab', 'pending'); // 'pending' or 'history'
-
-        $query = Procurement::with('report');
-
-        // Hanya pengadaan untuk ruangan yang dikelola  ini
-        $room = Auth::user()->room; // hasOne Room
-        if ($room) {
-            $query->whereHas('report', function($q) use ($room) {
-                $q->where('room_id', $room->id);
-            });
-        } else {
-            // Jika belum punya ruangan, kembalikan kosong
-            $procurements = collect();
-            return view('kepala_ruang.procurements', compact('procurements', 'tab'));
-        }
-
-        if($tab === 'history') {
-    // Tambahkan ' ke dalam array
-    $query->whereIn('status', [
-        'submitted_to_management', // <--- Tambahkan ini
-        'submitted_to_bendahara', 
-        'submitted_to_director', 
-        'approved_by_director', 
-        'rejected'
-    ]);
-} else {
-    // Pending tetap sama karena ini tahap awal Kepala Ruang
-    $query->where('status', 'submitted_to_kepala_ruang');
-}
-
-        if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->date);
-        } else {
-            if ($request->filled('start_date')) {
-                $query->whereDate('created_at', '>=', $request->start_date);
-            }
-            if ($request->filled('end_date')) {
-                $query->whereDate('created_at', '<=', $request->end_date);
-            }
-        }
-
-        if ($request->filled('search')) {
-            $term = $request->search;
-            $query->where(function($q) use ($term) {
-                $q->where('items', 'LIKE', "%{$term}%")
-                  ->orWhereHas('report', function($r) use ($term) {
-                      $r->where('ticket_number', 'LIKE', "%{$term}%")
-                        ->orWhere('ruangan', 'LIKE', "%{$term}%");
-                  });
-            });
-        }
-
-        $procurements = $query->latest()->get();
-
-        return view('kepala_ruang.procurements', compact('procurements', 'tab'));
-    }
-
-    // Direktur: ACC sebuah pengadaan
-    public function directorApproveProcurement($id)
-    {
-        if(Auth::user()->role !== 'direktur') abort(403);
-
-        $proc = Procurement::findOrFail($id);
-        $proc->status = 'approved_by_director';
-        $proc->save();
-
-        return back()->with('success', 'Pengadaan berhasil di-ACC.');
-    }
-
-    public function directorRejectProcurement(Request $request, $id)
-    {
-        if(Auth::user()->role !== 'direktur') abort(403);
-
-        $proc = Procurement::findOrFail($id);
-        $proc->status = 'rejected';
-        // save optional director note (catatan)
-        $proc->director_note = $request->catatan ?? null;
-        $proc->save();
-
-        return back()->with('success', 'Pengadaan berhasil ditolak.');
-    }
-
-    // : ACC sebuah pengadaan (teruskan ke Bendahara)
-    public function kepalaRuangApproveProcurement($id)
-    {
-        if(Auth::user()->role !== 'kepala_ruang') abort(403);
-
-        $proc = Procurement::with('report')->findOrFail($id);
-
-        // Validasi: pastikan procurement untuk r
-        $room = Auth::user()->room;
-        if (!$room || $proc->report->room_id != $room->id) {
-            abort(403, 'Anda tidak berwenang memproses pengadaan untuk ruangan ini.');
-        }
-
-        $proc->status = 'submitted_to_management';
-        $proc->save();
-
-        return back()->with('success', 'Pengadaan berhasil diteruskan ke Management.');
-    }
-
-    public function kepalaRuangRejectProcurement(Request $request, $id)
-    {
-        if(Auth::user()->role !== 'kepala_ruang') abort(403);
-
-        $proc = Procurement::with('report')->findOrFail($id);
-
-        // Validasi: pastikan procurement untuk ruangan ini
-        $room = Auth::user()->room;
-        if (!$room || $proc->report->room_id != $room->id) {
-            abort(403, 'Anda tidak berwenang memproses pengadaan untuk ruangan ini.');
-        }
-
-        $proc->status = 'rejected';
-        $proc->director_note = $request->catatan ?? null;
-        $proc->save();
-
-        return back()->with('success', 'Pengadaan berhasil ditolak oleh kepala ruang.');
-    }
-
-    // Management: Lihat daftar pengadaan yang diajukan oleh Kepala Ruang
-public function managementProcurements(Request $request)
-{
-    if(Auth::user()->role !== 'management') abort(403);
-
-    $tab = $request->get('tab', 'pending'); // 'pending' or 'history'
-    $query = Procurement::with('report');
-
-    if($tab === 'history') {
-        // History: Sudah disetujui management (lanjut ke bendahara/direktur) atau ditolak
-        $query->whereIn('status', ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'rejected']);
-    } else {
-        // Pending: Menunggu persetujuan Management
-        $query->where('status', 'submitted_to_management');
-    }
-
-    // Filter Tanggal
-    if ($request->filled('date')) {
-        $query->whereDate('created_at', $request->date);
-    } else {
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
-    }
-
-    // Filter Pencarian
-    if ($request->filled('search')) {
-        $term = $request->search;
-        $query->where(function($q) use ($term) {
-            $q->where('items', 'LIKE', "%{$term}%")
-              ->orWhereHas('report', function($r) use ($term) {
-                  $r->where('ticket_number', 'LIKE', "%{$term}%")
-                    ->orWhere('ruangan', 'LIKE', "%{$term}%");
-              });
-        });
-    }
-
-    $procurements = $query->latest()->get();
-
-    return view('management.procurements', compact('procurements', 'tab'));
-}
-
-// Management: ACC sebuah pengadaan (teruskan ke Bendahara)
-public function managementApproveProcurement($id)
-{
-    if(Auth::user()->role !== 'management') abort(403);
-
-    $proc = Procurement::findOrFail($id);
-    $proc->status = 'submitted_to_bendahara';
-    $proc->save();
-
-    return back()->with('success', 'Pengadaan disetujui oleh Management dan diteruskan ke Bendahara.');
-}
-
-// Management: Reject sebuah pengadaan
-public function managementRejectProcurement(Request $request, $id)
-{
-    if(Auth::user()->role !== 'management') abort(403);
-
-    $proc = Procurement::findOrFail($id);
-    $proc->status = 'rejected';
-    $proc->director_note = $request->catatan ?? null; // Menggunakan kolom yang sama untuk alasan penolakan
-    $proc->save();
-
-    return back()->with('success', 'Pengadaan berhasil ditolak oleh Management.');
-}
-
-// Management: Lihat daftar laporan kerusakan (sama dengan bendaharaReports)
-public function managementReports(Request $request)
-{
-    if(Auth::user()->role !== 'management') abort(403);
-
-    // Laporan Aktif (Pending & Proses)
-    $activeReports = Report::whereIn('status', ['Belum Diproses', 'Diproses'])
-        ->orderByRaw("CASE WHEN status = 'Belum Diproses' THEN 1 ELSE 2 END")
-        ->orderBy('urgency', 'desc')
-        ->orderBy('created_at', 'asc')
-        ->paginate(10, ['*'], 'active_page');
-
-    // Laporan Riwayat
-    $historyQuery = Report::whereIn('status', ['Selesai', 'Tidak Selesai', 'Ditolak']);
-    if ($request->filled('date')) {
-        $historyQuery->whereDate('created_at', $request->date);
-    }
-    if ($request->filled('search')) {
-        $term = $request->search;
-        $historyQuery->where(function($q) use ($term) {
-            $q->where('ticket_number', 'LIKE', "%{$term}%")
-            ->orWhere('ruangan', 'LIKE', "%{$term}%");
-        });
-    }
-
-    $historyReports = $historyQuery->latest()->paginate(10, ['*'], 'history_page');
-
-    return view('management.reports', compact('activeReports', 'historyReports'));
-}
-
-    // Bendahara: ACC sebuah pengadaan (teruskan ke Direktur)
-    public function bendaharaApproveProcurement($id)
-    {
-        if(Auth::user()->role !== 'bendahara') abort(403);
-
-        $proc = Procurement::findOrFail($id);
-        $proc->status = 'submitted_to_director';
-        $proc->save();
-
-        return back()->with('success', 'Pengadaan berhasil diteruskan ke Direktur.');
-    }
-
-    public function bendaharaRejectProcurement(Request $request, $id)
-    {
-        if(Auth::user()->role !== 'bendahara') abort(403);
-
-        $proc = Procurement::findOrFail($id);
-        $proc->status = 'rejected';
-        $proc->director_note = $request->catatan ?? null;
-        $proc->save();
-
-        return back()->with('success', 'Pengadaan berhasil ditolak oleh Bendahara.');
+        return view('management.reports', compact('activeReports', 'historyReports'));
     }
 
     // Bendahara: Approve/Reject directly on AppRequest when no Procurement record exists
@@ -1104,15 +814,41 @@ public function downloadProcurementReport($id)
 
     $procurementTotal = $project->procurement_estimate ?? 0;
 
-    // Generate QR code for validation (URL yang mengarah ke halaman detail)
-    $validationUrl = route('apps.show', $project->id);
-    $qrCode = base64_encode(QrCode::format('png')->size(150)->generate($validationUrl));
+    // Generate QR codes dynamically - check if they exist in DB, if not generate and save
+    $baseUrl = route('apps.show', $project->id);
+    $qrCodes = [];
+    $qrRoleMap = [
+        'kepala_ruang' => 'qr_kepala_ruang',
+        'admin_it' => 'qr_admin_it',
+        'management' => 'qr_management',
+        'bendahara' => 'qr_bendahara',
+        'direktur' => 'qr_direktur'
+    ];
+    
+    foreach ($qrRoleMap as $role => $column) {
+        // Get from DB if exists, otherwise generate
+        if (!empty($project->$column)) {
+            $qrCodes[$role] = $project->$column;
+        } else {
+            // Generate QR code
+            $qr = base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=' . $role));
+            $qrCodes[$role] = $qr;
+            // Save to database for future use
+            if (\Illuminate\Support\Facades\Schema::hasColumn('app_requests', $column)) {
+                $project->$column = $qr;
+            }
+        }
+    }
+    // Save if any QR codes were generated
+    if (array_filter($qrCodes)) {
+        $project->save();
+    }
 
     $pdf = Pdf::loadView('pdf.procurement-report', [
         'project' => $project,
         'items' => $procurementItems,
         'total' => $procurementTotal,
-        'qrCode' => $qrCode,
+        'qrCodes' => $qrCodes,
         'generatedDate' => Carbon::now()
     ]);
 

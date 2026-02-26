@@ -4,85 +4,98 @@
     <meta charset="utf-8">
     <title>Laporan Pengadaan #{{ $project->ticket_number }}</title>
     <style>
-        body { font-family: sans-serif; font-size:11px; color: #333; }
-        table { width:100%; border-collapse: collapse; }
-        th, td { border:1px solid #333; padding:6px; }
-        th { background:#f0f0f0; text-align: left; }
+        @page { margin: 1cm; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 10pt; color: #333; line-height: 1.4; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; vertical-align: top; }
+        th { background: #f2f2f2; text-align: center; font-weight: bold; text-transform: uppercase; font-size: 9pt; }
         
-        /* Helper Text */
+        /* Helper Classes */
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .text-bold { font-weight: bold; }
-        .text-red { color: #d32f2f; }
-        .text-green { color: #388e3c; }
-        .text-gray { color: #757575; }
         .italic { font-style: italic; }
-
-        /* Status Box untuk Tanda Tangan */
-        .status-box {
-            height: 65px;
-            vertical-align: middle;
-            width: 100%;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .border-none { border: none !important; }
         
-        .qr-img {
-            width: 65px;
-            height: 65px;
+        /* Status Badge */
+        .status-badge {
+            font-weight: bold;
+            padding: 5px 10px;
+            border: 2px solid #333;
+            display: inline-block;
+            background: #eee;
         }
+
+        /* Signature Section */
+        .sig-table td { border: none !important; padding: 10px 5px; }
+        .sig-box {
+            height: 70px;
+            width: 70px;
+            margin: 5px auto;
+            border: 1px solid #ddd; /* Placeholder jika tidak ada QR */
+            display: block;
+        }
+        .qr-img { width: 70px; height: 70px; }
+        .sig-name { font-size: 9pt; border-top: 1px solid #333; display: inline-block; min-width: 100px; margin-top: 5px; }
     </style>
 </head>
 <body>
     {{-- KOP SURAT --}}
-    <div style="text-align:center; margin-bottom:15px;">
+    <div style="text-align:center; margin-bottom: 20px;">
         @php 
             $kopFile = public_path('images/KOPSurat.jfif');
         @endphp
         @if(file_exists($kopFile))
-            <img src="{{ $kopFile }}" alt="Kop Surat" style="width:100%; max-height:110px; object-fit:contain;" />
+            <img src="{{ $kopFile }}" alt="Kop Surat" style="width:100%; max-height:120px;" />
         @else
-            <div style="font-size:16px; font-weight:bold;">{{ config('app.name', 'RS Maintenance') }}</div>
-            <div style="font-size:12px;">Laporan Pengadaan Aplikasi</div>
-            <hr style="margin-top:5px; border:1px solid #000;">
+            <div style="font-size:18px; font-weight:bold; text-transform: uppercase;">{{ config('app.name', 'RS Maintenance') }}</div>
+            <div style="font-size:14px;">LAPORAN PENGADAAN BARANG / JASA</div>
+            <hr style="border: 1.5px solid #000; margin-top: 5px;">
         @endif
     </div>
 
     {{-- HEADER INFO --}}
-    <table style="border:none; margin-bottom:15px;">
-        <tr style="border:none;">
-            <td style="border:none; width:60%;">
-                <h3 style="margin:0;">Laporan Pengadaan #{{ $project->ticket_number ?? $project->id }}</h3>
-                <div style="margin-top:5px;">Tanggal Pengajuan: {{ $project->created_at->format('d/m/Y') }}</div>
+    <table class="border-none">
+        <tr class="border-none">
+            <td class="border-none" style="width:60%; padding-left: 0;">
+                <div style="font-size: 14pt; font-weight: bold;">NO. TIKET: #{{ $project->ticket_number ?? $project->id }}</div>
+                <div style="margin-top: 5px;">Tanggal Pengajuan: <strong>{{ $project->created_at->format('d F Y') }}</strong></div>
             </td>
-            <td style="border:none; width:40%; text-align:right;">
-                <div style="font-weight:bold; font-size:12px; padding:5px; border:1px solid #333; display:inline-block;">
-                    STATUS: {{ strtoupper(str_replace('_', ' ', $project->procurement_approval_status ?? 'PENDING')) }}
+            <td class="border-none text-right" style="width:40%; padding-right: 0;">
+                <div class="status-badge">
+                    {{ strtoupper(str_replace('_', ' ', $project->procurement_approval_status ?? 'PENDING')) }}
                 </div>
             </td>
         </tr>
     </table>
 
-    {{-- INFO RELASI --}}
-    <div style="margin-bottom: 15px; background: #f9f9f9; padding: 10px; border: 1px solid #ddd;">
-        <strong>Informasi Referensi:</strong><br>
-        Nama Aplikasi: <strong>{{ $project->nama_aplikasi }}</strong><br>
-        Pemohon: <strong>{{ $project->user->name ?? '-' }}</strong>
+    {{-- INFO DATA --}}
+    <div style="margin-bottom: 20px;">
+        <table style="border: none;">
+            <tr class="border-none">
+                <td class="border-none" width="20%">Nama Aplikasi</td>
+                <td class="border-none" width="5%">:</td>
+                <td class="border-none"><strong>{{ $project->nama_aplikasi }}</strong></td>
+            </tr>
+            <tr class="border-none">
+                <td class="border-none">Unit Pemohon</td>
+                <td class="border-none">:</td>
+                <td class="border-none">{{ $project->room->name ?? '-' }} ({{ $project->user->name ?? '-' }})</td>
+            </tr>
+        </table>
     </div>
 
     {{-- TABEL ITEM --}}
-    <h4 style="margin-bottom:5px;">Rincian Item Pengadaan</h4>
+    <h4 style="margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom: 5px;">RINCIAN KEBUTUHAN BARANG</h4>
     <table>
         <thead>
             <tr>
-                <th width="5%" class="text-center">No</th>
-                <th width="30%">Nama Barang</th>
-                <th width="20%">Merk / Spesifikasi</th>
-                <th width="10%" class="text-center">Jml</th>
-                <th width="15%" class="text-right">Harga Satuan</th>
-                <th width="20%" class="text-right">Subtotal</th>
+                <th width="5%">No</th>
+                <th width="35%">Nama Barang / Jasa</th>
+                <th width="20%">Spesifikasi / Merk</th>
+                <th width="8%">Qty</th>
+                <th width="15%">Harga Satuan</th>
+                <th width="17%">Subtotal</th>
             </tr>
         </thead>
         <tbody>
@@ -94,117 +107,145 @@
                 @php
                     $qty = isset($it['quantity']) ? (int)$it['quantity'] : (isset($it['jumlah']) ? (int)$it['jumlah'] : 1);
                     $price = isset($it['unit_price']) ? (float)$it['unit_price'] : (isset($it['harga_satuan']) ? (float)$it['harga_satuan'] : 0);
-                    $name = $it['name'] ?? $it['nama'] ?? '-';
-                    $brand = $it['brand'] ?? $it['merk'] ?? ($it['spek'] ?? '-');
-                    
                     $subtotal = $price * $qty;
                     $total += $subtotal;
                 @endphp
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $name }}</td>
-                    <td>{{ $brand }}</td>
+                    <td>{{ $it['name'] ?? $it['nama'] ?? '-' }}</td>
+                    <td>{{ $it['brand'] ?? $it['merk'] ?? ($it['spek'] ?? '-') }}</td>
                     <td class="text-center">{{ $qty }}</td>
-                    <td class="text-right">Rp {{ number_format($price, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($subtotal, 0, ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($price, 0, ',', '.') }}</td>
+                    <td class="text-right">{{ number_format($subtotal, 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center italic">Tidak ada item barang.</td>
+                    <td colspan="6" class="text-center italic" style="padding: 20px;">Tidak ada item barang yang dicatat.</td>
                 </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="5" class="text-right text-bold" style="background: #f0f0f0;">Total Estimasi Biaya</td>
-                <td class="text-right text-bold" style="background: #f0f0f0;">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                <td colspan="5" class="text-right text-bold" style="background: #f2f2f2;">TOTAL ESTIMASI BIAYA</td>
+                <td class="text-right text-bold" style="background: #f2f2f2;">Rp {{ number_format($total, 0, ',', '.') }}</td>
             </tr>
         </tfoot>
     </table>
 
-    {{-- CATATAN MANAGEMENT/DIREKTUR --}}
-    @if($project->catatan_management_procurement || $project->catatan_management || $project->catatan_direktur)
-        <div style="margin-top: 15px;">
-            @if($project->catatan_management_procurement)
-                <strong>Catatan Management (Pengadaan):</strong>
-                <div style="border:1px dashed #555; padding:8px; margin-bottom:5px; background: #f0f7ff;">
-                    {{ $project->catatan_management_procurement }}
-                </div>
-            @endif
-            @if($project->catatan_management)
-                <strong>Catatan Management (Aplikasi):</strong>
-                <div style="border:1px dashed #555; padding:8px; margin-bottom:5px; background: #f0f7ff;">
-                    {{ $project->catatan_management }}
-                </div>
-            @endif
-            @if($project->catatan_direktur)
-                <strong>Catatan Direktur:</strong>
-                <div style="border:1px dashed #555; padding:8px; background: #fffbe6;">
-                    {{ $project->catatan_direktur }}
-                </div>
-            @endif
+    {{-- CATATAN --}}
+    @if($project->catatan_management_procurement || $project->catatan_direktur)
+        <div style="margin-top: 10px;">
+            <p class="text-bold" style="margin-bottom: 5px;">Catatan Persetujuan:</p>
+            <table style="border: none;">
+                @if($project->catatan_management_procurement)
+                <tr>
+                    <td class="italic" style="border: 1px dashed #ccc; background: #fafafa;">
+                        <strong>Management:</strong> {{ $project->catatan_management_procurement }}
+                    </td>
+                </tr>
+                @endif
+                @if($project->catatan_direktur)
+                <tr>
+                    <td class="italic" style="border: 1px dashed #ccc; background: #fafafa;">
+                        <strong>Direktur:</strong> {{ $project->catatan_direktur }}
+                    </td>
+                </tr>
+                @endif
+            </table>
         </div>
     @endif
 
-    {{-- AREA TANDA TANGAN (5 KOLOM) --}}
-    <div style="margin-top: 30px;">
-        <table style="border: none;">
-            <tr style="border: none;">
-                
-                {{-- 1. PEMOHON (Kepala Ruang) --}}
-                <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                    <p class="text-bold" style="margin-bottom: 5px;">Diajukan Oleh</p>
-                    <div style="height: 65px; border: 1px solid #999; margin: 0 auto 5px; width: 65px;"></div>
-                    <span style="font-size: 8pt;">{{ $project->user->name ?? 'Pemohon' }}</span>
-                </td>
-
-                {{-- 2. MANAGEMENT (Validasi) --}}
-                <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                    <p class="text-bold" style="margin-bottom: 5px;">Validasi</p>
-                    @if(isset($qrCode) && $qrCode)
-                        <img src="data:image/png;base64,{{ $qrCode }}" class="qr-img" style="margin: 0 auto 5px; display: block;">
-                        <span style="font-size: 8pt;">Management</span>
+    {{-- Area Tanda Tangan Validasi Bertahap --}}
+<div style="margin-top: 30px;">
+    <table style="width: 100%; border: none; table-layout: fixed;">
+        <tr style="border: none;">
+            
+            {{-- 1. KEPALA RUANG --}}
+            <td class="text-center" style="border: none; vertical-align: top;">
+                <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Kepala Ruang</p>
+                <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
+                    {{-- Kepala Ruang (Pemohon) selalu ada karena ini yang mengajukan --}}
+                    @if(!empty($qrCodes['kepala_ruang']))
+                        <img src="data:image/png;base64,{{ $qrCodes['kepala_ruang'] ?? '' }}" style="width: 100%;">
                     @else
-                        <div style="height: 65px; border: 1px solid #999; margin: 0 auto 5px; width: 65px;"></div>
-                        <span class="italic text-gray" style="font-size: 8pt;">
-                            @if(in_array($project->procurement_approval_status, ['rejected']))
-                                -
-                            @else
-                                Menunggu
-                            @endif
-                        </span>
+                        <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif
-                </td>
+                </div>
+                <span style="font-size: 8pt; border-top: 1px solid #000; display: block; padding-top: 2px; margin: 0 10px;">
+                    {{ $project->user->name ?? 'Pemohon' }}
+                </span>
+            </td>
 
-                {{-- 3. BENDAHARA (Verifikasi) --}}
-                <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                    <p class="text-bold" style="margin-bottom: 5px;">Verifikasi</p>
-                    <div style="height: 65px; border: 1px solid #999; margin: 0 auto 5px; width: 65px;"></div>
-                    <span style="font-size: 8pt;">Bendahara</span>
-                </td>
-
-                {{-- 4. DIREKTUR (Menyetujui) --}}
-                <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                    <p class="text-bold" style="margin-bottom: 5px;">Menyetujui</p>
-                    <div style="height: 65px; border: 1px solid #999; margin: 0 auto 5px; width: 65px;"></div>
-                    <span style="font-size: 8pt;">Direktur Utama</span>
-                </td>
-
-                {{-- 5. QR CODE VALIDASI --}}
-                <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                    <p class="text-bold" style="margin-bottom: 5px;">QR Validasi</p>
-                    @if(isset($qrCode) && $qrCode)
-                        <img src="data:image/png;base64,{{ $qrCode }}" class="qr-img" style="margin: 0 auto 5px; display: block;">
-                        <span style="font-size: 8pt;">Scan verifikasi</span>
+            {{-- 2. ADMIN IT --}}
+            <td class="text-center" style="border: none; vertical-align: top;">
+                <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Admin IT</p>
+                <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
+                    {{-- Admin IT mengisi estimasi biaya dan diteruskan ke management --}}
+                    @if(!empty($project->procurement_estimate) && !empty($qrCodes['admin_it']))
+                        <img src="data:image/png;base64,{{ $qrCodes['admin_it'] ?? '' }}" style="width: 100%;">
                     @else
-                        <div style="height: 65px; border: 1px solid #999; margin: 0 auto 5px; width: 65px;"></div>
-                        <span class="italic text-gray" style="font-size: 8pt;">-</span>
+                        <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif
-                </td>
+                </div>
+                <span style="font-size: 8pt; border-top: 1px solid #000; display: block; padding-top: 2px; margin: 0 10px;">
+                    Admin IT
+                </span>
+            </td>
 
-            </tr>
-        </table>
+            {{-- 3. MANAGEMENT --}}
+            <td class="text-center" style="border: none; vertical-align: top;">
+                <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Management</p>
+                <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
+                    {{-- Management approve jika status bukan pending/submitted_to_admin --}}
+                    @if(($project->catatan_management_procurement) ||  $project->procurement_approval_status == 'submitted_to_bendahara')
+                        <img src="data:image/png;base64,{{ $qrCodes['management'] ?? '' }}" style="width: 100%;">
+                    @else
+                        <div style="height: 65px; border: 1px dashed #ccc;"></div>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; border-top: 1px solid #000; display: block; padding-top: 2px; margin: 0 10px;">
+                    {{ $project->management_name ?? 'Management' }}
+                </span>
+            </td>
+
+            {{-- 4. BENDAHARA --}}
+            <td class="text-center" style="border: none; vertical-align: top;">
+                <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Bendahara</p>
+                <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
+                    {{-- Bendahara validate setelah management approve, ditandai dengan procurement_approval_status=submitted_to_bendahara atau approved --}}
+                    @if(($project->procurement_approval_status == 'submitted_to_director'))
+                        <img src="data:image/png;base64,{{ $qrCodes['bendahara'] ?? '' }}" style="width: 100%;">
+                    @else
+                        <div style="height: 65px; border: 1px dashed #ccc;"></div>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; border-top: 1px solid #000; display: block; padding-top: 2px; margin: 0 10px;">
+                    Bag. Keuangan
+                </span>
+            </td>
+
+            {{-- 5. DIREKTUR --}}
+            <td class="text-center" style="border: none; vertical-align: top;">
+                <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Direktur</p>
+                <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
+                    {{-- Direktur approve jika procurement_approval_status sudah submitted_to_director atau approved --}}
+                    @if( $project->procurement_approval_status == 'approved' || $project->procurement_approval_status == 'rejected')
+                        <img src="data:image/png;base64,{{ $qrCodes['direktur'] ?? '' }}" style="width: 100%;">
+                    @else
+                        <div style="height: 65px; border: 1px dashed #ccc;"></div>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; border-top: 1px solid #000; display: block; padding-top: 2px; margin: 0 10px;">
+                    Direktur Utama
+                </span>
+            </td>
+
+        </tr>
+    </table>
+</div>
+
+    <div style="position: fixed; bottom: 0; width: 100%; font-size: 8pt; text-align: center; color: #777;">
+        Dokumen ini dicetak otomatis melalui Sistem RS Maintenance pada {{ date('d/m/Y H:i') }}
     </div>
-
 </body>
 </html>

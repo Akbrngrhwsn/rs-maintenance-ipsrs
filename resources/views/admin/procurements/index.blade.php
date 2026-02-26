@@ -121,7 +121,7 @@
                                                         </tfoot>
                                                     </table>
                                                     <div class="mt-4">
-                                                        <a href="{{ route('admin.procurements.export.single', $proc->id) }}" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">
+                                                        <a href="{{ route('admin.procurements.export.single', $proc->id) }}" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">
                                                             Export Pengadaan (PDF)
                                                         </a>
                                                     </div>
@@ -189,7 +189,7 @@
                             <h3 class="font-bold text-lg text-gray-800">Unduh Laporan Bulanan</h3>
                             <button type="button" onclick="document.getElementById('export-modal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">✕</button>
                         </div>
-                        <form action="{{ route('admin.procurements.export.monthly') }}" method="GET" target="_blank">
+                        <form action="{{ route('admin.procurements.export.monthly') }}" method="GET">
                             <div class="p-6">
                                 <label class="block text-sm font-bold text-gray-600 mb-2">Pilih Bulan</label>
                                 <input type="month" name="month" value="{{ request('month', date('Y-m')) }}" class="w-full border-gray-300 rounded-md px-3 py-2">
