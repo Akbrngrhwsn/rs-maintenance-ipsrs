@@ -14,7 +14,7 @@ class ProcurementController extends Controller
     // === HELPER: Generate QR Codes untuk validasi ===
     private function generateQrCodes($procurementId)
     {
-        $baseUrl = route('dir.procurements.index') . "?procurement={$procurementId}";
+        $baseUrl = route('director.procurements.index') . "?procurement={$procurementId}";
         
         return [
             'qr_kepala_ruang' => base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '&approver=kepala_ruang')),
@@ -426,77 +426,75 @@ class ProcurementController extends Controller
 
     // === EXPORT: Download Pengadaan Report as PDF ===
     public function downloadProcurementReportPdf($id)
-    {
-        try {
-            $procurement = Procurement::with('report')->findOrFail($id);
+{
+    try {
+        $procurement = Procurement::with('report')->findOrFail($id);
 
-            // Helper Generate QR
-            $generateQr = function($text) {
-                return base64_encode(
-                    QrCode::format('png')
-                        ->size(100)->margin(0)->errorCorrection('M')->generate($text)
-                );
-            };
+        // Helper Generate QR
+        $generateQr = function($text) {
+            return base64_encode(
+                QrCode::format('png')
+                    ->size(100)->margin(0)->errorCorrection('M')->generate($text)
+            );
+        };
 
-            // LOGIKA ESTAFET QR CODE
-            // Urutan Status: submitted_to_kepala_ruang -> submitted_to_management -> submitted_to_bendahara -> submitted_to_director -> approved_by_director
-            
-            $s = $procurement->status; 
+        // Inisialisasi dengan string kosong (BUKAN null) agar tidak merusak src img di Blade
+        $qrAdmin = '';
+        $qrkepala_ruang = '';
+        $qrManagement = '';
+        $qrBendahara = '';
+        $qrDirektur = '';
 
-            // A. QR Admin (Selalu Ada)
-            $infoAdmin = "Diajukan oleh Admin IT. Tiket: " . ($procurement->report->ticket_number ?? '-') . ". Tgl: " . $procurement->created_at->format('d/m/Y');
-            $qrAdmin = $generateQr($infoAdmin);
+        $s = $procurement->status; 
 
-            // B. QR Kepala Ruang - Muncul jika status SUDAH melewati kepala ruang
-            $qrkepala_ruang = null;
-            $statusSetelahKapro = ['submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'];
-            if (in_array($s, $statusSetelahKapro)) {
-                $qrkepala_ruang = $generateQr("Divalidasi Kepala ruang Unit. ID: " . $procurement->id);
-            }
+        // A. QR Admin (Selalu Ada)
+        $infoAdmin = "Diajukan oleh Admin IT. Tiket: " . ($procurement->report->ticket_number ?? '-') . ". Tgl: " . $procurement->created_at->format('d/m/Y');
+        $qrAdmin = $generateQr($infoAdmin);
 
-            // C. QR Management - Muncul jika status SUDAH melewati Management
-            $qrManagement = null;
-            $statusSetelahManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'];
-            if (in_array($s, $statusSetelahManagement)) {
-                $qrManagement = $generateQr("Divalidasi oleh Management. Tanggal: " . date('d/m/Y'));
-            }
-
-            // D. QR Bendahara - Muncul jika status SUDAH melewati Bendahara
-            $qrBendahara = null;
-            $statusSetelahBendahara = ['submitted_to_director', 'approved_by_director'];
-            if (in_array($s, $statusSetelahBendahara)) {
-                $qrBendahara = $generateQr("Diverifikasi Bendahara. Anggaran Tersedia.");
-            }
-
-            // E. QR Direktur - Muncul jika SUDAH disetujui Direktur
-            $qrDirektur = null;
-            if ($s === 'approved_by_director') {
-                $qrDirektur = $generateQr("Disetujui Direktur Utama. " . date('d/m/Y'));
-            }
-
-            // Load View dengan safety checks
-            $pdf = Pdf::loadView('pdf.procurement_single', [
-                'procurement' => $procurement, 
-                'qrAdmin' => $qrAdmin, 
-                'qrkepala_ruang' => $qrkepala_ruang, 
-                'qrManagement' => $qrManagement,
-                'qrBendahara' => $qrBendahara, 
-                'qrDirektur' => $qrDirektur
-            ]);
-            
-            // Set options untuk DomPDF
-            $pdf->setPaper('A4');
-            $pdf->setOption('isHtml5ParserEnabled', true);
-            $pdf->setOption('isRemoteEnabled', true);
-            
-            $filename = 'laporan-pengadaan-' . $procurement->id . '-' . now()->format('d-m-Y') . '.pdf';
-            
-            // Force download dengan response headers yang tepat
-            return $pdf->download($filename);
-            
-        } catch (\Exception $e) {
-            \Log::error('Error download procurement PDF: ' . $e->getMessage());
-            return back()->with('error', 'Error mengunduh PDF: ' . $e->getMessage());
+        // B. QR Kepala Ruang
+        $statusSetelahKapro = ['submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'];
+        if (in_array($s, $statusSetelahKapro)) {
+            $qrkepala_ruang = $generateQr("Divalidasi Kepala ruang Unit. ID: " . $procurement->id);
         }
+
+        // C. QR Management
+        $statusSetelahManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'];
+        if (in_array($s, $statusSetelahManagement)) {
+            $qrManagement = $generateQr("Divalidasi oleh Management. Tanggal: " . date('d/m/Y'));
+        }
+
+        // D. QR Bendahara
+        $statusSetelahBendahara = ['submitted_to_director', 'approved_by_director'];
+        if (in_array($s, $statusSetelahBendahara)) {
+            $qrBendahara = $generateQr("Diverifikasi Bendahara. Anggaran Tersedia.");
+        }
+
+        // E. QR Direktur
+        if ($s === 'approved_by_director') {
+            $qrDirektur = $generateQr("Disetujui Direktur Utama. " . date('d/m/Y'));
+        }
+
+        // Load View
+        $pdf = Pdf::loadView('pdf.procurement_single', [
+            'procurement' => $procurement, 
+            'qrAdmin' => $qrAdmin, 
+            'qrkepala_ruang' => $qrkepala_ruang, 
+            'qrManagement' => $qrManagement,
+            'qrBendahara' => $qrBendahara, 
+            'qrDirektur' => $qrDirektur
+        ]);
+        
+        $pdf->setPaper('A4');
+        $pdf->setOption('isHtml5ParserEnabled', true);
+        $pdf->setOption('isRemoteEnabled', true);
+        
+        $filename = 'laporan-pengadaan-' . $procurement->id . '-' . now()->format('d-m-Y') . '.pdf';
+        
+        return $pdf->download($filename);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error download procurement PDF: ' . $e->getMessage());
+        return back()->with('error', 'Error mengunduh PDF: ' . $e->getMessage());
     }
+}
 }

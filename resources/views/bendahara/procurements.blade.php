@@ -144,6 +144,11 @@
                                                             <p class="text-sm text-gray-700">{{ $proc->director_note }}</p>
                                                         </div>
                                                     @endif
+                                                    <div class="mt-4 px-4">
+                                                        <a href="{{ route('bendahara.procurements.export.single', $proc->id) }}" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">
+                                                            Export Pengadaan (PDF)
+                                                        </a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

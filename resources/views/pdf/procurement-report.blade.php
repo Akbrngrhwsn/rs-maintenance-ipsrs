@@ -164,9 +164,8 @@
             <td class="text-center" style="border: none; vertical-align: top;">
                 <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Kepala Ruang</p>
                 <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
-                    {{-- Kepala Ruang (Pemohon) selalu ada karena ini yang mengajukan --}}
                     @if(!empty($qrCodes['kepala_ruang']))
-                        <img src="data:image/png;base64,{{ $qrCodes['kepala_ruang'] ?? '' }}" style="width: 100%;">
+                        <img src="data:image/png;base64,{{ $qrCodes['kepala_ruang'] }}" style="width: 100%;">
                     @else
                         <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif
@@ -180,9 +179,9 @@
             <td class="text-center" style="border: none; vertical-align: top;">
                 <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Admin IT</p>
                 <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
-                    {{-- Admin IT mengisi estimasi biaya dan diteruskan ke management --}}
+                    {{-- QR Admin IT muncul jika estimasi biaya sudah diisi --}}
                     @if(!empty($project->procurement_estimate) && !empty($qrCodes['admin_it']))
-                        <img src="data:image/png;base64,{{ $qrCodes['admin_it'] ?? '' }}" style="width: 100%;">
+                        <img src="data:image/png;base64,{{ $qrCodes['admin_it'] }}" style="width: 100%;">
                     @else
                         <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif
@@ -196,9 +195,13 @@
             <td class="text-center" style="border: none; vertical-align: top;">
                 <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Management</p>
                 <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
-                    {{-- Management approve jika status bukan pending/submitted_to_admin --}}
-                    @if(($project->catatan_management_procurement) ||  $project->procurement_approval_status == 'submitted_to_bendahara')
-                        <img src="data:image/png;base64,{{ $qrCodes['management'] ?? '' }}" style="width: 100%;">
+                    @php
+                        // List status setelah Management menyetujui
+                        $afterManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved', 'completed'];
+                    @endphp
+                    {{-- QR muncul jika status sudah melewati management --}}
+                    @if(in_array($project->procurement_approval_status, $afterManagement) && !empty($qrCodes['management']))
+                        <img src="data:image/png;base64,{{ $qrCodes['management'] }}" style="width: 100%;">
                     @else
                         <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif
@@ -212,9 +215,13 @@
             <td class="text-center" style="border: none; vertical-align: top;">
                 <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Bendahara</p>
                 <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
-                    {{-- Bendahara validate setelah management approve, ditandai dengan procurement_approval_status=submitted_to_bendahara atau approved --}}
-                    @if(($project->procurement_approval_status == 'submitted_to_director'))
-                        <img src="data:image/png;base64,{{ $qrCodes['bendahara'] ?? '' }}" style="width: 100%;">
+                    @php
+                        // List status setelah Bendahara menyetujui
+                        $afterBendahara = ['submitted_to_director', 'approved', 'completed'];
+                    @endphp
+                    {{-- QR muncul jika status sudah melewati bendahara --}}
+                    @if(in_array($project->procurement_approval_status, $afterBendahara) && !empty($qrCodes['bendahara']))
+                        <img src="data:image/png;base64,{{ $qrCodes['bendahara'] }}" style="width: 100%;">
                     @else
                         <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif
@@ -228,9 +235,9 @@
             <td class="text-center" style="border: none; vertical-align: top;">
                 <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Direktur</p>
                 <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
-                    {{-- Direktur approve jika procurement_approval_status sudah submitted_to_director atau approved --}}
-                    @if( $project->procurement_approval_status == 'approved' || $project->procurement_approval_status == 'rejected')
-                        <img src="data:image/png;base64,{{ $qrCodes['direktur'] ?? '' }}" style="width: 100%;">
+                    {{-- QR muncul jika status final disetujui atau ditolak --}}
+                    @if(in_array($project->procurement_approval_status, ['approved', 'completed', 'rejected']) && !empty($qrCodes['direktur']))
+                        <img src="data:image/png;base64,{{ $qrCodes['direktur'] }}" style="width: 100%;">
                     @else
                         <div style="height: 65px; border: 1px dashed #ccc;"></div>
                     @endif

@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/management/procurements', [ProcurementController::class, 'managementIndex'])->name('management.procurements');
     Route::patch('/management/procurements/{id}/approve', [ProcurementController::class, 'managementApprove'])->name('management.procurements.approve');
     Route::patch('/management/procurements/{id}/reject', [ProcurementController::class, 'managementReject'])->name('management.procurements.reject');
+    Route::get('/management/procurement/{id}/export', [ProcurementController::class, 'downloadProcurementReportPdf'])->name('management.procurements.export.single');
     
     // Perubahan: Routes untuk management approval pengadaan di level AppRequest
     Route::patch('/management/app/{id}/procurement/approve', [AppRequestController::class, 'managementApproveProcurementForApp'])->name('management.app.procurement.approve');
@@ -75,6 +76,7 @@ Route::middleware('auth')->group(function () {
     // Bendahara: ACC pengadaan (teruskan ke Direktur)
     Route::patch('/bendahara/procurement/{id}/approve', [ProcurementController::class, 'bendaharaApprove'])->name('bendahara.procurements.approve');
     Route::patch('/bendahara/procurement/{id}/reject', [ProcurementController::class, 'bendaharaReject'])->name('bendahara.procurements.reject');
+    Route::get('/bendahara/procurement/{id}/export', [ProcurementController::class, 'downloadProcurementReportPdf'])->name('bendahara.procurements.export.single');
 
     // --- GROUP KHUSUS ADMIN IT (Dashboard & Pengadaan) ---
     // Diproteksi oleh Middleware EnsureUserIsAdmin

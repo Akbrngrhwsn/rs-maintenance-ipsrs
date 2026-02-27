@@ -797,62 +797,49 @@ class AppRequestController extends Controller
 }
 
 // === Download Procurement Report as PDF ===
+// app/Http/Controllers/AppRequestController.php
+
 public function downloadProcurementReport($id)
 {
-    $project = AppRequest::with(['user', 'features'])->findOrFail($id);
+    $app = AppRequest::findOrFail($id);
+    $s = $app->procurement_status; // Pastikan menggunakan kolom status yang tepat
+
+    $generateQr = function($text) {
+        return base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+            ->size(100)->margin(0)->generate($text));
+    };
+
+    // Inisialisasi string kosong agar tidak error di Blade
+    $qrAdmin = $generateQr("Diajukan Admin IT. App: " . $app->app_name);
+    $qrManagement = '';
+    $qrBendahara = '';
+    $qrDirektur = '';
+
+    // LOGIKA ESTAFET: QR tetap ada jika status sudah melewati tahap tersebut
     
-    // Check if has procurement data
-    if (!$project->needs_procurement) {
-        return back()->with('error', 'Aplikasi ini tidak memiliki pengadaan.');
+    // Management sudah setuju jika status sudah masuk ke bendahara, direktur, atau selesai
+    if (in_array($s, ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'completed'])) {
+        $qrManagement = $generateQr("Divalidasi Management. ID: " . $app->id);
     }
 
-    // Get procurement data from app_request
-    $procurementItems = is_array($project->requested_items) ? $project->requested_items : (
-        is_string($project->requested_items) && $project->requested_items !== '' 
-            ? @json_decode($project->requested_items, true) 
-            : []
-    );
-
-    $procurementTotal = $project->procurement_estimate ?? 0;
-
-    // Generate QR codes dynamically - check if they exist in DB, if not generate and save
-    $baseUrl = route('apps.show', $project->id);
-    $qrCodes = [];
-    $qrRoleMap = [
-        'kepala_ruang' => 'qr_kepala_ruang',
-        'admin_it' => 'qr_admin_it',
-        'management' => 'qr_management',
-        'bendahara' => 'qr_bendahara',
-        'direktur' => 'qr_direktur'
-    ];
-    
-    foreach ($qrRoleMap as $role => $column) {
-        // Get from DB if exists, otherwise generate
-        if (!empty($project->$column)) {
-            $qrCodes[$role] = $project->$column;
-        } else {
-            // Generate QR code
-            $qr = base64_encode(QrCode::format('png')->size(150)->generate($baseUrl . '?approver=' . $role));
-            $qrCodes[$role] = $qr;
-            // Save to database for future use
-            if (\Illuminate\Support\Facades\Schema::hasColumn('app_requests', $column)) {
-                $project->$column = $qr;
-            }
-        }
-    }
-    // Save if any QR codes were generated
-    if (array_filter($qrCodes)) {
-        $project->save();
+    // Bendahara sudah setuju jika status sudah di tangan direktur atau selesai
+    if (in_array($s, ['submitted_to_director', 'approved_by_director', 'completed'])) {
+        $qrBendahara = $generateQr("Diverifikasi Bendahara. Anggaran Tersedia.");
     }
 
-    $pdf = Pdf::loadView('pdf.procurement-report', [
-        'project' => $project,
-        'items' => $procurementItems,
-        'total' => $procurementTotal,
-        'qrCodes' => $qrCodes,
-        'generatedDate' => Carbon::now()
+    // Direktur muncul hanya jika sudah final
+    if (in_array($s, ['approved_by_director', 'completed'])) {
+        $qrDirektur = $generateQr("Disetujui Direktur Utama.");
+    }
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.procurement-report', [
+        'app' => $app,
+        'qrAdmin' => $qrAdmin,
+        'qrManagement' => $qrManagement,
+        'qrBendahara' => $qrBendahara,
+        'qrDirektur' => $qrDirektur,
     ]);
 
-    return $pdf->download('Laporan_Pengadaan_' . $project->ticket_number . '_' . now()->format('d-m-Y') . '.pdf');
+    return $pdf->download('laporan-pengadaan-aplikasi.pdf');
 }
 }
