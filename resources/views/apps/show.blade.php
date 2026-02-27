@@ -446,7 +446,7 @@
             </div>
 
             {{-- Tindakan Management --}}
-            @if(Auth::user()->role === 'management' && ($project->status === 'submitted_to_management' || ($project->status === 'approved' && $project->needs_procurement && ($project->procurement_approval_status === 'pending' || is_null($project->procurement_approval_status)))))
+            @if(Auth::user()->role === 'management' && ($project->status === 'submitted_to_management' || ($project->status === 'submitted_to_management' && $project->needs_procurement && ($project->procurement_approval_status === 'pending' || is_null($project->procurement_approval_status)))))
                 <div class="mt-6 border-t pt-6">
                     <h4 class="font-bold mb-4">Tindakan Management</h4>
                     
@@ -551,7 +551,13 @@
             @endif
 
             {{-- Tindakan Bendahara --}}
-            @if(Auth::user()->role === 'bendahara' && $project->procurement_approval_status === 'submitted_to_bendahara')
+            @php
+                // If a Procurement record exists for this AppRequest, prefer its status
+                $procUniversal = isset($procUniversal) ? $procUniversal : \App\Models\Procurement::where('app_request_id', $project->id)->first();
+                $isSubmittedToBendahara = ($project->procurement_approval_status === 'submitted_to_bendahara') || ($procUniversal && ($procUniversal->status ?? null) === 'submitted_to_bendahara');
+            @endphp
+
+            @if(Auth::user()->role === 'bendahara' && $isSubmittedToBendahara)
                 <div class="mt-6 border-t pt-6">
                     <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                         <h4 class="font-bold text-yellow-800 mb-3 flex items-center gap-2">

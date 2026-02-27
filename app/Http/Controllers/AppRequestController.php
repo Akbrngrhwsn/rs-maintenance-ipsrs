@@ -323,7 +323,8 @@ class AppRequestController extends Controller
         }
 
         // PERUBAHAN: Aplikasi approval terlepas dari procurement
-        // Aplikasi selalu lanjut ke Direktur untuk persetujuan
+        // Saat Management menekan "Setujui Aplikasi" aplikasi harus diteruskan
+        // ke Direktur untuk persetujuan akhir. Pengadaan diproses terpisah.
         $app->status = 'submitted_to_director';
 
         $app->save();
