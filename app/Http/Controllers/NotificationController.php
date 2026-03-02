@@ -30,6 +30,8 @@ class NotificationController extends Controller
                 'reports' => $reportCount,
                 'apps' => $appCount
             ];
+
+            if($reportCount > 0 || $appCount > 0) $response['has_notification'] = true;
         } 
         // --- DIREKTUR (TAMBAHAN: tangani submitted_to_director dan pending_director) ---
         elseif ($role === 'direktur') {
@@ -83,12 +85,15 @@ class NotificationController extends Controller
         elseif ($role === 'bendahara') {
             // Bendahara memvalidasi pengadaan untuk AppRequest — gunakan kolom procurement_approval_status
             $pendingProcurements = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
+            // Hitung juga apps yang membutuhkan perhatian dari bendahara
+            $appsCount = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
 
             $response['counts'] = [
+                'apps' => $appsCount,
                 'pending_procurements' => $pendingProcurements,
             ];
 
-            if($pendingProcurements > 0) $response['has_notification'] = true;
+            if($pendingProcurements > 0 || $appsCount > 0) $response['has_notification'] = true;
         }
 
         return response()->json($response);

@@ -43,6 +43,92 @@
                 const sound = document.getElementById('notifSound');
                 let lastCounts = JSON.parse(sessionStorage.getItem('notifCounts')) || {};
 
+                // Fungsi untuk update badges di navbar
+                function updateNavbarBadges(role, counts) {
+                    if (role === 'admin') {
+                        const reportBadge = document.getElementById('badge-admin-reports');
+                        const appBadge = document.getElementById('badge-admin-apps');
+                        
+                        if (counts.reports > 0) {
+                            reportBadge.textContent = counts.reports;
+                            reportBadge.classList.remove('hidden');
+                        } else {
+                            reportBadge.classList.add('hidden');
+                        }
+
+                        if (counts.apps > 0) {
+                            appBadge.textContent = counts.apps;
+                            appBadge.classList.remove('hidden');
+                        } else {
+                            appBadge.classList.add('hidden');
+                        }
+                    } 
+                    else if (role === 'direktur') {
+                        const appBadge = document.getElementById('badge-director-apps');
+                        const procBadge = document.getElementById('badge-director-procurements');
+                        
+                        if (counts.pending_apps > 0) {
+                            appBadge.textContent = counts.pending_apps;
+                            appBadge.classList.remove('hidden');
+                        } else {
+                            appBadge.classList.add('hidden');
+                        }
+
+                        if (counts.pending_procurements > 0) {
+                            procBadge.textContent = counts.pending_procurements;
+                            procBadge.classList.remove('hidden');
+                        } else {
+                            procBadge.classList.add('hidden');
+                        }
+                    } 
+                    else if (role === 'management') {
+                        const appBadge = document.getElementById('badge-management-apps');
+                        const procBadge = document.getElementById('badge-management-procurements');
+                        
+                        if (counts.submitted_apps > 0) {
+                            appBadge.textContent = counts.submitted_apps;
+                            appBadge.classList.remove('hidden');
+                        } else {
+                            appBadge.classList.add('hidden');
+                        }
+
+                        if (counts.submitted_procurements > 0) {
+                            procBadge.textContent = counts.submitted_procurements;
+                            procBadge.classList.remove('hidden');
+                        } else {
+                            procBadge.classList.add('hidden');
+                        }
+                    } 
+                    else if (role === 'bendahara') {
+                        const appBadge = document.getElementById('badge-bendahara-apps');
+                        const procBadge = document.getElementById('badge-bendahara-procurements');
+                        
+                        if (counts.apps > 0) {
+                            appBadge.textContent = counts.apps;
+                            appBadge.classList.remove('hidden');
+                        } else {
+                            appBadge.classList.add('hidden');
+                        }
+
+                        if (counts.pending_procurements > 0) {
+                            procBadge.textContent = counts.pending_procurements;
+                            procBadge.classList.remove('hidden');
+                        } else {
+                            procBadge.classList.add('hidden');
+                        }
+                    } 
+                    else if (role === 'kepala_ruang') {
+                        const procBadge = document.getElementById('badge-kepala-ruang-procurements');
+                        
+                        if (counts.pending_procurements > 0) {
+                            procBadge.textContent = counts.pending_procurements;
+                            procBadge.classList.remove('hidden');
+                        } else {
+                            procBadge.classList.add('hidden');
+                        }
+                    }
+                }
+
                 function playNotification() {
                     sound.play().catch(e => console.log('Audio blocked:', e));
                 }
@@ -58,6 +144,9 @@
                             // Deteksi URL saat ini untuk Auto-Reload
                             const currentPath = window.location.pathname;
                             let needReload = false;
+
+                            // Update badges navbar untuk semua role
+                            updateNavbarBadges(data.role, data.counts);
 
                             // === LOGIKA ADMIN ===
                             if (data.role === 'admin') {
@@ -134,7 +223,7 @@
                                 lastCounts.submitted_procurements = currentSubmittedProc;
                             }
 
-                            // === LOGIKA  (BARU) ===
+                            // === LOGIKA KEPALA RUANG ===
                             else if (data.role === 'kepala_ruang') {
                                 const currentPendingProc = data.counts.pending_procurements || 0;
                                 const lastPendingProc = lastCounts.pending_procurements || 0;
@@ -150,7 +239,7 @@
                                 lastCounts.pending_procurements = currentPendingProc;
                             }
 
-                            // === LOGIKA BENDAHARA (BARU) ===
+                            // === LOGIKA BENDAHARA ===
                             else if (data.role === 'bendahara') {
                                 const currentPendingProc = data.counts.pending_procurements || 0;
                                 const lastPendingProc = lastCounts.pending_procurements || 0;
@@ -201,11 +290,20 @@
                 fetch('{{ route("notifications.check") }}')
                     .then(r => r.json())
                     .then(d => {
+                        // Update badges pada page load
+                        updateNavbarBadges(d.role, d.counts);
+                        
                         if(!sessionStorage.getItem('notifCounts')) {
                             if(d.role === 'admin') {
                                 lastCounts = { reports: d.counts.reports, apps: d.counts.apps };
                             } else if(d.role === 'direktur') {
                                 lastCounts = { pending_apps: d.counts.pending_apps, pending_procurements: d.counts.pending_procurements };
+                            } else if(d.role === 'management') {
+                                lastCounts = { submitted_apps: d.counts.submitted_apps, submitted_procurements: d.counts.submitted_procurements };
+                            } else if(d.role === 'bendahara') {
+                                lastCounts = { apps: d.counts.apps, pending_procurements: d.counts.pending_procurements };
+                            } else if(d.role === 'kepala_ruang') {
+                                lastCounts = { pending_procurements: d.counts.pending_procurements };
                             }
                             sessionStorage.setItem('notifCounts', JSON.stringify(lastCounts));
                         }
