@@ -48,12 +48,20 @@
                     if (role === 'admin') {
                         const reportBadge = document.getElementById('badge-admin-reports');
                         const appBadge = document.getElementById('badge-admin-apps');
+                        const requestAppBadge = document.getElementById('badge-admin-request-apps');
                         
                         if (counts.reports > 0) {
                             reportBadge.textContent = counts.reports;
                             reportBadge.classList.remove('hidden');
                         } else {
                             reportBadge.classList.add('hidden');
+                        }
+
+                        if (counts.request_apps > 0) {
+                            requestAppBadge.textContent = counts.request_apps;
+                            requestAppBadge.classList.remove('hidden');
+                        } else {
+                            requestAppBadge.classList.add('hidden');
                         }
 
                         if (counts.apps > 0) {
@@ -66,7 +74,15 @@
                     else if (role === 'direktur') {
                         const appBadge = document.getElementById('badge-director-apps');
                         const procBadge = document.getElementById('badge-director-procurements');
+                        const requestAppBadge = document.getElementById('badge-director-request-apps');
                         
+                        if (counts.request_apps > 0) {
+                            requestAppBadge.textContent = counts.request_apps;
+                            requestAppBadge.classList.remove('hidden');
+                        } else {
+                            requestAppBadge.classList.add('hidden');
+                        }
+
                         if (counts.pending_apps > 0) {
                             appBadge.textContent = counts.pending_apps;
                             appBadge.classList.remove('hidden');
@@ -84,7 +100,15 @@
                     else if (role === 'management') {
                         const appBadge = document.getElementById('badge-management-apps');
                         const procBadge = document.getElementById('badge-management-procurements');
+                        const requestAppBadge = document.getElementById('badge-management-request-apps');
                         
+                        if (counts.submitted_apps > 0) {
+                            requestAppBadge.textContent = counts.submitted_apps;
+                            requestAppBadge.classList.remove('hidden');
+                        } else {
+                            requestAppBadge.classList.add('hidden');
+                        }
+
                         if (counts.submitted_apps > 0) {
                             appBadge.textContent = counts.submitted_apps;
                             appBadge.classList.remove('hidden');
@@ -102,7 +126,15 @@
                     else if (role === 'bendahara') {
                         const appBadge = document.getElementById('badge-bendahara-apps');
                         const procBadge = document.getElementById('badge-bendahara-procurements');
+                        const requestAppBadge = document.getElementById('badge-bendahara-request-apps');
                         
+                        if (counts.request_apps > 0) {
+                            requestAppBadge.textContent = counts.request_apps;
+                            requestAppBadge.classList.remove('hidden');
+                        } else {
+                            requestAppBadge.classList.add('hidden');
+                        }
+
                         if (counts.apps > 0) {
                             appBadge.textContent = counts.apps;
                             appBadge.classList.remove('hidden');

@@ -25,26 +25,32 @@ class NotificationController extends Controller
             $reportCount = Report::where('status', 'Belum Diproses')->count();
             // Hitung AppRequest yang baru masuk ke alur Admin IT
             $appCount = AppRequest::where('status', 'submitted_to_admin')->count();
+            // Hitung semua request apps yang pending
+            $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_admin', 'submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director'])->count();
 
             $response['counts'] = [
                 'reports' => $reportCount,
-                'apps' => $appCount
+                'apps' => $appCount,
+                'request_apps' => $requestAppsCount
             ];
 
-            if($reportCount > 0 || $appCount > 0) $response['has_notification'] = true;
+            if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0) $response['has_notification'] = true;
         } 
         // --- DIREKTUR (TAMBAHAN: tangani submitted_to_director dan pending_director) ---
         elseif ($role === 'direktur') {
             // Direktur perlu diberitahu jika ada app request yang dikirim ke direktur
             $pendingApps = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
             $pendingProcurements = Procurement::where('status', 'submitted_to_director')->count();
+            // Hitung request apps untuk direktur
+            $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
 
             $response['counts'] = [
                 'pending_apps' => $pendingApps,
                 'pending_procurements' => $pendingProcurements,
+                'request_apps' => $requestAppsCount
             ];
 
-            if($pendingApps > 0 || $pendingProcurements > 0) $response['has_notification'] = true;
+            if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0) $response['has_notification'] = true;
         }
 
         // --- MANAGEMENT (BARU) ---
@@ -57,6 +63,7 @@ class NotificationController extends Controller
             $response['counts'] = [
                 'submitted_apps' => $appsForManagement,
                 'submitted_procurements' => $procurementsForManagement,
+                'request_apps' => $appsForManagement
             ];
 
             if($appsForManagement > 0 || $procurementsForManagement > 0) $response['has_notification'] = true;
@@ -87,13 +94,16 @@ class NotificationController extends Controller
             $pendingProcurements = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
             // Hitung juga apps yang membutuhkan perhatian dari bendahara
             $appsCount = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
+            // Hitung request apps untuk bendahara
+            $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_bendahara', 'pending_bendahara'])->count();
 
             $response['counts'] = [
                 'apps' => $appsCount,
                 'pending_procurements' => $pendingProcurements,
+                'request_apps' => $requestAppsCount
             ];
 
-            if($pendingProcurements > 0 || $appsCount > 0) $response['has_notification'] = true;
+            if($pendingProcurements > 0 || $appsCount > 0 || $requestAppsCount > 0) $response['has_notification'] = true;
         }
 
         return response()->json($response);
