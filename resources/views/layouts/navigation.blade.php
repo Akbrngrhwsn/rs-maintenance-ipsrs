@@ -216,100 +216,134 @@
     {{-- Quick Rapat Modal removed — single Rapat link in navbar covers all functions. --}}
 
     {{-- MOBILE MENU --}}
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white border-t border-gray-100">
-        <div class="pt-2 pb-3 space-y-1 px-2">
-            @if(Auth::check())
-                <x-responsive-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.*')" class="rounded-lg font-bold text-[13px]">{{ __('Rapat') }}</x-responsive-nav-link>
-                
-                {{-- ADMIN MOBILE --}}
-                @if(Auth::user()->role === 'admin')
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Pemeliharaan') }}</x-responsive-nav-link>
-                        <span id="badge-admin-reports" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                        <span id="badge-admin-request-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
-                        <span id="badge-admin-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white hidden">0</span>
-                    </div>
-                    <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('User') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Ruangan') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('admin.procurements.index')" :active="request()->routeIs('admin.procurements.*')" class="rounded-lg font-bold text-[13px]">{{ __('Pengadaan') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')" class="rounded-lg font-bold text-[13px]">{{ __('Catatan IT') }}</x-responsive-nav-link>
-                @endif
-
-                {{-- DIREKTUR MOBILE --}}
-                @if(Auth::user()->role === 'direktur')
-                    <x-responsive-nav-link :href="route('director.reports')" :active="request()->routeIs('director.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('director.procurements.index')" :active="request()->routeIs('director.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Pengadaan') }}</x-responsive-nav-link>
-                        <span id="badge-director-procurements" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                        <span id="badge-director-request-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
-                        <span id="badge-director-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white hidden">0</span>
-                    </div>
-                    <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
-                @endif
-
-                {{-- MANAGEMENT MOBILE --}}
-                @if(Auth::user()->role === 'management')
-                    <x-responsive-nav-link :href="route('management.reports')" :active="request()->routeIs('management.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                        <span id="badge-management-request-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
-                        <span id="badge-management-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('management.procurements')" :active="request()->routeIs('management.procurements')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Persetujuan') }}</x-responsive-nav-link>
-                        <span id="badge-management-procurements" class="px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-600 text-white hidden">0</span>
-                    </div>
-                    <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
-                @endif
-
-                {{-- BENDAHARA MOBILE --}}
-                @if(Auth::user()->role === 'bendahara')
-                    <x-responsive-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                        <span id="badge-bendahara-request-apps" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                    </div>
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Validasi Keuangan') }}</x-responsive-nav-link>
-                        <span id="badge-bendahara-procurements" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                    </div>
-                    <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Tracking') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
-                @endif
-
-                {{-- KEPALA RUANG MOBILE --}}
-                @if(Auth::user()->role === 'kepala_ruang')
-                    <div class="flex items-center justify-between px-3 py-2">
-                        <x-responsive-nav-link :href="route('kepala-ruang.procurements.index')" :active="request()->routeIs('kepala-ruang.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Validasi Pengadaan') }}</x-responsive-nav-link>
-                        <span id="badge-kepala-ruang-procurements" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                    </div>
-                    <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold text-[13px]">{{ __('Form Req. Aplikasi') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Daftar Request') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
-                @endif
-
-            @else
-                <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking Laporan') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Buat Laporan Baru') }}</x-responsive-nav-link>
+<div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white border-t border-gray-100">
+    <div class="pt-2 pb-3 space-y-1 px-2">
+        @if(Auth::check())
+            <x-responsive-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.*')" class="rounded-lg font-bold text-[13px]">{{ __('Rapat') }}</x-responsive-nav-link>
+            
+            {{-- ADMIN MOBILE --}}
+            @if(Auth::user()->role === 'admin')
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Pemeliharaan') }}</x-responsive-nav-link>
+                    <span id="badge-admin-reports-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
+                    <span id="badge-admin-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
+                    <span id="badge-admin-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white hidden">0</span>
+                </div>
+                <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('User') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Ruangan') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.procurements.index')" :active="request()->routeIs('admin.procurements.*')" class="rounded-lg font-bold text-[13px]">{{ __('Pengadaan') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')" class="rounded-lg font-bold text-[13px]">{{ __('Catatan IT') }}</x-responsive-nav-link>
             @endif
-        </div>
+
+            {{-- DIREKTUR MOBILE --}}
+            @if(Auth::user()->role === 'direktur')
+                <x-responsive-nav-link :href="route('director.reports')" :active="request()->routeIs('director.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('director.procurements.index')" :active="request()->routeIs('director.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Pengadaan') }}</x-responsive-nav-link>
+                    <span id="badge-director-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
+                    <span id="badge-director-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
+                    <span id="badge-director-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white hidden">0</span>
+                </div>
+                <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+            @endif
+
+            {{-- MANAGEMENT MOBILE --}}
+            @if(Auth::user()->role === 'management')
+                <x-responsive-nav-link :href="route('management.reports')" :active="request()->routeIs('management.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
+                    <span id="badge-management-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
+                    <span id="badge-management-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('management.procurements')" :active="request()->routeIs('management.procurements')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Persetujuan') }}</x-responsive-nav-link>
+                    <span id="badge-management-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-600 text-white hidden">0</span>
+                </div>
+                <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+            @endif
+
+            {{-- BENDAHARA MOBILE --}}
+            @if(Auth::user()->role === 'bendahara')
+                <x-responsive-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
+                    <span id="badge-bendahara-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+                </div>
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Validasi Keuangan') }}</x-responsive-nav-link>
+                    <span id="badge-bendahara-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+                </div>
+                <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Tracking') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+            @endif
+
+            {{-- KEPALA RUANG MOBILE --}}
+            @if(Auth::user()->role === 'kepala_ruang')
+                <div class="flex items-center justify-between px-3 py-2">
+                    <x-responsive-nav-link :href="route('kepala-ruang.procurements.index')" :active="request()->routeIs('kepala-ruang.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Validasi Pengadaan') }}</x-responsive-nav-link>
+                    <span id="badge-kepala-ruang-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+                </div>
+                <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold text-[13px]">{{ __('Form Req. Aplikasi') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Daftar Request') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+            @endif
+
+            {{-- RESPONSIVE SETTINGS OPTIONS (LOGOUT & PROFILE) --}}
+            <div class="pt-4 pb-1 border-t border-gray-200 mt-4">
+                <div class="px-4 flex items-center">
+                    <div class="h-10 w-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold shadow-sm">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                    <div class="ms-3">
+                        <div class="font-bold text-sm text-blue-900">{{ Auth::user()->name }}</div>
+                        <div class="font-medium text-xs text-gray-500">{{ Auth::user()->email }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-3 space-y-1">
+                    <x-responsive-nav-link :href="route('profile.edit')" class="font-bold text-sm">
+                        {{ __('My Profile') }}
+                    </x-responsive-nav-link>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="block w-full text-start ps-3 pe-4 py-2 border-l-4 border-transparent text-sm font-bold text-red-600 hover:bg-red-50 transition">
+                            {{ __('Sign Out') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        @else
+            {{-- MENU UNTUK GUEST --}}
+            <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking Laporan') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Buat Laporan Baru') }}</x-responsive-nav-link>
+            
+            {{-- TOMBOL LOGIN MOBILE --}}
+            <div class="pt-4 pb-2 border-t border-gray-100 mt-2 px-4">
+                <a href="{{ route('login') }}" class="flex justify-center items-center w-full px-4 py-3 bg-blue-900 rounded-xl font-bold text-sm text-white uppercase tracking-widest hover:bg-blue-800 transition shadow-sm">
+                    {{ __('Login') }}
+                </a>
+            </div>
+        @endif
     </div>
+</div>
 </nav>

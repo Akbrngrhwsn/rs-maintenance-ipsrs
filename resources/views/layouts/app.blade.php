@@ -46,127 +46,46 @@
 
                 // Fungsi untuk update badges di navbar
                 function updateNavbarBadges(role, counts) {
-                    if (role === 'admin') {
-                        const reportBadge = document.getElementById('badge-admin-reports');
-                        const appBadge = document.getElementById('badge-admin-apps');
-                        const requestAppBadge = document.getElementById('badge-admin-request-apps');
-                        
-                        if (counts.reports > 0) {
-                            reportBadge.textContent = counts.reports;
-                            reportBadge.classList.remove('hidden');
-                        } else {
-                            reportBadge.classList.add('hidden');
-                        }
-
-                        if (counts.request_apps > 0) {
-                            requestAppBadge.textContent = counts.request_apps;
-                            requestAppBadge.classList.remove('hidden');
-                        } else {
-                            requestAppBadge.classList.add('hidden');
-                        }
-
-                        if (counts.apps > 0) {
-                            appBadge.textContent = counts.apps;
-                            appBadge.classList.remove('hidden');
-                        } else {
-                            appBadge.classList.add('hidden');
-                        }
-                    } 
-                    else if (role === 'direktur') {
-                        const appBadge = document.getElementById('badge-director-apps');
-                        const procBadge = document.getElementById('badge-director-procurements');
-                        const requestAppBadge = document.getElementById('badge-director-request-apps');
-                        
-                        if (counts.request_apps > 0) {
-                            requestAppBadge.textContent = counts.request_apps;
-                            requestAppBadge.classList.remove('hidden');
-                        } else {
-                            requestAppBadge.classList.add('hidden');
-                        }
-
-                        if (counts.pending_apps > 0) {
-                            appBadge.textContent = counts.pending_apps;
-                            appBadge.classList.remove('hidden');
-                        } else {
-                            appBadge.classList.add('hidden');
-                        }
-
-                        if (counts.pending_procurements > 0) {
-                            procBadge.textContent = counts.pending_procurements;
-                            procBadge.classList.remove('hidden');
-                        } else {
-                            procBadge.classList.add('hidden');
-                        }
-                    } 
-                    else if (role === 'management') {
-                        const appBadge = document.getElementById('badge-management-apps');
-                        const procBadge = document.getElementById('badge-management-procurements');
-                        const requestAppBadge = document.getElementById('badge-management-request-apps');
-                        
-                        if (counts.submitted_apps > 0) {
-                            requestAppBadge.textContent = counts.submitted_apps;
-                            requestAppBadge.classList.remove('hidden');
-                        } else {
-                            requestAppBadge.classList.add('hidden');
-                        }
-
-                        if (counts.submitted_apps > 0) {
-                            appBadge.textContent = counts.submitted_apps;
-                            appBadge.classList.remove('hidden');
-                        } else {
-                            appBadge.classList.add('hidden');
-                        }
-
-                        if (counts.submitted_procurements > 0) {
-                            procBadge.textContent = counts.submitted_procurements;
-                            procBadge.classList.remove('hidden');
-                        } else {
-                            procBadge.classList.add('hidden');
-                        }
-                    } 
-                    else if (role === 'bendahara') {
-                        const appBadge = document.getElementById('badge-bendahara-apps');
-                        const procBadge = document.getElementById('badge-bendahara-procurements');
-                        const requestAppBadge = document.getElementById('badge-bendahara-request-apps');
-                        
-                        if (requestAppBadge) {
-                            if (counts.request_apps > 0) {
-                                requestAppBadge.textContent = counts.request_apps;
-                                requestAppBadge.classList.remove('hidden');
-                            } else {
-                                requestAppBadge.classList.add('hidden');
-                            }
-                        }
-
-                        if (appBadge) {
-                            if (counts.apps > 0) {
-                                appBadge.textContent = counts.apps;
-                                appBadge.classList.remove('hidden');
-                            } else {
-                                appBadge.classList.add('hidden');
-                            }
-                        }
-
-                        if (procBadge) {
-                            if (counts.pending_procurements > 0) {
-                                procBadge.textContent = counts.pending_procurements;
-                                procBadge.classList.remove('hidden');
-                            } else {
-                                procBadge.classList.add('hidden');
-                            }
-                        }
-                    } 
-                    else if (role === 'kepala_ruang') {
-                        const procBadge = document.getElementById('badge-kepala-ruang-procurements');
-                        
-                        if (counts.pending_procurements > 0) {
-                            procBadge.textContent = counts.pending_procurements;
-                            procBadge.classList.remove('hidden');
-                        } else {
-                            procBadge.classList.add('hidden');
-                        }
-                    }
+    // Fungsi pembantu untuk update elemen desktop & mobile sekaligus
+    const updateElement = (id, count) => {
+        const ids = [id, id + '-mobile'];
+        ids.forEach(targetId => {
+            const badge = document.getElementById(targetId);
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
                 }
+            }
+        });
+    };
+
+    if (role === 'admin') {
+        updateElement('badge-admin-reports', counts.reports);
+        updateElement('badge-admin-apps', counts.apps);
+        updateElement('badge-admin-request-apps', counts.request_apps);
+    } 
+    else if (role === 'direktur') {
+        updateElement('badge-director-request-apps', counts.request_apps);
+        updateElement('badge-director-apps', counts.pending_apps);
+        updateElement('badge-director-procurements', counts.pending_procurements);
+    } 
+    else if (role === 'management') {
+        updateElement('badge-management-request-apps', counts.submitted_apps);
+        updateElement('badge-management-apps', counts.submitted_apps);
+        updateElement('badge-management-procurements', counts.submitted_procurements);
+    } 
+    else if (role === 'bendahara') {
+        updateElement('badge-bendahara-request-apps', counts.request_apps);
+        updateElement('badge-bendahara-apps', counts.apps);
+        updateElement('badge-bendahara-procurements', counts.pending_procurements);
+    } 
+    else if (role === 'kepala_ruang') {
+        updateElement('badge-kepala-ruang-procurements', counts.pending_procurements);
+    }
+}
 
                 function playNotification() {
                     sound.play().catch(e => console.log('Audio blocked:', e));
