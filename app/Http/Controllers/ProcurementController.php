@@ -492,9 +492,25 @@ class ProcurementController extends Controller
         
         return $pdf->download($filename);
         
+        
     } catch (\Exception $e) {
         \Log::error('Error download procurement PDF: ' . $e->getMessage());
         return back()->with('error', 'Error mengunduh PDF: ' . $e->getMessage());
     }
 }
+public function finish($id)
+    {
+        $procurement = \App\Models\Procurement::findOrFail($id);
+        
+        // Memastikan pengadaan hanya bisa diselesaikan jika sudah di-ACC Direktur
+        if ($procurement->status === 'approved_by_director') {
+            $procurement->update([
+                'status' => 'completed'
+            ]);
+            
+            return redirect()->back()->with('success', 'Pengadaan telah berhasil diselesaikan!');
+        }
+        
+        return redirect()->back()->with('error', 'Status pengadaan tidak dapat diubah karena belum disetujui.');
+    }
 }

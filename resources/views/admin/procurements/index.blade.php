@@ -94,7 +94,7 @@
                                                         </thead>
                                                         <tbody class="divide-y divide-gray-100">
                                                             @foreach($proc->items as $item)
-                                                                    @php
+                                                                @php
                                                                     $qty = isset($item['jumlah']) ? (int)$item['jumlah'] : 1;
                                                                     $price = isset($item['harga_satuan']) ? (float)$item['harga_satuan'] : (isset($item['harga']) ? (float)$item['harga'] : (isset($item['biaya']) ? (float)$item['biaya'] : 0));
                                                                     $subtotal = $price * $qty;
@@ -128,7 +128,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        </td>
+                                    </td>
 
                                     <td class="px-6 py-4 align-top text-center">
                                         @php
@@ -136,6 +136,7 @@
                                                 'submitted_to_kepala_ruang' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'submitted_to_bendahara' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'approved_by_director' => 'bg-green-100 text-green-700 border-green-200',
+                                                'completed' => 'bg-blue-100 text-blue-800 border-blue-300', /* TAMBAHAN WARNA UNTUK SELESAI */
                                                 'rejected' => 'bg-red-100 text-red-700 border-red-200',
                                                 default => 'bg-gray-100 text-gray-700 border-gray-200',
                                             };
@@ -143,6 +144,7 @@
                                                 'submitted_to_kepala_ruang' => 'Menunggu Konfirmasi Kepala Ruang',
                                                 'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
                                                 'approved_by_director' => 'Disetujui',
+                                                'completed' => 'Selesai', /* TAMBAHAN LABEL SELESAI */
                                                 'rejected' => 'Ditolak',
                                                 default => ucfirst(str_replace('_', ' ', $proc->status)),
                                             };
@@ -161,6 +163,16 @@
                                             <a href="{{ route('procurement.edit', $proc->id) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                                                 Edit
                                             </a>
+                                        @elseif($proc->status === 'approved_by_director')
+                                            <form action="{{ route('admin.procurement.finish', $proc->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded shadow flex items-center gap-1" title="Tandai Selesai">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         @else
                                             <span class="text-gray-400 text-sm italic">Tidak tersedia</span>
                                         @endif
@@ -181,7 +193,6 @@
                     </table>
                 </div>
 
-                <!-- Export Bulanan Modal -->
                 <div id="export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
                     <div class="absolute inset-0 bg-gray-900 opacity-60" onclick="document.getElementById('export-modal').classList.add('hidden')"></div>
                     <div class="bg-white rounded-xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden transform transition-all m-4">

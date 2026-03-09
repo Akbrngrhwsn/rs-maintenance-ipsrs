@@ -188,6 +188,9 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
         Route::patch('/{id}/bendahara-reject', [AppRequestController::class, 'bendaharaRejectAppRequest'])->name('apps.bendahara_reject');
 
         Route::delete('/apps/features/{id}/delete', [AppRequestController::class, 'deleteFeature'])->name('apps.delete_feature');
+
+        // Route untuk Admin menandai pengadaan telah selesai
+        Route::patch('/admin/procurement/{id}/finish', [\App\Http\Controllers\ProcurementController::class, 'finish'])->name('admin.procurement.finish');
     });
 
     // --- MEETINGS (RAPAT) ---

@@ -29,7 +29,7 @@ class Procurement extends Model
     }
 
     // Human-readable label for status, localized to Indonesian
-    public function getStatusLabelAttribute()
+   public function getStatusLabelAttribute()
     {
         $map = [
             'submitted_to_kepala_ruang' => 'Menunggu Konfirmasi Kepala Ruang',
@@ -37,6 +37,7 @@ class Procurement extends Model
             'submitted_to_bendahara' => 'Menunggu Konfirmasi Bendahara',
             'submitted_to_director' => 'Menunggu ACC Direktur',
             'approved_by_director' => 'Disetujui',
+            'completed' => 'Selesai', // <--- TAMBAHKAN BARIS INI
             'rejected' => 'Ditolak',
             'draft' => 'Draft',
             'pending' => 'Menunggu',
