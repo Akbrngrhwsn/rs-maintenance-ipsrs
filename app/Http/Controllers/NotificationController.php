@@ -28,10 +28,13 @@ class NotificationController extends Controller
             // Hitung semua request apps yang pending
             $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_admin' ])->count();
 
+            $approvedProcurements = Procurement::whereIn('status', ['approved_by_director', 'approved'])->count();
+
             $response['counts'] = [
                 'reports' => $reportCount,
                 'apps' => $appCount,
-                'request_apps' => $requestAppsCount
+                'request_apps' => $requestAppsCount,
+                'procurements' => $approvedProcurements
             ];
 
             if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0) $response['has_notification'] = true;

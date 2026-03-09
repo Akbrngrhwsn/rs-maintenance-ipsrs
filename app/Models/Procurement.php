@@ -8,9 +8,9 @@ class Procurement extends Model
 {
     protected $fillable = [
     'report_id', 
-    'app_request_id',
+    //'app_request_id',
     'items', 
-    'total',
+    //'total',
     'status', 
     'director_note', 
     'qr_kepala_ruang', 
