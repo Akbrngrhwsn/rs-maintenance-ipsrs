@@ -31,11 +31,22 @@ class NotificationController extends Controller
             // Hitung pengadaan yang menunggu diselesaikan admin (sudah di-ACC direktur)
             $approvedProcurements = Procurement::whereIn('status', ['approved_by_director', 'approved'])->count();
 
+            // 2. TAMBAHAN: Hitung Aplikasi yang sudah disetujui Direktur (status 'in_progress' atau 'approved')
+            // Sesuaikan status 'in_progress' jika itu menandakan aplikasi baru saja disetujui direktur
+            $approvedApps = AppRequest::where('status', 'in_progress')->count();
+
+            // 3. TAMBAHAN: Hitung Pengadaan Khusus Aplikasi yang sudah disetujui Direktur
+            $approvedAppProcurements = AppRequest::where('needs_procurement', true)
+                ->where('procurement_approval_status', 'approved')
+                ->count();
+
             $response['counts'] = [
                 'reports' => $reportCount,
                 'apps' => $appCount,
                 'request_apps' => $requestAppsCount,
-                'procurements' => $approvedProcurements
+                'procurements' => $approvedProcurements,
+                'approved_apps' => $approvedApps, // Data baru
+                'approved_app_procurements' => $approvedAppProcurements // Data baru
             ];
 
             // PERBAIKAN: Tambahkan $approvedProcurements ke dalam kondisi if
