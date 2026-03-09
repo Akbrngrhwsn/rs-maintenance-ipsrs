@@ -144,7 +144,8 @@ class ProcurementController extends Controller
                 'submitted_to_management',
                 'submitted_to_bendahara', 
                 'submitted_to_director', 
-                'approved_by_director', 
+                'approved_by_director',
+                'completed', 
                 'rejected'
             ]);
         } else {
@@ -228,8 +229,8 @@ class ProcurementController extends Controller
 
         if($tab === 'history') {
             // History: Sudah disetujui management (lanjut ke bendahara/direktur) atau ditolak
-            $query->whereIn('status', ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'rejected']);
-        } else {
+            $query->whereIn('status', ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'completed', 'rejected']); // <-- TAMBAHKAN COMPLETED
+        }else {
             // Pending: Menunggu persetujuan Management
             $query->where('status', 'submitted_to_management');
         }
@@ -298,7 +299,7 @@ class ProcurementController extends Controller
         $query = Procurement::with('report');
 
         if($tab === 'history') {
-            $query->whereIn('status', ['approved_by_director', 'rejected']);
+            $query->whereIn('status', ['approved_by_director', 'completed', 'rejected']); // <-- TAMBAHKAN COMPLETED
         } else {
             $query->where('status', 'submitted_to_bendahara');
         }
@@ -365,7 +366,7 @@ class ProcurementController extends Controller
         $query = Procurement::with('report');
 
         if($tab === 'history') {
-            $query->whereIn('status', ['approved_by_director', 'rejected']);
+            $query->whereIn('status', ['approved_by_director', 'completed', 'rejected']); // <-- TAMBAHKAN COMPLETED
         } else {
             $query->where('status', 'submitted_to_director');
         }

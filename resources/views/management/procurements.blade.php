@@ -159,12 +159,14 @@
                                             $statusClass = match($proc->status) {
                                                 'submitted_to_management' => 'bg-amber-100 text-amber-700 border-amber-200',
                                                 'approved_by_bendahara' => 'bg-green-100 text-green-700 border-green-200',
+                                                'completed' => 'bg-blue-100 text-blue-800 border-blue-300',
                                                 'rejected' => 'bg-red-100 text-red-700 border-red-200',
                                                 default => 'bg-gray-100 text-gray-700 border-gray-200',
                                             };
                                             $statusLabel = match($proc->status) {
                                                 'submitted_to_management' => 'Menunggu Konfirmasi Management',
                                                 'approved_by_bendahara' => 'Disetujui',
+                                                'completed' => 'Selesai',
                                                 'rejected' => 'Ditolak',
                                                 default => ucfirst(str_replace('_', ' ', $proc->status)),
                                             };

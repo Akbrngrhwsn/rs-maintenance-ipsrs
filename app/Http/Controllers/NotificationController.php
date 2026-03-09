@@ -28,6 +28,7 @@ class NotificationController extends Controller
             // Hitung semua request apps yang pending
             $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_admin' ])->count();
 
+            // Hitung pengadaan yang menunggu diselesaikan admin (sudah di-ACC direktur)
             $approvedProcurements = Procurement::whereIn('status', ['approved_by_director', 'approved'])->count();
 
             $response['counts'] = [
@@ -37,7 +38,10 @@ class NotificationController extends Controller
                 'procurements' => $approvedProcurements
             ];
 
-            if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0) $response['has_notification'] = true;
+            // PERBAIKAN: Tambahkan $approvedProcurements ke dalam kondisi if
+            if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0 || $approvedProcurements > 0) {
+                $response['has_notification'] = true;
+            }
         } 
         // --- DIREKTUR (TAMBAHAN: tangani submitted_to_director dan pending_director) ---
         elseif ($role === 'direktur') {
@@ -53,7 +57,9 @@ class NotificationController extends Controller
                 'request_apps' => $requestAppsCount
             ];
 
-            if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0) $response['has_notification'] = true;
+            if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0) {
+                $response['has_notification'] = true;
+            }
         }
 
         // --- MANAGEMENT (BARU) ---
@@ -69,11 +75,13 @@ class NotificationController extends Controller
                 'request_apps' => $appsForManagement
             ];
 
-            if($appsForManagement > 0 || $procurementsForManagement > 0) $response['has_notification'] = true;
+            if($appsForManagement > 0 || $procurementsForManagement > 0) {
+                $response['has_notification'] = true;
+            }
         }
-        // --- MANA(BARU) ---
+        // --- KEPALA RUANG ---
         elseif ($role === 'kepala_ruang') {
-            // Manmemantau pengadaan dari Admin IT, tapi hanya untuk ruangan yang dikelolanya
+            // Memantau pengadaan dari Admin IT, tapi hanya untuk ruangan yang dikelolanya
             $room = $user->room; // hasOne(Room::class)
 
             if ($room) {
@@ -89,7 +97,9 @@ class NotificationController extends Controller
                 'pending_procurements' => $pendingProcurements,
             ];
 
-            if ($pendingProcurements > 0) $response['has_notification'] = true;
+            if ($pendingProcurements > 0) {
+                $response['has_notification'] = true;
+            }
         }
         // --- BENDAHARA (UPDATE) ---
         elseif ($role === 'bendahara') {
@@ -108,7 +118,9 @@ class NotificationController extends Controller
                 'request_apps' => $requestAppsCount
             ];
 
-            if($pendingProcurements > 0 || $appsCount > 0 || $requestAppsCount > 0) $response['has_notification'] = true;
+            if($pendingProcurements > 0 || $appsCount > 0 || $requestAppsCount > 0) {
+                $response['has_notification'] = true;
+            }
         }
 
         return response()->json($response);
