@@ -47,20 +47,37 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $app->user->name }}</td>
                             <td class="px-6 py-4">
-                                @php
-                                    $statusLabels = [
-                                        'submitted_to_admin' => ['label' => 'Menunggu Admin', 'class' => 'bg-blue-100 text-blue-800'],
-                                        'submitted_to_management' => ['label' => 'Menunggu Management', 'class' => 'bg-indigo-100 text-indigo-800'],
-                                        'submitted_to_bendahara' => ['label' => 'Menunggu Bendahara', 'class' => 'bg-yellow-100 text-yellow-800'],
-                                        'submitted_to_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
-                                        'pending_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
-                                        'approved' => ['label' => 'Disetujui', 'class' => 'bg-green-100 text-green-800'],
-                                        'rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
-                                    ];
-                                    $s = $statusLabels[$app->status] ?? ['label' => ucfirst(str_replace('_',' ',$app->status)), 'class' => 'bg-gray-100 text-gray-800'];
-                                @endphp
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $s['class'] }}">{{ $s['label'] }}</span>
-                            </td>
+    @php
+        $statusLabels = [
+            'submitted_to_admin' => ['label' => 'Menunggu Admin', 'class' => 'bg-blue-100 text-blue-800'],
+            'submitted_to_management' => ['label' => 'Menunggu Management', 'class' => 'bg-indigo-100 text-indigo-800'],
+            'submitted_to_bendahara' => ['label' => 'Menunggu Bendahara', 'class' => 'bg-yellow-100 text-yellow-800'],
+            'submitted_to_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
+            'pending_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
+            'approved' => ['label' => 'Disetujui', 'class' => 'bg-green-100 text-green-800'],
+            'rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
+        ];
+        
+        $s = $statusLabels[$app->status] ?? ['label' => ucfirst(str_replace('_',' ',$app->status)), 'class' => 'bg-gray-100 text-gray-800'];
+        
+        // Logika Khusus Bendahara: Menandai item yang butuh aksinya
+        $isNeedsBendaharaAction = Auth::user()->role === 'bendahara' && 
+                                 $app->procurement_approval_status === 'submitted_to_bendahara';
+    @endphp
+
+    <div class="flex flex-col gap-1">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $s['class'] }}">
+            {{ $s['label'] }}
+        </span>
+
+        {{-- Label Tambahan Khusus Bendahara --}}
+        @if($isNeedsBendaharaAction)
+            <span class="px-2 inline-flex text-[10px] leading-4 font-bold rounded-full bg-red-600 text-white animate-pulse">
+                BUTUH VALIDASI ANGGARAN
+            </span>
+        @endif
+    </div>
+</td>
                             <td class="px-6 py-4 text-sm font-medium">
                                 <a href="{{ route('apps.show', $app->id) }}" class="text-indigo-600 hover:text-indigo-900 font-bold">Buka Detail</a>
                             </td>

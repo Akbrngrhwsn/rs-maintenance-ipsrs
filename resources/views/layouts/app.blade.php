@@ -80,7 +80,7 @@
             updateElement('badge-management-procurements', counts.submitted_procurements);
         } 
         else if (role === 'bendahara') {
-            updateElement('badge-bendahara-request-apps', counts.request_apps);
+            
             updateElement('badge-bendahara-apps', counts.apps);
             updateElement('badge-bendahara-procurements', counts.pending_procurements);
         } 

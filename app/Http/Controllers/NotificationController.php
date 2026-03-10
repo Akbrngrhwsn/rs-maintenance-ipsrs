@@ -112,24 +112,21 @@ class NotificationController extends Controller
                 $response['has_notification'] = true;
             }
         }
-        // --- BENDAHARA (UPDATE) ---
+        // --- BENDAHARA (SESUAI REVISI) ---
         elseif ($role === 'bendahara') {
-            // Bendahara memvalidasi pengadaan dari Procurement model
+            // 1. Hitung pengadaan barang umum (dari model Procurement)
             $pendingProcurements = Procurement::where('status', 'submitted_to_bendahara')->count();
             
-            // Hitung AppRequest yang submitted ke bendahara untuk validasi anggaran
-            $appsCount = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
+            // 2. Hitung validasi anggaran untuk pengadaan aplikasi (dari model AppRequest)
+            $appsProcurementCount = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
             
-            // Hitung request apps untuk bendahara
-            $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_bendahara', 'pending_bendahara'])->count();
-
             $response['counts'] = [
-                'apps' => $appsCount,
-                'pending_procurements' => $pendingProcurements,
-                'request_apps' => $requestAppsCount
+                'apps' => $appsProcurementCount, // Label untuk pengadaan aplikasi
+                'pending_procurements' => $pendingProcurements, // Label untuk pengadaan barang
             ];
 
-            if($pendingProcurements > 0 || $appsCount > 0 || $requestAppsCount > 0) {
+            // Notifikasi aktif jika salah satu ada yang pending
+            if($pendingProcurements > 0 || $appsProcurementCount > 0) {
                 $response['has_notification'] = true;
             }
         }

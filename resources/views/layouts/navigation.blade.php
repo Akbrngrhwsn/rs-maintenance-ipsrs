@@ -112,25 +112,30 @@
                     @endif
 
                     {{-- === 4. MENU BENDAHARA === --}}
-                    @if(Auth::check() && Auth::user()->role === 'bendahara')
-                        <x-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Monitoring') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Req. Aplikasi') }}
-                            <span id="badge-bendahara-request-apps" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                        </x-nav-link>
-                        <x-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Validasi Keuangan') }}
-                            <span id="badge-bendahara-procurements" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                        </x-nav-link>
-                        <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight text-gray-500">
-                            {{ __('Tracking') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
-                            {{ __('Laporan Baru') }}
-                        </x-nav-link>
-                    @endif
+@if(Auth::check() && Auth::user()->role === 'bendahara')
+    <x-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="text-[13px] font-bold tracking-tight">
+        {{ __('Monitoring') }}
+    </x-nav-link>
+
+    <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
+        {{ __('Anggaran Aplikasi') }}
+        {{-- ID diubah agar sesuai dengan logic JS (counts.apps) --}}
+        <span id="badge-bendahara-apps" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+    </x-nav-link>
+
+    <x-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="text-[13px] font-bold tracking-tight">
+        {{ __('Validasi Keuangan') }}
+        <span id="badge-bendahara-procurements" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+    </x-nav-link>
+
+    <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight text-gray-500">
+        {{ __('Tracking') }}
+    </x-nav-link>
+
+    <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
+        {{ __('Laporan Baru') }}
+    </x-nav-link>
+@endif
 
                     {{-- === 5. MENU KEPALA RUANG === --}}
                     @if(Auth::check() && Auth::user()->role === 'kepala_ruang')
@@ -301,19 +306,34 @@
             @endif
 
             {{-- BENDAHARA MOBILE --}}
-            @if(Auth::user()->role === 'bendahara')
-                <x-responsive-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                    <span id="badge-bendahara-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                </div>
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Validasi Keuangan') }}</x-responsive-nav-link>
-                    <span id="badge-bendahara-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-                </div>
-                <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
-            @endif
+@if(Auth::check() && Auth::user()->role === 'bendahara')
+    <x-responsive-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="rounded-lg font-bold text-[13px]">
+        {{ __('Monitoring') }}
+    </x-responsive-nav-link>
+
+    <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+        <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">
+            {{ __('Anggaran Aplikasi') }}
+        </x-responsive-nav-link>
+        {{-- ID diubah agar sesuai dengan logic JS (updateElement) --}}
+        <span id="badge-bendahara-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+    </div>
+
+    <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+        <x-responsive-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">
+            {{ __('Validasi Keuangan') }}
+        </x-responsive-nav-link>
+        <span id="badge-bendahara-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
+    </div>
+
+    <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px] text-gray-500">
+        {{ __('Tracking') }}
+    </x-responsive-nav-link>
+
+    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">
+        {{ __('Laporan Baru') }}
+    </x-responsive-nav-link>
+@endif
 
             {{-- KEPALA RUANG MOBILE --}}
             @if(Auth::user()->role === 'kepala_ruang')
