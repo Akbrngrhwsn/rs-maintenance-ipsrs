@@ -553,6 +553,8 @@
                                 ];
                             @endphp
                             
+
+                            
                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full {{ $ps['class'] }}">
                                 {{ $ps['label'] }}
                             </span>
