@@ -533,6 +533,45 @@
                             Unduh Laporan Pengadaan
                         </a>
                     @endif
+
+                    @if($project->needs_procurement)
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-500">Status Pengadaan:</span>
+                            @php
+                                $procStatusLabels = [
+                                    'pending' => ['label' => 'Menunggu Review Admin', 'class' => 'bg-gray-100 text-gray-800'],
+                                    'submitted_to_management' => ['label' => 'Menunggu Management', 'class' => 'bg-indigo-100 text-indigo-800'],
+                                    'submitted_to_bendahara' => ['label' => 'Menunggu Bendahara (Validasi Anggaran)', 'class' => 'bg-yellow-100 text-yellow-800'],
+                                    'submitted_to_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-blue-100 text-blue-800'],
+                                    'approved' => ['label' => 'Pengadaan Disetujui', 'class' => 'bg-green-100 text-green-800'],
+                                    'rejected' => ['label' => 'Pengadaan Ditolak', 'class' => 'bg-red-100 text-red-800'],
+                                    'rejected_by_management' => ['label' => 'Ditolak Management (Revisi)', 'class' => 'bg-red-100 text-red-800'],
+                                ];
+                                $ps = $procStatusLabels[$project->procurement_approval_status] ?? [
+                                    'label' => ucfirst(str_replace('_', ' ', $project->procurement_approval_status)), 
+                                    'class' => 'bg-gray-100 text-gray-800'
+                                ];
+                            @endphp
+                            
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full {{ $ps['class'] }}">
+                                {{ $ps['label'] }}
+                            </span>
+
+                        </div>
+                    @endif
+
+                    {{-- Tombol Ceklist Selesai untuk Admin --}}
+            @if(Auth::user()->role === 'admin' && $project->procurement_approval_status === 'approved')
+                <form action="{{ route('admin.apps.finish_procurement', $project->id) }}" method="POST" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-teal-500 text-white text-xs font-bold rounded-lg hover:bg-teal-600 transition shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Selesaikan Pengadaan
+                    </button>
+                </form>
+            @endif
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

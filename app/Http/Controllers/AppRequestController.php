@@ -948,4 +948,19 @@ public function reprocessProcurement(Request $request, $id)
         return back()->with('error', 'Pengadaan ditolak dan dikembalikan ke Admin IT untuk direvisi.');
     }
 
+    public function finishProcurement($id)
+{
+    $project = AppRequest::findOrFail($id);
+
+    // Pastikan hanya pengadaan yang sudah disetujui Direktur yang bisa di-finish
+    if ($project->procurement_approval_status !== 'approved') {
+        return back()->with('error', 'Pengadaan harus disetujui direktur terlebih dahulu.');
+    }
+
+    $project->update([
+        'procurement_approval_status' => 'finish'
+    ]);
+
+    return back()->with('success', 'Status pengadaan berhasil ditandai sebagai Selesai (Barang dibeli).');
+}
 }

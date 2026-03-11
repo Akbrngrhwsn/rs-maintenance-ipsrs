@@ -138,6 +138,9 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
             ->name('admin.apps.reprocess_procurement')
             ->middleware(['auth']);
 
+        Route::post('/admin/apps/{id}/finish-procurement', [AppRequestController::class, 'finishProcurement'])
+    ->name('admin.apps.finish_procurement');
+
     });
 
     Route::middleware(['auth', 'verified'])->group(function () {
