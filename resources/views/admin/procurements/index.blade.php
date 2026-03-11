@@ -167,12 +167,15 @@
                                             <form action="{{ route('admin.procurement.finish', $proc->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded shadow flex items-center gap-1" title="Tandai Selesai">
+                                                <center><button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded shadow flex items-center gap-1" title="Tandai Selesai">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
-                                                </button>
+                                                </button></center>
+                                                <p class="text-xs text-gray-500 mt-1">Tandai jika barang sudah dibeli</p>
                                             </form>
+                                        @elseif($proc->status === 'completed')
+                                            <span class="text-gray-400 text-sm italic">Pengadaan sudah diselesaikan</span>
                                         @else
                                             <span class="text-gray-400 text-sm italic">Tidak tersedia</span>
                                         @endif
