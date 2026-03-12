@@ -66,13 +66,13 @@
             updateElement('badge-admin-reports', counts.reports);
             updateElement('badge-admin-apps', counts.apps);
             updateElement('badge-admin-request-apps', counts.request_apps);
-            // TAMBAHKAN INI UNTUK UPDATE BADGE PENGADAAN ADMIN
             updateElement('badge-admin-procurements', counts.procurements);
         } 
         else if (role === 'direktur') {
             updateElement('badge-director-request-apps', counts.request_apps);
             updateElement('badge-director-apps', counts.pending_apps);
             updateElement('badge-director-procurements', counts.pending_procurements);
+            updateElement('badge-director-app-procurements', counts.app_procurements);
         } 
         else if (role === 'management') {
             updateElement('badge-management-request-apps', counts.submitted_apps);
@@ -167,29 +167,35 @@ if (data.role === 'admin') {
 }
 
                 // === LOGIKA DIREKTUR ===
-                else if (data.role === 'direktur') {
-                    const currentPendingApps = data.counts.pending_apps || 0;
-                    const lastPendingApps = lastCounts.pending_apps || 0;
-                    const currentPendingProc = data.counts.pending_procurements || 0;
-                    const lastPendingProc = lastCounts.pending_procurements || 0;
+                            else if (data.role === 'direktur') {
+                                const currentPendingApps = data.counts.pending_apps || 0;
+                                const lastPendingApps = lastCounts.pending_apps || 0;
+                                const currentPendingProc = data.counts.pending_procurements || 0;
+                                const lastPendingProc = lastCounts.pending_procurements || 0;
+                                // TAMBAHKAN INI: Deteksi perubahan jumlah pengadaan aplikasi
+                                const currentAppProc = data.counts.app_procurements || 0;
+                                const lastAppProc = lastCounts.app_procurements || 0;
 
-                    if (currentPendingApps > lastPendingApps) {
-                        title = '📩 Permintaan Aplikasi ke Direktur';
-                        message = 'Ada aplikasi yang diteruskan ke Direktur untuk persetujuan.';
-                        shouldNotify = true;
-                        if(currentPath.includes('/director/reports') || currentPath.includes('/director/')) needReload = true;
-                    }
+                                if (currentPendingApps > lastPendingApps) {
+                                    title = '📩 Permintaan Aplikasi';
+                                    message = 'Ada aplikasi menunggu persetujuan Direktur.';
+                                    shouldNotify = true;
+                                    if(currentPath.includes('/director/reports')) needReload = true;
+                                } else if (currentPendingProc > lastPendingProc) {
+                                    title = '📦 Pengadaan Barang';
+                                    message = 'Ada pengajuan pengadaan barang butuh persetujuan.';
+                                    shouldNotify = true;
+                                    if(currentPath.includes('/director/procurements')) needReload = true;
+                                } else if (currentAppProc > lastAppProc) {
+                                    // NOTIFIKASI BARU: Validasi Pengadaan Aplikasi
+                                    title = '💻 Pengadaan Aplikasi';
+                                    message = 'Ada pengadaan aplikasi yang butuh validasi akhir.';
+                                    shouldNotify = true;
+                                    if(currentPath.includes('/apps')) needReload = true;
+                                }
 
-                    if (currentPendingProc > lastPendingProc) {
-                        title = '📦 Pengadaan untuk Direktur';
-                        message = 'Ada pengajuan pengadaan yang butuh persetujuan Direktur.';
-                        shouldNotify = true;
-                        if(currentPath.includes('/director/procurements')) needReload = true;
-                    }
-
-                    lastCounts.pending_apps = currentPendingApps;
-                    lastCounts.pending_procurements = currentPendingProc;
-                }
+                                Object.assign(lastCounts, data.counts);
+                            }
 
                 // === LOGIKA MANAGEMENT ===
                 else if (data.role === 'management') {

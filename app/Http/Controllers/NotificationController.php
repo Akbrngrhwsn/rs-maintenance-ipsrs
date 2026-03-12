@@ -56,22 +56,32 @@ class NotificationController extends Controller
         } 
         // --- DIREKTUR (TAMBAHAN: tangani submitted_to_director dan pending_director) ---
         elseif ($role === 'direktur') {
-            // Direktur perlu diberitahu jika ada app request yang dikirim ke direktur
-            $pendingApps = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
-            $pendingProcurements = Procurement::where('status', 'submitted_to_director')->count();
-            // Hitung request apps untuk direktur
-            $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
+        // 1. Notifikasi Persetujuan Aplikasi (Alur Utama)
+        $pendingApps = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
+        
+        // 2. Notifikasi Pengadaan Barang Umum (Model Procurement)
+        $pendingProcurements = Procurement::where('status', 'submitted_to_director')->count();
+        
+        // 3. Notifikasi Pengadaan Khusus Aplikasi (Model AppRequest - BARU)
+        // Menghitung aplikasi yang butuh pengadaan dan statusnya sudah sampai di Direktur
+        $appProcurementForDirector = AppRequest::where('needs_procurement', true)
+            ->where('procurement_approval_status', 'submitted_to_director')
+            ->count();
 
-            $response['counts'] = [
-                'pending_apps' => $pendingApps,
-                'pending_procurements' => $pendingProcurements,
-                'request_apps' => $requestAppsCount
-            ];
+        $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
 
-            if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0) {
-                $response['has_notification'] = true;
-            }
+        $response['counts'] = [
+            'pending_apps' => $pendingApps,
+            'pending_procurements' => $pendingProcurements,
+            'request_apps' => $requestAppsCount,
+            'app_procurements' => $appProcurementForDirector // Data baru untuk indikator
+        ];
+
+        // Notifikasi aktif jika ada aplikasi, pengadaan umum, ATAU pengadaan aplikasi yang pending
+        if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0 || $appProcurementForDirector > 0) {
+            $response['has_notification'] = true;
         }
+    }
 
         // --- MANAGEMENT (BARU) ---
         elseif ($role === 'management') {

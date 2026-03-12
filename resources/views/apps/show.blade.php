@@ -751,53 +751,67 @@
             @endif
 
             {{-- Tindakan Direktur (Aplikasi dan Pengadaan independen) --}}
-            @if(Auth::user()->role === 'direktur' && ($project->status === 'submitted_to_director' || ($project->status === 'approved' && $project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director')))
-                <div class="mt-6 border-t pt-6">
-                    <h4 class="font-bold mb-4">Tindakan Direktur</h4>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        @if($project->status === 'submitted_to_director')
-                            <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                                <h5 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Persetujuan Aplikasi
-                                </h5>
-                                <form action="{{ route('apps.approve', $project->id) }}" method="POST" class="space-y-3">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" name="status" value="terima" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition">
-                                        ✓ Setujui Aplikasi
-                                    </button>
-                                </form>
+@php
+    $isDirector = Auth::user()->role === 'direktur';
+    // Cek apakah ada aksi aplikasi yang menunggu
+    $waitingApp = $project->status === 'submitted_to_director';
+    // Cek apakah ada aksi pengadaan yang menunggu
+    $waitingProc = $project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director';
+@endphp
 
-                                <button type="button" onclick="openRejectModal('{{ route('apps.approve', $project->id) }}', 'catatan', {status: 'tolak'}, 'Tolak Aplikasi')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">Tolak Aplikasi</button>
-                            </div>
-                        @endif
+{{-- Pembungkus hanya muncul jika user adalah direktur DAN ada salah satu aksi yang menunggu --}}
+@if($isDirector && ($waitingApp || $waitingProc))
+    <div class="mt-6 border-t pt-6">
+        <h4 class="font-bold mb-4 text-gray-800">Tindakan Direktur</h4>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {{-- PANEL KIRI: Persetujuan Aplikasi --}}
+            @if($waitingApp)
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h5 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Persetujuan Aplikasi
+                    </h5>
+                    <form action="{{ route('apps.approve', $project->id) }}" method="POST" class="space-y-3">
+                        @csrf @method('PATCH')
+                        <button type="submit" name="status" value="terima" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
+                            ✓ Setujui Aplikasi
+                        </button>
+                    </form>
 
-                        @if($project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director')
-                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-                                <h5 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                    Persetujuan Pengadaan
-                                    <span class="ml-auto text-xs bg-indigo-200 px-2 py-1 rounded">Final Approval</span>
-                                </h5>
-                                <p class="text-xs text-indigo-700 mb-3 bg-indigo-100 p-2 rounded">
-                                    ✓ Pengadaan sudah disetujui Bendahara. Silakan berikan approval akhir.
-                                </p>
-                                
-                                <form action="{{ route('director.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">
-                                        ✓ Setujui Pengadaan
-                                    </button>
-                                </form>
-
-                                <button type="button" onclick="openRejectModal('{{ route('director.app.procurement.reject', $project->id) }}', 'catatan', {}, 'Tolak Pengadaan')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">Tolak Pengadaan</button>
-                            </div>
-                        @endif
-                    </div>
+                    <button type="button" onclick="openRejectModal('{{ route('apps.approve', $project->id) }}', 'catatan', {status: 'tolak'}, 'Tolak Aplikasi')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
+                        Tolak Aplikasi
+                    </button>
                 </div>
             @endif
 
+            {{-- PANEL KANAN: Persetujuan Pengadaan --}}
+            @if($waitingProc)
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                    <h5 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        Persetujuan Pengadaan
+                        <span class="ml-auto text-xs bg-indigo-200 px-2 py-1 rounded">Final Approval</span>
+                    </h5>
+                    <p class="text-xs text-indigo-700 mb-3 bg-indigo-100 p-2 rounded border border-indigo-200">
+                        ✓ Pengadaan sudah disetujui Bendahara. Silakan berikan approval akhir.
+                    </p>
+                    
+                    <form action="{{ route('director.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
+                        @csrf @method('PATCH')
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
+                            ✓ Setujui Pengadaan
+                        </button>
+                    </form>
+
+                    <button type="button" onclick="openRejectModal('{{ route('director.app.procurement.reject', $project->id) }}', 'catatan', {}, 'Tolak Pengadaan')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
+                        Tolak Pengadaan
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
+@endif
             {{-- Tindakan Bendahara --}}
             @php
                 $procUniversal = isset($procUniversal) ? $procUniversal : \App\Models\Procurement::where('app_request_id', $project->id)->first();
