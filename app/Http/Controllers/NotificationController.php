@@ -143,4 +143,32 @@ class NotificationController extends Controller
 
         return response()->json($response);
     }
+
+    // Method untuk mendapatkan detail laporan terbaru (untuk TTS)
+    public function getLatestReport()
+    {
+        $user = Auth::user();
+        
+        if ($user->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $report = Report::where('status', 'Belum Diproses')
+            ->latest('created_at')
+            ->first();
+
+        if (!$report) {
+            return response()->json(['report' => null]);
+        }
+
+        return response()->json([
+            'report' => [
+                'id' => $report->id,
+                'ruangan' => $report->ruangan,
+                'ticket_number' => $report->ticket_number,
+                'keluhan' => $report->keluhan,
+                'urgency' => $report->urgency,
+            ]
+        ]);
+    }
 }

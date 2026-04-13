@@ -89,6 +89,31 @@
         }
     }
 
+    // Fungsi untuk Text-to-Speech menggunakan Web Speech API
+    function speakNotification(text) {
+        // Cek jika browser support Web Speech API
+        const SpeechSynthesisUtterance = window.SpeechSynthesisUtterance || window.webkitSpeechSynthesisUtterance;
+        const speechSynthesis = window.speechSynthesis || window.webkitSpeechSynthesis;
+        
+        if (!SpeechSynthesisUtterance || !speechSynthesis) {
+            console.log('Web Speech API tidak didukung di browser ini');
+            return;
+        }
+
+        // Hentikan pidato sebelumnya jika ada
+        speechSynthesis.cancel();
+
+        // Buat utterance baru
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID'; // Bahasa Indonesia
+        utterance.rate = 0.95; // Kecepatan berbicara
+        utterance.pitch = 1; // Pitch normal
+        utterance.volume = 3; // Volume maksimal
+
+        // Jalankan speech
+        speechSynthesis.speak(utterance);
+    }
+
     function playNotification() {
         sound.play().catch(e => console.log('Audio blocked:', e));
     }
@@ -150,6 +175,32 @@ if (data.role === 'admin') {
         message = 'Ada laporan kerusakan baru.';
         shouldNotify = true;
         if(currentPath.includes('/admin/dashboard') || currentPath === '/' || currentPath === '/dashboard') needReload = true;
+        
+        // Fetch data laporan terbaru untuk Text-to-Speech
+        fetch('{{ route("notifications.latest_report") }}')
+            .then(r => r.json())
+            .then(data => {
+                if (data.report) {
+                    const room = data.report.ruangan || 'Ruangan tidak diketahui';
+                    const urgency = data.report.urgency || 'tidak ada';
+                    const keluhan = data.report.keluhan || 'detail tidak ada';
+                    
+                    // Format urgensi menjadi bahasa yang lebih mudah dipahami
+                    let urgencyText = '';
+                    if (urgency === 'tinggi') {
+                        urgencyText = 'tinggi';
+                    } else if (urgency === 'sedang') {
+                        urgencyText = 'sedang';
+                    } else {
+                        urgencyText = 'rendah';
+                    }
+                    
+                    const textToSpeak = `Mas Ai ti, Ada  kerusakan dari ${room}. Tingkat urgensi ${urgencyText}. Keluhan; ${keluhan}`;
+
+                    speakNotification(textToSpeak);
+                }
+            })
+            .catch(e => console.log('Error fetching report data:', e));
     }
     else if (currentApps > lastApps) {
         title = '🔔 Request Aplikasi Baru';
