@@ -168,6 +168,7 @@ class NotificationController extends Controller
                 'ticket_number' => $report->ticket_number,
                 'keluhan' => $report->keluhan,
                 'urgency' => $report->urgency,
+                'urgency_reason' => $report->urgency_reason,
             ]
         ]);
     }

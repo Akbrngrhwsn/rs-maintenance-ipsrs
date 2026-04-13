@@ -184,6 +184,7 @@ if (data.role === 'admin') {
                     const room = data.report.ruangan || 'Ruangan tidak diketahui';
                     const urgency = data.report.urgency || 'tidak ada';
                     const keluhan = data.report.keluhan || 'detail tidak ada';
+                    const urgencyReason = data.report.urgency_reason || '';
                     
                     // Format urgensi menjadi bahasa yang lebih mudah dipahami
                     let urgencyText = '';
@@ -195,7 +196,14 @@ if (data.role === 'admin') {
                         urgencyText = 'rendah';
                     }
                     
-                    const textToSpeak = `Mas Ai ti, Ada  kerusakan dari ${room}. Tingkat urgensi ${urgencyText}. Keluhan; ${keluhan}`;
+                    // Build complete text with urgency reason
+                    let textToSpeak = `Mas Ai ti, Ada  kerusakan dari ${room}. Tingkat urgensi ${urgencyText}`;
+                    
+                    if (urgencyReason) {
+                        textToSpeak += `. Alasan; ${urgencyReason}`;
+                    }
+                    
+                    textToSpeak += `. Keluhan; ${keluhan}`;
 
                     speakNotification(textToSpeak);
                 }
