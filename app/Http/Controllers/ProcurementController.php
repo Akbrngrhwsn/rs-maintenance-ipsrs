@@ -33,8 +33,7 @@ class ProcurementController extends Controller
             $s = $request->search;
             $query->whereHas('report', function($q) use ($s) {
                 $q->where('ticket_number', 'like', "%{$s}%")
-                  ->orWhere('ruangan', 'like', "%{$s}%")
-                  ->orWhere('description', 'like', "%{$s}%");
+                  ->orWhere('ruangan', 'like', "%{$s}%");
             });
         }
 
