@@ -95,4 +95,18 @@ class UserManagementController extends Controller
 
         return back()->with('success', 'User berhasil dihapus dari sistem.');
     }
+
+    // Admin: update/reset user password
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', "Password pengguna {$user->name} berhasil diubah.");
+    }
 }

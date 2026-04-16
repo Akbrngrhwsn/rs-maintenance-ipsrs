@@ -105,6 +105,7 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
         Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');
         Route::post('/admin/users', [UserManagementController::class, 'store'])->name('admin.users.store');
         Route::patch('/admin/users/{id}/role', [UserManagementController::class, 'updateRole'])->name('admin.users.update');
+        Route::patch('/admin/users/{id}/password', [UserManagementController::class, 'updatePassword'])->name('admin.users.update-password');
         Route::patch('/admin/users/{id}/assign-room', [UserManagementController::class, 'assignRoom'])->name('admin.users.assignRoom');
         Route::delete('/admin/users/{id}', [UserManagementController::class, 'destroy'])->name('admin.users.destroy');
         

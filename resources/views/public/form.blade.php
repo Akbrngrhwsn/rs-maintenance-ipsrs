@@ -22,10 +22,10 @@
                 <form method="POST" action="{{ route('public.store') }}" class="space-y-6">
                     @csrf
 
-                    {{-- Input Ruangan (Select) --}}
+                    {{-- Input Ruangan (Searchable Select) --}}
                     <div class="relative">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Lokasi Ruangan</label>
-                        <select name="room_id" id="room_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3">
+                        <select name="room_id" id="room_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" placeholder="Cari atau pilih ruangan...">
                             <option value="">Pilih ruangan...</option>
                             @foreach($rooms as $r)
                                 <option value="{{ $r->id }}">{{ $r->name }}</option>
@@ -107,9 +107,26 @@
     
 
 
-    {{-- Script Toggle Urgency --}}
+    {{-- Tom Select Library untuk Searchable Dropdown --}}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+    {{-- Script Toggle Urgency dan Init Tom Select --}}
     <script>
         (function(){
+            // Init Tom Select untuk searchable dropdown ruangan
+            new TomSelect('#room_id', {
+                placeholder: 'Cari atau pilih ruangan...',
+                allowEmptyOption: true,
+                maxOptions: null,
+                plugins: {
+                    'remove_button': {
+                        title: 'Hapus pilihan ini'
+                    }
+                }
+            });
+
+            // Toggle Urgency Reason
             const sel = document.getElementById('urgency');
             const wrapper = document.getElementById('urgency_reason_wrapper');
             const reason = document.getElementById('urgency_reason');

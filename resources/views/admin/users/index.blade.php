@@ -141,10 +141,20 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-bold">Hapus</button>
-                                        </form>
+                                        <div class="flex items-center justify-center gap-2 flex-wrap">
+                                            <button 
+                                                type="button"
+                                                class="text-blue-600 hover:text-blue-800 text-sm font-bold px-2 py-1 rounded hover:bg-blue-100 transition"
+                                                data-id="{{ $user->id }}"
+                                                data-name="{{ $user->name }}"
+                                                onclick="openPasswordModal(this)">
+                                                Ubah Password
+                                            </button>
+                                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus user ini?');">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-bold px-2 py-1 rounded hover:bg-red-100 transition">Hapus</button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -159,4 +169,91 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal untuk Ubah Password -->
+    <div id="passwordModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Ubah Password untuk <span id="modalUserName"></span></h3>
+            
+            <form id="passwordForm" method="POST" class="space-y-4">
+                @csrf
+                @method('PATCH')
+                
+                <div>
+                    <label class="block text-sm font-bold mb-2">Password Baru</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="newPassword"
+                        required
+                        minlength="6"
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Masukkan password baru (minimal 6 karakter)">
+                    <x-input-error :messages="$errors->get('password')" class="mt-1" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-2">Konfirmasi Password</label>
+                    <input 
+                        type="password" 
+                        name="password_confirmation" 
+                        id="confirmPassword"
+                        required
+                        minlength="6"
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        placeholder="Masukkan ulang password baru">
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                    <button 
+                        type="button" 
+                        onclick="closePasswordModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <button 
+                        type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                        Ubah Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openPasswordModal(button) {
+            const userId = button.getAttribute('data-id');
+            const userName = button.getAttribute('data-name');
+            const modal = document.getElementById('passwordModal');
+            const form = document.getElementById('passwordForm');
+            const userNameSpan = document.getElementById('modalUserName');
+            
+            userNameSpan.textContent = userName;
+            form.action = `/admin/users/${userId}/password`;
+            
+            modal.classList.remove('hidden');
+            document.getElementById('newPassword').focus();
+        }
+
+        function closePasswordModal() {
+            const modal = document.getElementById('passwordModal');
+            modal.classList.add('hidden');
+            document.getElementById('passwordForm').reset();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('passwordModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePasswordModal();
+            }
+        });
+
+        // Allow ESC key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePasswordModal();
+            }
+        });
+    </script>
 </x-app-layout>
