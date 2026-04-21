@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\AppRequest;
 use App\Models\Procurement;
+use App\Models\NewItemRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,6 +32,9 @@ class NotificationController extends Controller
             // Hitung pengadaan yang menunggu diselesaikan admin (sudah di-ACC direktur)
             $approvedProcurements = Procurement::whereIn('status', ['approved_by_director', 'approved'])->count();
 
+            // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest)
+            $newItemsCount = NewItemRequest::where('status', 'pending_admin')->count();
+
             // 2. TAMBAHAN: Hitung Aplikasi yang sudah disetujui Direktur (status 'in_progress' atau 'approved')
             // Sesuaikan status 'in_progress' jika itu menandakan aplikasi baru saja disetujui direktur
             $approvedApps = AppRequest::where('status', 'in_progress')->count();
@@ -44,13 +48,13 @@ class NotificationController extends Controller
                 'reports' => $reportCount,
                 'apps' => $appCount,
                 'request_apps' => $requestAppsCount,
-                'procurements' => $approvedProcurements,
+                'procurements' => $approvedProcurements + $newItemsCount, // Gabungkan dengan new items
                 'approved_apps' => $approvedApps, // Data baru
                 'approved_app_procurements' => $approvedAppProcurements // Data baru
             ];
 
             // PERBAIKAN: Tambahkan $approvedProcurements ke dalam kondisi if
-            if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0 || $approvedProcurements > 0) {
+            if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0 || $approvedProcurements > 0 || $newItemsCount > 0) {
                 $response['has_notification'] = true;
             }
         } 
@@ -62,6 +66,9 @@ class NotificationController extends Controller
         // 2. Notifikasi Pengadaan Barang Umum (Model Procurement)
         $pendingProcurements = Procurement::where('status', 'submitted_to_director')->count();
         
+        // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest) untuk Direktur
+        $newItemsCount = NewItemRequest::where('status', 'pending_director')->count();
+        
         // 3. Notifikasi Pengadaan Khusus Aplikasi (Model AppRequest - BARU)
         // Menghitung aplikasi yang butuh pengadaan dan statusnya sudah sampai di Direktur
         $appProcurementForDirector = AppRequest::where('needs_procurement', true)
@@ -72,13 +79,13 @@ class NotificationController extends Controller
 
         $response['counts'] = [
             'pending_apps' => $pendingApps,
-            'pending_procurements' => $pendingProcurements,
+            'pending_procurements' => $pendingProcurements + $newItemsCount, // Gabungkan dengan new items
             'request_apps' => $requestAppsCount,
             'app_procurements' => $appProcurementForDirector // Data baru untuk indikator
         ];
 
         // Notifikasi aktif jika ada aplikasi, pengadaan umum, ATAU pengadaan aplikasi yang pending
-        if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0 || $appProcurementForDirector > 0) {
+        if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0 || $appProcurementForDirector > 0 || $newItemsCount > 0) {
             $response['has_notification'] = true;
         }
     }
@@ -89,14 +96,17 @@ class NotificationController extends Controller
             $appsForManagement = AppRequest::where('status', 'submitted_to_management')->count();
             // dan juga pengadaan yang dialihkan ke management (jika ada)
             $procurementsForManagement = Procurement::where('status', 'submitted_to_management')->count();
+            
+            // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest) untuk Management
+            $newItemsCount = NewItemRequest::where('status', 'pending_management')->count();
 
             $response['counts'] = [
                 'submitted_apps' => $appsForManagement,
-                'submitted_procurements' => $procurementsForManagement,
+                'submitted_procurements' => $procurementsForManagement + $newItemsCount, // Gabungkan dengan new items
                 'request_apps' => $appsForManagement
             ];
 
-            if($appsForManagement > 0 || $procurementsForManagement > 0) {
+            if($appsForManagement > 0 || $procurementsForManagement > 0 || $newItemsCount > 0) {
                 $response['has_notification'] = true;
             }
         }
@@ -127,16 +137,19 @@ class NotificationController extends Controller
             // 1. Hitung pengadaan barang umum (dari model Procurement)
             $pendingProcurements = Procurement::where('status', 'submitted_to_bendahara')->count();
             
+            // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest) untuk Bendahara
+            $newItemsCount = NewItemRequest::where('status', 'pending_bendahara')->count();
+            
             // 2. Hitung validasi anggaran untuk pengadaan aplikasi (dari model AppRequest)
             $appsProcurementCount = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
             
             $response['counts'] = [
                 'apps' => $appsProcurementCount, // Label untuk pengadaan aplikasi
-                'pending_procurements' => $pendingProcurements, // Label untuk pengadaan barang
+                'pending_procurements' => $pendingProcurements + $newItemsCount, // Gabungkan dengan new items
             ];
 
             // Notifikasi aktif jika salah satu ada yang pending
-            if($pendingProcurements > 0 || $appsProcurementCount > 0) {
+            if($pendingProcurements > 0 || $appsProcurementCount > 0 || $newItemsCount > 0) {
                 $response['has_notification'] = true;
             }
         }

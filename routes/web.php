@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ITNoteController;
+use App\Http\Controllers\NewItemRequestController;
 
 // === USER 1: PUBLIC (Tanpa Login) ===
 Route::get('/', [PublicReportController::class, 'index'])->name('public.home');
@@ -20,6 +21,29 @@ Route::get('/tracking', [PublicReportController::class, 'tracking'])->name('publ
 
 // === GROUP AUTHENTICATED (Harus Login) ===
 Route::middleware('auth')->group(function () {
+
+    // Rute Export PDF Barang Baru (Bisa diakses semua role yang login)
+Route::get('/new-items/{id}/export', [NewItemRequestController::class, 'exportSingle'])->name('new_items.export.single');
+
+    // Rute untuk Kepala Ruang
+    Route::get('/kepala-ruang/new-item-request/create', [NewItemRequestController::class, 'create'])->name('kepala-ruang.new_items.create');
+    Route::post('/kepala-ruang/new-item-request/store', [NewItemRequestController::class, 'store'])->name('kepala-ruang.new_items.store');
+
+    // Rute Approval Admin IT
+    Route::patch('/admin/new-items/{id}/approve', [NewItemRequestController::class, 'approve'])->defaults('role', 'admin')->name('admin.new_items.approve');
+    Route::patch('/admin/new-items/{id}/reject', [NewItemRequestController::class, 'reject'])->name('admin.new_items.reject');
+
+    // Rute Approval Management
+    Route::patch('/management/new-items/{id}/approve', [NewItemRequestController::class, 'approve'])->defaults('role', 'management')->name('management.new_items.approve');
+    Route::patch('/management/new-items/{id}/reject', [NewItemRequestController::class, 'reject'])->name('management.new_items.reject');
+
+    // Rute Approval Bendahara
+    Route::patch('/bendahara/new-items/{id}/approve', [NewItemRequestController::class, 'approve'])->defaults('role', 'bendahara')->name('bendahara.new_items.approve');
+    Route::patch('/bendahara/new-items/{id}/reject', [NewItemRequestController::class, 'reject'])->name('bendahara.new_items.reject');
+
+    // Rute Approval Direktur
+    Route::patch('/direktur/new-items/{id}/approve', [NewItemRequestController::class, 'approve'])->defaults('role', 'direktur')->name('direktur.new_items.approve');
+    Route::patch('/direktur/new-items/{id}/reject', [NewItemRequestController::class, 'reject'])->name('direktur.new_items.reject');
 
     // --- FITUR UMUM (Notifikasi & Profile) ---
     Route::get('/notifications/check', [NotificationController::class, 'check'])->name('notifications.check');

@@ -146,6 +146,12 @@
                             {{ __('Validasi Pengadaan') }}
                             <span id="badge-kepala-ruang-procurements" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
                         </x-nav-link>
+                        
+                        {{-- TOMBOL BARU: FORM PENGADAAN BARANG BARU --}}
+                        <x-nav-link :href="route('kepala-ruang.new_items.create')" :active="request()->routeIs('kepala-ruang.new_items.*')" class="text-[13px] font-bold tracking-tight text-emerald-700">
+                            {{ __('Pengadaan Baru') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Form Req. Aplikasi') }}
                         </x-nav-link>
@@ -351,6 +357,12 @@
                     <x-responsive-nav-link :href="route('kepala-ruang.procurements.index')" :active="request()->routeIs('kepala-ruang.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Validasi Pengadaan') }}</x-responsive-nav-link>
                     <span id="badge-kepala-ruang-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
                 </div>
+                
+                {{-- TOMBOL BARU MOBILE: FORM PENGADAAN BARANG BARU --}}
+                <x-responsive-nav-link :href="route('kepala-ruang.new_items.create')" :active="request()->routeIs('kepala-ruang.new_items.*')" class="rounded-lg font-bold text-[13px] text-emerald-700">
+                    {{ __('Pengadaan Baru') }}
+                </x-responsive-nav-link>
+
                 <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold text-[13px]">{{ __('Form Req. Aplikasi') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Daftar Request') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>

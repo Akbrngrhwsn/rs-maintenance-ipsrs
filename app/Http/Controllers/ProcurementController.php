@@ -39,7 +39,18 @@ class ProcurementController extends Controller
 
         $procurements = $query->paginate(20)->withQueryString();
 
-        return view('admin.procurements.index', compact('procurements'));
+        // --- TAMBAHAN: Ambil data Pengadaan Barang Baru ---
+        $newItemsQuery = \App\Models\NewItemRequest::with(['user', 'room'])->latest();
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $newItemsQuery->where('purpose', 'like', "%{$s}%")
+                          ->orWhereHas('room', function($q) use ($s) {
+                              $q->where('name', 'like', "%{$s}%"); // Sesuaikan jika nama kolom ruangan berbeda
+                          });
+        }
+        $newItemRequests = $newItemsQuery->paginate(20, ['*'], 'new_page')->withQueryString();
+
+        return view('admin.procurements.index', compact('procurements', 'newItemRequests'));
     }
 
     // === ADMIN: Form Buat Pengadaan ===
@@ -260,7 +271,16 @@ class ProcurementController extends Controller
 
         $procurements = $query->latest()->get();
 
-        return view('management.procurements', compact('procurements', 'tab'));
+        // --- TAMBAHAN: Ambil data Pengadaan Barang Baru ---
+        $newItemsQuery = \App\Models\NewItemRequest::with(['user', 'room']);
+        if($tab === 'history') {
+            $newItemsQuery->whereIn('status', ['pending_bendahara', 'pending_director', 'approved', 'rejected', 'completed']);
+        } else {
+            $newItemsQuery->where('status', 'pending_management');
+        }
+        $newItemRequests = $newItemsQuery->latest()->get();
+
+        return view('management.procurements', compact('procurements', 'tab', 'newItemRequests'));
     }
 
     // === MANAGEMENT: Approve Pengadaan (teruskan ke Bendahara) ===
@@ -327,7 +347,16 @@ class ProcurementController extends Controller
 
         $procurements = $query->latest()->get();
 
-        return view('bendahara.procurements', compact('procurements', 'tab'));
+        // --- TAMBAHAN: Ambil data Pengadaan Barang Baru ---
+        $newItemsQuery = \App\Models\NewItemRequest::with(['user', 'room']);
+        if($tab === 'history') {
+            $newItemsQuery->whereIn('status', ['pending_director', 'approved', 'rejected', 'completed']);
+        } else {
+            $newItemsQuery->where('status', 'pending_bendahara');
+        }
+        $newItemRequests = $newItemsQuery->latest()->get();
+
+        return view('bendahara.procurements', compact('procurements', 'tab', 'newItemRequests'));
     }
 
     // === BENDAHARA: Approve Pengadaan (teruskan ke Direktur) ===
@@ -395,7 +424,16 @@ class ProcurementController extends Controller
 
         $procurements = $query->latest()->get();
 
-        return view('director.procurements', compact('procurements', 'tab'));
+        // --- TAMBAHAN: Ambil data Pengadaan Barang Baru ---
+        $newItemsQuery = \App\Models\NewItemRequest::with(['user', 'room']);
+        if($tab === 'history') {
+            $newItemsQuery->whereIn('status', ['approved', 'rejected', 'completed']);
+        } else {
+            $newItemsQuery->where('status', 'pending_director');
+        }
+        $newItemRequests = $newItemsQuery->latest()->get();
+
+        return view('director.procurements', compact('procurements', 'tab', 'newItemRequests'));
     }
 
     // === DIREKTUR: Approve Pengadaan ===
