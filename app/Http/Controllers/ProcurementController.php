@@ -187,7 +187,19 @@ class ProcurementController extends Controller
 
         $procurements = $query->latest()->get();
 
-        return view('kepala_ruang.procurements', compact('procurements', 'tab'));
+        // --- TAMBAHAN: Ambil data Pengajuan Barang Baru milik Ruangan Karu ini ---
+        $newItemsQuery = \App\Models\NewItemRequest::with(['user', 'room'])
+            ->where('room_id', Auth::user()->room_id ?? Auth::user()->room->id); // Hanya ambil milik ruangannya sendiri
+
+        if($tab === 'history') {
+            $newItemsQuery->whereIn('status', ['approved', 'rejected', 'completed']);
+        } else {
+            // Pending berarti yang masih diproses oleh Admin/Management/Bendahara/Direktur
+            $newItemsQuery->whereNotIn('status', ['approved', 'rejected', 'completed']);
+        }
+        $newItemRequests = $newItemsQuery->latest()->get();
+
+        return view('kepala_ruang.procurements', compact('procurements', 'tab', 'newItemRequests'));
     }
 
     // === KEPALA RUANG: Approve Pengadaan (teruskan ke Management) ===
