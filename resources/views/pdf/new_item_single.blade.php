@@ -9,28 +9,10 @@
         th, td { border:1px solid #333; padding:6px; }
         th { background:#f0f0f0; text-align: left; }
         
-        /* Helper Text */
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .text-bold { font-weight: bold; }
-        .text-red { color: #d32f2f; }
-        .text-green { color: #388e3c; }
-        .text-gray { color: #757575; }
         .italic { font-style: italic; }
-
-        /* Status Box untuk Tanda Tangan */
-        .status-box {
-            height: 65px;
-            display: table-cell;
-            vertical-align: middle;
-            width: 100%;
-            text-align: center;
-        }
-        
-        .qr-img {
-            width: 65px;
-            height: 65px;
-        }
     </style>
 </head>
 <body>
@@ -132,25 +114,35 @@
         <table style="border: none;">
             <tr style="border: none;">
                 
-                {{-- KEPALA RUANG (PEMOHON UTAMA) --}}
-                <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                    <p class="text-bold" style="margin-bottom: 5px;">Diajukan Oleh</p>
-                    <div style="height: 65px; line-height: 65px; color: #333; font-size: 8pt;">
-                        {{-- Karu otomatis terverifikasi karena dia yang membuat form --}}
-                        <strong style="color: green;">(Telah Diajukan)</strong>
-                    </div>
-                    <br><span style="font-size: 8pt;">Kepala Ruang</span>
-                </td>
+                {{-- KEPALA RUANG (DIAJUKAN OLEH) --}}
+            <td width="20%" class="text-center" style="border: none; vertical-align: top;">
+                <p class="text-bold" style="margin-bottom: 5px;">Diajukan Oleh</p>
+                @php
+                    $showQrKaru = $qrKaru;
+                    // Fallback untuk data lama yang qr_karu-nya masih kosong
+                    if(empty($showQrKaru)) {
+                        $showQrKaru = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Diajukan oleh: " . ($procurement->user->name ?? 'Karu')));
+                    }
+                @endphp
+                <img src="data:image/png;base64,{!! trim($showQrKaru) !!}" style="width: 65px; height: 65px;" />
+                <br><span style="font-size: 8pt;">Kepala Ruang</span>
+            </td>
 
                 {{-- ADMIN IT --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Mengetahui</p>
-                    @if(!empty($qrAdmin))
-                        <img src="data:image/png;base64,{{ trim($qrAdmin) }}" style="width: 65px; height: 65px;" />
+                    @php
+                        $showQrAdmin = $qrAdmin;
+                        $passedAdmin = in_array($procurement->status, ['pending_management', 'pending_bendahara', 'pending_director', 'approved', 'completed']);
+                        // Fallback: Jika data lama kosong tapi statusnya sudah lolos admin, buat QR dadakan
+                        if(empty($showQrAdmin) && $passedAdmin) {
+                            $showQrAdmin = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Disetujui oleh Admin IT\nPengajuan: " . $procurement->purpose));
+                        }
+                    @endphp
+                    @if(!empty($showQrAdmin))
+                        <img src="data:image/png;base64,{!! trim($showQrAdmin) !!}" style="width: 65px; height: 65px;" />
                     @else
-                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                            (Belum Validasi)
-                        </div>
+                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">(Belum Validasi)</div>
                     @endif
                     <br><span style="font-size: 8pt;">Admin IT</span>
                 </td>
@@ -158,12 +150,17 @@
                 {{-- MANAGEMENT --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Validasi</p>
-                    @if(!empty($qrManagement))
-                        <img src="data:image/png;base64,{{ trim($qrManagement) }}" style="width: 65px; height: 65px;" />
+                    @php
+                        $showQrManagement = $qrManagement;
+                        $passedManagement = in_array($procurement->status, ['pending_bendahara', 'pending_director', 'approved', 'completed']);
+                        if(empty($showQrManagement) && $passedManagement) {
+                            $showQrManagement = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Disetujui oleh Management\nPengajuan: " . $procurement->purpose));
+                        }
+                    @endphp
+                    @if(!empty($showQrManagement))
+                        <img src="data:image/png;base64,{!! trim($showQrManagement) !!}" style="width: 65px; height: 65px;" />
                     @else
-                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                            -
-                        </div>
+                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">-</div>
                     @endif
                     <br><span style="font-size: 8pt;">Management</span>
                 </td>
@@ -171,12 +168,17 @@
                 {{-- BENDAHARA --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Verifikasi</p>
-                    @if(!empty($qrBendahara))
-                        <img src="data:image/png;base64,{{ trim($qrBendahara) }}" style="width: 65px; height: 65px;" />
+                    @php
+                        $showQrBendahara = $qrBendahara;
+                        $passedBendahara = in_array($procurement->status, ['pending_director', 'approved', 'completed']);
+                        if(empty($showQrBendahara) && $passedBendahara) {
+                            $showQrBendahara = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Disetujui oleh Bendahara\nPengajuan: " . $procurement->purpose));
+                        }
+                    @endphp
+                    @if(!empty($showQrBendahara))
+                        <img src="data:image/png;base64,{!! trim($showQrBendahara) !!}" style="width: 65px; height: 65px;" />
                     @else
-                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                            -
-                        </div>
+                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">-</div>
                     @endif
                     <br><span style="font-size: 8pt;">Bendahara</span>
                 </td>
@@ -184,12 +186,17 @@
                 {{-- DIREKTUR --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Menyetujui</p>
-                    @if(!empty($qrDirektur))
-                        <img src="data:image/png;base64,{{ trim($qrDirektur) }}" style="width: 65px; height: 65px;" />
+                    @php
+                        $showQrDirektur = $qrDirektur;
+                        $passedDirektur = in_array($procurement->status, ['approved', 'completed']);
+                        if(empty($showQrDirektur) && $passedDirektur) {
+                            $showQrDirektur = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Disetujui oleh Direktur\nPengajuan: " . $procurement->purpose));
+                        }
+                    @endphp
+                    @if(!empty($showQrDirektur))
+                        <img src="data:image/png;base64,{!! trim($showQrDirektur) !!}" style="width: 65px; height: 65px;" />
                     @else
-                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                            -
-                        </div>
+                        <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">-</div>
                     @endif
                     <br><span style="font-size: 8pt;">Direktur Utama</span>
                 </td>

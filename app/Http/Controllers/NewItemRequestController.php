@@ -22,24 +22,30 @@ class NewItemRequestController extends Controller
 
     // === SIMPAN PENGAJUAN KEPALA RUANG ===
     public function store(Request $request)
-    {
-        $request->validate([
-            'purpose' => 'required|string|max:255',
-            'items.*.nama' => 'required|string',
-            'items.*.harga_satuan' => 'required|numeric|min:0', // <--- Tambahan validasi harga satuan
-            'items.*.jumlah' => 'required|numeric|min:1',
-        ]);
+{
+    $request->validate([
+        'purpose' => 'required|string|max:255',
+        'items.*.nama' => 'required|string',
+        'items.*.harga_satuan' => 'required|numeric|min:0',
+        'items.*.jumlah' => 'required|numeric|min:1',
+    ]);
 
-        NewItemRequest::create([
-            'user_id' => Auth::id(),
-            'room_id' => Auth::user()->room->id,
-            'purpose' => $request->purpose,
-            'items' => $request->items, // Data nama, harga_satuan, dan jumlah akan otomatis tersimpan dalam bentuk JSON
-            'status' => 'pending_admin'
-        ]);
+    // --- GENERATE QR UNTUK KARU ---
+    $user = Auth::user();
+    $qrText = "Diajukan oleh: " . $user->name . "\nRuangan: " . ($user->room->name ?? '-') . "\nTanggal: " . now()->format('d/m/Y H:i');
+    $qrKaru = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate($qrText));
 
-        return redirect()->route('kepala-ruang.procurements.index')->with('success', 'Pengajuan barang baru berhasil dikirim ke Admin IT.');
-    }
+    NewItemRequest::create([
+        'user_id' => $user->id,
+        'room_id' => $user->room->id,
+        'qr_karu' => $qrKaru, // Simpan QR Karu
+        'purpose' => $request->purpose,
+        'items' => $request->items,
+        'status' => 'pending_admin'
+    ]);
+
+    return redirect()->route('kepala-ruang.procurements.index')->with('success', 'Pengajuan barang baru berhasil dikirim.');
+}
 
     // === METHOD APPROVAL UNTUK MASING-MASING ROLE ===
     public function approve(Request $request, $id, $role)
@@ -93,19 +99,19 @@ class NewItemRequestController extends Controller
 
     // === METHOD EXPORT PDF ===
     public function exportSingle($id)
-    {
-        $procurement = NewItemRequest::with(['user', 'room'])->findOrFail($id);
+{
+    $procurement = NewItemRequest::with(['user', 'room'])->findOrFail($id);
 
-        $data = [
-            'procurement' => $procurement,
-            'qrAdmin' => $procurement->qr_admin,
-            'qrManagement' => $procurement->qr_management,
-            'qrBendahara' => $procurement->qr_bendahara,
-            'qrDirektur' => $procurement->qr_direktur,
-        ];
+    $data = [
+        'procurement' => $procurement,
+        'qrKaru'      => $procurement->qr_karu,
+        'qrAdmin'     => $procurement->qr_admin,
+        'qrManagement'=> $procurement->qr_management,
+        'qrBendahara' => $procurement->qr_bendahara,
+        'qrDirektur'  => $procurement->qr_direktur,
+    ];
 
-        // Pastikan Anda memanggil view yang baru saja kita buat
-        $pdf = PDF::loadView('pdf.new_item_single', $data);
-        return $pdf->stream('Laporan_Barang_Baru_' . $procurement->id . '.pdf');
-    }
+    $pdf = PDF::loadView('pdf.new_item_single', $data);
+    return $pdf->stream('Laporan_Barang_Baru_' . $procurement->id . '.pdf');
+}
 }

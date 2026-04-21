@@ -327,6 +327,11 @@
                                                                 </tfoot>
                                                             </table>
                                                         </div>
+                                                        <div class="mt-4 px-6">
+                                                            <a href="{{ route('new_items.export.single', $itemReq->id) }}" target="_blank" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">
+                                                                Export Pengadaan (PDF)
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
