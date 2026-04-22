@@ -15,6 +15,9 @@ class AdminReportController extends Controller
 {
     public function index(Request $request)
     {
+        // --- TAMBAHAN: Ambil teknisi yang sedang bertugas saat ini ---
+        $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+
         // 1. Pending (Urutkan Urgency via SQL agar bisa paginate)
         $pendingReports = Report::where('status', 'Belum Diproses')
             ->orderByRaw("CASE 
@@ -24,13 +27,17 @@ class AdminReportController extends Controller
             ->orderBy('created_at', 'asc')
             ->paginate(10, ['*'], 'pending_page'); 
 
-        // 2. Sedang Dikerjakan
-        $processedReports = Report::where('status', 'Diproses')
+        // 2. Sedang Dikerjakan 
+        // --- TAMBAHAN: Gunakan with('itStaff') untuk meload relasi nama teknisi ---
+        $processedReports = Report::with('itStaff')
+            ->where('status', 'Diproses')
             ->orderBy('created_at', 'asc')
             ->paginate(10, ['*'], 'process_page');
 
         // 3. Riwayat (History)
-        $historyQuery = Report::whereIn('status', ['Selesai', 'Tidak Selesai', 'Ditolak']);
+        // --- TAMBAHAN: Gunakan with('itStaff') untuk meload relasi nama teknisi ---
+        $historyQuery = Report::with('itStaff')
+            ->whereIn('status', ['Selesai', 'Tidak Selesai', 'Ditolak']);
 
         if ($request->has('date') && $request->date != '') {
             $historyQuery->whereDate('created_at', $request->date);
@@ -47,7 +54,8 @@ class AdminReportController extends Controller
         $historyReports = $historyQuery->latest()
             ->paginate(10, ['*'], 'history_page');
 
-        return view('dashboard', compact('pendingReports', 'processedReports', 'historyReports'));
+        // --- TAMBAHAN: Masukkan variabel $onDutyStaff ke compact ---
+        return view('dashboard', compact('pendingReports', 'processedReports', 'historyReports', 'onDutyStaff'));
     }
 
     public function convertToProcurement($id)
@@ -73,9 +81,17 @@ class AdminReportController extends Controller
         if ($report->status !== 'Belum Diproses') {
             return back()->with('warning', 'Laporan ini sudah diproses sebelumnya.');
         }
+
+        // Cari teknisi yang sedang On-Duty
+        $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+
         $report->status = 'Diproses';
+        // Masukkan ID teknisi bertugas ke dalam laporan
+        $report->it_staff_id = $onDutyStaff ? $onDutyStaff->id : null; 
         $report->save();
-        return back()->with('success', 'Laporan berhasil di-ACC. Segera lakukan perbaikan!');
+
+        $namaTeknisi = $onDutyStaff ? $onDutyStaff->nama : 'Tim IT';
+        return back()->with('success', "Laporan berhasil di-ACC. Ditugaskan kepada: {$namaTeknisi}");
     }
 
     public function validasi(Request $request, $id)

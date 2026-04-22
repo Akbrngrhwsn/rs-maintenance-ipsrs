@@ -14,13 +14,18 @@ class Report extends Model
         'ticket_number', 'pelapor_nama', 'ruangan', 'keluhan', 
         'urgency', 'urgency_reason', 'status', 'tindakan_teknisi', 'room_id','needs_procurement',
     'procurement_items_request',
-    'procurement_status',
+    'procurement_status', 'it_staff_id',
     ];
 
     protected $casts = [
         'procurement_items_request' => 'array',
         'needs_procurement' => 'boolean',
     ];
+
+    public function itStaff()
+    {
+        return $this->belongsTo(ItStaff::class, 'it_staff_id');
+    }
 
     // Relasi ke User (Pelapor)
     public function user()

@@ -8,14 +8,38 @@
                 <p class="text-gray-500 mt-1">Pantau status perbaikan. Urutan berdasarkan <b class="text-red-600">Urgensi & Waktu Masuk</b>.</p>
             </div>
             
-            <form action="{{ route('public.tracking') }}" method="GET" class="flex w-full md:w-80">
-                <input type="text" name="ticket" placeholder="Cari No. Tiket..." value="{{ request('ticket') }}" 
-                    class="w-full rounded-l-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition">
-                    Cari
-                </button>
-            </form>
+            <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                <form action="{{ route('public.tracking') }}" method="GET" class="flex w-full md:w-80">
+                    <input type="text" name="ticket" placeholder="Cari No. Tiket..." value="{{ request('ticket') }}" 
+                        class="w-full rounded-l-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition">
+                        Cari
+                    </button>
+                </form>
+
+                {{-- Tombol Export (hanya untuk authenticated user) --}}
+                @auth
+                    <button onclick="openExportModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-semibold text-sm">
+                        📥 Unduh Riwayat
+                    </button>
+                @endauth
+            </div>
         </div>
+
+        {{-- BANNER TEKNISI JAGA (TAMBAHAN) --}}
+        @if($onDutyStaff)
+        <div class="mb-8 bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+            <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-md">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Teknisi IT Standby Hari Ini:</p>
+                <p class="text-lg font-black text-blue-900 leading-tight">{{ $onDutyStaff->nama }}</p>
+            </div>
+        </div>
+        @endif
 
         {{-- BAGIAN 1: PENDING / BELUM SELESAI (Tetap Menggunakan Card Grid) --}}
         <div class="mb-12">
@@ -79,8 +103,16 @@
                                     </p>
                                 @endif
 
-                                <div class="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center text-xs text-gray-400">
-                                    <span>Oleh: {{ $report->pelapor_nama ?? 'Anonim' }}</span>
+                                <div class="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center text-[11px]">
+                                    <span class="text-gray-400">Oleh: {{ $report->pelapor_nama ?? 'Anonim' }}</span>
+                                    
+                                    {{-- INFO TEKNISI PADA CARD --}}
+                                    @if($report->itStaff)
+                                        <span class="font-bold text-blue-600 italic flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10zm3 0a1 1 0 000 2h.01a1 1 0 100-2H13zM7 13a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10zm3 0a1 1 0 000 2h.01a1 1 0 100-2H13z" clip-rule="evenodd"></path></svg>
+                                            {{ $report->itStaff->nama }}
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -113,7 +145,7 @@
                                     <th class="px-6 py-4 text-left">Tanggal</th>
                                     <th class="px-6 py-4 text-left">Ruangan / Tiket</th>
                                     <th class="px-6 py-4 text-left">Keluhan</th>
-                                    <th class="px-6 py-4 text-left">Tindakan Teknisi</th>
+                                    <th class="px-6 py-4 text-left">Keterangan</th>
                                     <th class="px-6 py-4 text-center">Status</th>
                                 </tr>
                             </thead>
@@ -133,8 +165,15 @@
                                         <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title="{{ $report->keluhan }}">
                                             {{ Str::limit($report->keluhan, 50) }}
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-600 italic max-w-xs truncate">
-                                            {{ $report->tindakan_teknisi ?? '-' }}
+                                        <td class="px-6 py-4 text-sm text-gray-600 max-w-xs">
+                                            <div class="italic truncate" title="{{ $report->tindakan_teknisi }}">{{ $report->tindakan_teknisi ?? '-' }}</div>
+                                            
+                                            {{-- NAMA PENINDAK LANJUT DI RIWAYAT --}}
+                                            @if($report->itStaff)
+                                                <div class="text-[10px] font-bold text-blue-500 mt-1 uppercase tracking-tighter">
+                                                    Penangan: {{ $report->itStaff->nama }}
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             @if($report->status == 'Selesai')
@@ -180,4 +219,48 @@
         </div>
 
     </div>
+
+    {{-- MODAL EXPORT RIWAYAT KERUSAKAN --}}
+    @auth
+    <div id="export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900 opacity-60" onclick="closeExportModal()"></div>
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden m-4">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-lg text-gray-800">Unduh Riwayat Kerusakan</h3>
+                <button type="button" onclick="closeExportModal()" class="text-gray-400 hover:text-red-500">✕</button>
+            </div>
+            <form action="{{ route('tracking.export.monthly') }}" method="GET">
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Bulan & Tahun</label>
+                        <input type="month" name="month" value="{{ date('Y-m') }}" 
+                            class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-sm" required />
+                    </div>
+                    <p class="text-xs text-gray-500 italic">
+                        📌 Laporan akan mencakup semua laporan kerusakan yang diselesaikan (Selesai, Ditolak, Pengadaan) pada bulan yang dipilih.
+                    </p>
+                </div>
+                <div class="px-6 py-4 border-t bg-gray-50 text-right space-x-2">
+                    <button type="button" onclick="closeExportModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-bold hover:bg-green-700">
+                        Unduh PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openExportModal() {
+            document.getElementById('export-modal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.add('hidden');
+        }
+    </script>
+    @endauth
+
 </x-app-layout>

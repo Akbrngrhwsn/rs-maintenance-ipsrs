@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\Room;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class PublicReportController extends Controller
 {
@@ -62,14 +66,17 @@ class PublicReportController extends Controller
     {
         $completedStatus = ['Selesai', 'Ditolak', 'Tidak Selesai'];
 
-        // 1. Query Dasar
-        $query = Report::query();
+        // --- TAMBAHAN: Ambil teknisi yang sedang bertugas ---
+        $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+
+        // 1. Query Dasar - Tambahkan with('itStaff') agar data teknisi terbawa
+        $query = Report::with('itStaff'); 
+        
         if ($request->has('ticket') && $request->ticket != '') {
             $query->where('ticket_number', 'LIKE', '%' . $request->ticket . '%');
         }
 
         // 2. Ambil Pending (Belum Selesai)
-        // Clone query agar filter tiket tetap terbawa
         $pendingReports = (clone $query)->whereNotIn('status', $completedStatus)
             ->orderByRaw("CASE 
                 WHEN urgency = 'tinggi' THEN 3 
@@ -83,6 +90,55 @@ class PublicReportController extends Controller
             ->latest()
             ->paginate(10, ['*'], 'history_page');
 
-        return view('public.tracking', compact('pendingReports', 'completedReports'));
+        // Kirim variabel $onDutyStaff ke view
+        return view('public.tracking', compact('pendingReports', 'completedReports', 'onDutyStaff'));
+    }
+
+    // === EXPORT MONTHLY REPORT (untuk semua role yang login) ===
+    public function exportMonthlyReport(Request $request)
+    {
+        // 1. Validasi: hanya authenticated user yang bisa export
+        if (!Auth::check()) {
+            abort(403, 'Anda harus login untuk mengunduh laporan.');
+        }
+
+        // 2. Ambil input bulan dari request
+        $monthInput = $request->input('month', date('Y-m'));
+        $startDate = Carbon::parse($monthInput)->startOfMonth();
+        $endDate = Carbon::parse($monthInput)->endOfMonth();
+
+        // 3. Ambil data laporan selesai dalam periode bulan tersebut
+        $reports = Report::whereIn('status', ['Selesai', 'Ditolak', 'Tidak Selesai'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // 4. Generate QR Code dengan informasi validator
+        $validator = Auth::user()->name ?? 'User';
+        $role = Auth::user()->role ?? 'guest';
+        $dateString = $startDate->locale('id')->translatedFormat('F Y');
+
+        $qrData = "Laporan Riwayat Kerusakan\n" .
+                 "Periode: " . $dateString . "\n" .
+                 "Diunduh oleh: " . $validator . " ({$role})\n" .
+                 "Total Laporan: " . $reports->count();
+
+        $qrCode = base64_encode(QrCode::format('png')
+            ->size(200)
+            ->margin(1)
+            ->generate($qrData));
+
+        // 5. Load View dan generate PDF
+        $pdf = Pdf::loadView('pdf.tracking_monthly_report', [
+            'reports' => $reports,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'validator' => $validator,
+            'role' => $role,
+            'qrCode' => $qrCode,
+            'dateString' => $dateString
+        ]);
+
+        return $pdf->download('Riwayat_Kerusakan_' . $startDate->format('M_Y') . '.pdf');
     }
 }

@@ -23,7 +23,10 @@ Route::get('/tracking', [PublicReportController::class, 'tracking'])->name('publ
 Route::middleware('auth')->group(function () {
 
     // Rute Export PDF Barang Baru (Bisa diakses semua role yang login)
-Route::get('/new-items/{id}/export', [NewItemRequestController::class, 'exportSingle'])->name('new_items.export.single');
+    Route::get('/new-items/{id}/export', [NewItemRequestController::class, 'exportSingle'])->name('new_items.export.single');
+
+    // Rute Export Riwayat Kerusakan (Bisa diakses semua role yang login)
+    Route::get('/tracking/export-monthly', [PublicReportController::class, 'exportMonthlyReport'])->name('tracking.export.monthly');
 
     // Rute untuk Kepala Ruang
     Route::get('/kepala-ruang/new-item-request/create', [NewItemRequestController::class, 'create'])->name('kepala-ruang.new_items.create');
@@ -109,6 +112,13 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
     // --- GROUP KHUSUS ADMIN IT (Dashboard & Pengadaan) ---
     // Diproteksi oleh Middleware EnsureUserIsAdmin
     Route::middleware(EnsureUserIsAdmin::class)->group(function () {
+
+        // CRUD & Penugasan Teknisi IT
+        Route::get('/admin/it-staff', [App\Http\Controllers\ItStaffController::class, 'index'])->name('admin.it_staff.index');
+        Route::post('/admin/it-staff', [App\Http\Controllers\ItStaffController::class, 'store'])->name('admin.it_staff.store');
+        Route::patch('/admin/it-staff/{id}', [App\Http\Controllers\ItStaffController::class, 'update'])->name('admin.it_staff.update');
+        Route::delete('/admin/it-staff/{id}', [App\Http\Controllers\ItStaffController::class, 'destroy'])->name('admin.it_staff.destroy');
+        Route::patch('/admin/it-staff/{id}/on-duty', [App\Http\Controllers\ItStaffController::class, 'setOnDuty'])->name('admin.it_staff.onduty');
         
         // Dashboard Admin
         Route::get('/admin/dashboard', [AdminReportController::class, 'index'])->name('dashboard');

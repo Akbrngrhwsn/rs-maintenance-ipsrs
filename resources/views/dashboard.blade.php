@@ -10,6 +10,20 @@
         </div>
     </x-slot>
 
+    {{-- BANNER TEKNISI BERTUGAS --}}
+            <div class="bg-blue-900 rounded-xl shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center text-white">
+                <div class="flex items-center gap-3">
+                    <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <div>
+                        <p class="text-sm text-blue-200">Teknisi Bertugas (On-Duty) Saat Ini:</p>
+                        <p class="font-bold text-lg">{{ $onDutyStaff->nama ?? 'Belum ada teknisi yang dipilih' }}</p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.it_staff.index') }}" class="mt-3 sm:mt-0 px-4 py-2 bg-blue-800 hover:bg-blue-700 border border-blue-600 rounded-lg text-sm font-bold transition">
+                    Ubah Teknisi Jaga
+                </a>
+            </div>
+
     <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
             
@@ -170,6 +184,10 @@
                                         @endif
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <h4 class="font-bold text-blue-900 text-lg">{{ $report->ruangan }}</h4>
+                                            <p class="text-sm text-gray-600 mb-4 border-l-2 border-blue-300 pl-2 italic">"{{ $report->keluhan }}"</p>
+                                            <p class="text-xs font-bold text-blue-700 mb-3 bg-blue-50 px-2 py-1 rounded w-fit border border-blue-100">
+                                                Ditangani oleh: {{ $report->itStaff->nama ?? 'Tim IT' }}
+                                            </p>
                                             @if(isset($report->urgency))
                                                 @php $map = ['rendah' => 'bg-gray-100 text-gray-700', 'sedang' => 'bg-amber-100 text-amber-800', 'tinggi' => 'bg-red-100 text-red-800']; @endphp
                                                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $map[$report->urgency] ?? '' }}">{{ ucfirst($report->urgency) }}</span>
@@ -180,7 +198,7 @@
                                     <form action="{{ route('admin.validate', $report->id) }}" method="POST">
                                         @csrf @method('PATCH')
                                         <div class="mb-3">
-                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Laporan Tindakan Teknisi</label>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Laporan Keterangan</label>
                                             <textarea name="tindakan_teknisi" required class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Jelaskan perbaikan..."></textarea>
                                         </div>
                                         <div class="flex gap-3">
@@ -392,7 +410,8 @@
                                                     </div>
 
                                                     <div>
-                                                        <h4 class="font-semibold text-gray-700">Tindakan Teknisi</h4>
+                                                        <h4 class="font-semibold text-gray-700">Keterangan</h4>
+                                                        <p class="text-xs font-bold text-blue-600 mb-1">Ditangani oleh: {{ $report->itStaff->nama ?? 'Tim IT' }}</p>
                                                         <p class="text-sm text-gray-600">{{ $report->tindakan_teknisi ?? '-' }}</p>
                                                     </div>
 
