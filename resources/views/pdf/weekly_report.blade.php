@@ -54,12 +54,13 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 8%;">Waktu</th>
-                <th style="width: 18%;">Ruangan / Tiket</th>
-                <th style="width: 20%;">Masalah</th>
-                <th style="width: 20%;">Tindakan</th>
-                <th style="width: 22%;">Detail (Item)</th>
-                <th style="width: 12%;">Status</th>
+                <th style="width: 7%;">Waktu</th>
+                <th style="width: 15%;">Ruangan / Tiket</th>
+                <th style="width: 18%;">Masalah</th>
+                <th style="width: 18%;">Tindakan</th>
+                <th style="width: 19%;">Detail (Item)</th>
+                <th style="width: 10%;">Status</th>
+                <th style="width: 13%;">Ditangani Oleh</th>
             </tr>
         </thead>
         <tbody>
@@ -71,7 +72,7 @@
 
             @forelse($groupedHistory as $date => $items)
                 <tr class="bg-date">
-                    <td colspan="6">
+                    <td colspan="7">
                         📅 {{ \Carbon\Carbon::parse($date)->locale('id')->isoFormat('dddd, D MMMM Y') }}
                         <span style="font-weight: normal; font-size: 9px;">({{ $items->count() }} Laporan)</span>
                     </td>
@@ -79,16 +80,16 @@
 
                 @foreach($items as $report)
                 <tr>
-                    <td class="text-center">{{ $report->created_at->format('H:i') }}</td>
-                    <td>
+                    <td class="text-center" style="font-size: 10px;">{{ $report->created_at->format('H:i') }}</td>
+                    <td style="font-size: 10px;">
                         <div class="font-bold">{{ $report->ruangan }}</div>
                         @if($report->ticket_number)
                             <div style="font-family: monospace; font-size: 9px; color: #666;">{{ $report->ticket_number }}</div>
                         @endif
                     </td>
-                    <td>{{ $report->keluhan }}</td>
-                    <td class="italic">{{ $report->tindakan_teknisi ?? '-' }}</td>
-                    <td>
+                    <td style="font-size: 10px;">{{ $report->keluhan }}</td>
+                    <td class="italic" style="font-size: 9px;">{{ $report->tindakan_teknisi ?? '-' }}</td>
+                    <td style="font-size: 9px;">
                         @if($report->procurement && !empty($report->procurement->items))
                             <table class="item-table">
                                 @foreach($report->procurement->items as $it)
@@ -99,11 +100,22 @@
                             -
                         @endif
                     </td>
-                    <td class="text-center font-bold">{{ $report->status }}</td>
+                    <td class="text-center font-bold" style="font-size: 9px;">{{ $report->status }}</td>
+                    <td style="font-size: 8px;">
+                        @php
+                            $handlers = [];
+                            if($report->handled_by_admin) $handlers[] = 'Admin: ' . $report->handled_by_admin;
+                            if($report->handled_by_karu) $handlers[] = 'Karu: ' . $report->handled_by_karu;
+                            if($report->handled_by_management) $handlers[] = 'Mgmt: ' . $report->handled_by_management;
+                            if($report->handled_by_bendahara) $handlers[] = 'Ben: ' . $report->handled_by_bendahara;
+                            if($report->handled_by_director) $handlers[] = 'Dir: ' . $report->handled_by_director;
+                        @endphp
+                        {{ implode(' | ', $handlers) ?: '-' }}
+                    </td>
                 </tr>
                 @endforeach
             @empty
-                <tr><td colspan="6" class="text-center italic" style="color: #777; padding: 20px;">Data tidak ditemukan.</td></tr>
+                <tr><td colspan="7" class="text-center italic" style="color: #777; padding: 20px;">Data tidak ditemukan.</td></tr>
             @endforelse
         </tbody>
     </table>

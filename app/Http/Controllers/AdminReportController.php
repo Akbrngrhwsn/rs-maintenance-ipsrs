@@ -87,7 +87,13 @@ class AdminReportController extends Controller
 
         $report->status = 'Diproses';
         // Masukkan ID teknisi bertugas ke dalam laporan
-        $report->it_staff_id = $onDutyStaff ? $onDutyStaff->id : null; 
+        $report->it_staff_id = $onDutyStaff ? $onDutyStaff->id : null;
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        if ($onDutyStaff) {
+            $report->handled_by_admin = $onDutyStaff->nama;
+        }
+        
         $report->save();
 
         $namaTeknisi = $onDutyStaff ? $onDutyStaff->nama : 'Tim IT';
@@ -113,6 +119,26 @@ class AdminReportController extends Controller
         $report = Report::findOrFail($id);
         $report->status = $request->status_akhir;
         $report->tindakan_teknisi = $request->tindakan_teknisi;
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+        if ($onDutyStaff) {
+            $currentUser = \Illuminate\Support\Facades\Auth::user();
+            $role = $currentUser->role ?? 'admin';
+            
+            if ($role === 'kepala_ruang') {
+                $report->handled_by_karu = $onDutyStaff->nama;
+            } elseif ($role === 'management') {
+                $report->handled_by_management = $onDutyStaff->nama;
+            } elseif ($role === 'bendahara') {
+                $report->handled_by_bendahara = $onDutyStaff->nama;
+            } elseif ($role === 'direktur') {
+                $report->handled_by_director = $onDutyStaff->nama;
+            } else {
+                $report->handled_by_admin = $onDutyStaff->nama;
+            }
+        }
+        
         $report->save();
         $msg = $report->status == 'Selesai' ? 'Laporan ditandai SELESAI.' : 'Laporan ditandai TIDAK SELESAI (Masuk Pengadaan).';
         return back()->with('success', $msg);

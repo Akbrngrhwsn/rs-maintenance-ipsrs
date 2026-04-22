@@ -15,6 +15,8 @@ class Report extends Model
         'urgency', 'urgency_reason', 'status', 'tindakan_teknisi', 'room_id','needs_procurement',
     'procurement_items_request',
     'procurement_status', 'it_staff_id',
+    'handled_by_admin', 'handled_by_karu', 'handled_by_management', 
+    'handled_by_bendahara', 'handled_by_director',
     ];
 
     protected $casts = [

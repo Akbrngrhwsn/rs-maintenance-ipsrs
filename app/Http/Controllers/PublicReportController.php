@@ -141,4 +141,60 @@ class PublicReportController extends Controller
 
         return $pdf->download('Riwayat_Kerusakan_' . $startDate->format('M_Y') . '.pdf');
     }
+
+    // === TAMBAHKAN METHOD INI UNTUK EKSPOR PDF BULANAN SESUAI ROLE ===
+    public function exportTrackingMonthly(Request $request)
+    {
+        $monthInput = $request->input('month', date('Y-m'));
+        
+        $startDate = \Carbon\Carbon::parse($monthInput)->startOfMonth();
+        $endDate = \Carbon\Carbon::parse($monthInput)->endOfMonth();
+
+        // Hanya ambil laporan yang sudah selesai/diputuskan
+        $completedStatus = ['Selesai', 'Ditolak', 'Tidak Selesai'];
+
+        $query = Report::with(['room', 'itStaff'])
+            ->whereIn('status', $completedStatus)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at', 'asc');
+
+        // --- FILTER KHUSUS KEPALA RUANG ---
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user->role === 'kepala_ruang') {
+            if ($user->room) {
+                // Hanya ambil laporan dari ruangan Karu tersebut
+                $query->where('room_id', $user->room->id);
+            } else {
+                // Jika Karu belum diassign ruangan, jangan tampilkan apa-apa
+                $query->where('room_id', 0); 
+            }
+        }
+
+        $reports = $query->get();
+        $validator = $user->name;
+        $dateString = $startDate->locale('id')->translatedFormat('F Y');
+
+        // Detail QR Code
+        $ruanganCetak = $user->role === 'kepala_ruang' ? ($user->room->name ?? 'Belum ada ruang') : 'Semua Ruangan (RS)';
+        $qrData = "Diunduh oleh: " . $validator . " (" . strtoupper($user->role) . ")\n" .
+                  "Ruangan: " . $ruanganCetak . "\n" .
+                  "Periode: " . $dateString . "\n" .
+                  "Total Laporan: " . $reports->count();
+
+        $qrCode = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+            ->size(200)
+            ->margin(1)
+            ->generate($qrData));
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.monthly_report', [
+            'reports' => $reports,
+            'startDate' => $startDate,
+            'validator' => $validator,
+            'qrCode' => $qrCode
+        ]);
+
+        $namaFile = $user->role === 'kepala_ruang' ? 'Riwayat_Kerusakan_' . str_replace(' ', '_', $ruanganCetak) . '_' . $startDate->format('M_Y') : 'Riwayat_Kerusakan_RS_' . $startDate->format('M_Y');
+
+        return $pdf->download($namaFile . '.pdf');
+    }
 }

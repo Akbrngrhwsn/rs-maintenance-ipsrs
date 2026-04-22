@@ -217,6 +217,15 @@ class ProcurementController extends Controller
 
         $proc->status = 'submitted_to_management';
         $proc->save();
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        if ($proc->report) {
+            $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+            if ($onDutyStaff) {
+                $proc->report->handled_by_karu = $onDutyStaff->nama;
+                $proc->report->save();
+            }
+        }
 
         return back()->with('success', 'Pengadaan berhasil diteruskan ke Management.');
     }
@@ -300,9 +309,18 @@ class ProcurementController extends Controller
     {
         if(Auth::user()->role !== 'management') abort(403);
 
-        $proc = Procurement::findOrFail($id);
+        $proc = Procurement::with('report')->findOrFail($id);
         $proc->status = 'submitted_to_bendahara';
         $proc->save();
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        if ($proc->report) {
+            $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+            if ($onDutyStaff) {
+                $proc->report->handled_by_management = $onDutyStaff->nama;
+                $proc->report->save();
+            }
+        }
 
         return back()->with('success', 'Pengadaan disetujui oleh Management dan diteruskan ke Bendahara.');
     }
@@ -376,9 +394,18 @@ class ProcurementController extends Controller
     {
         if(Auth::user()->role !== 'bendahara') abort(403);
 
-        $proc = Procurement::findOrFail($id);
+        $proc = Procurement::with('report')->findOrFail($id);
         $proc->status = 'submitted_to_director';
         $proc->save();
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        if ($proc->report) {
+            $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+            if ($onDutyStaff) {
+                $proc->report->handled_by_bendahara = $onDutyStaff->nama;
+                $proc->report->save();
+            }
+        }
 
         return back()->with('success', 'Pengadaan berhasil diteruskan ke Direktur.');
     }
@@ -453,9 +480,18 @@ class ProcurementController extends Controller
     {
         if(Auth::user()->role !== 'direktur') abort(403);
 
-        $proc = Procurement::findOrFail($id);
+        $proc = Procurement::with('report')->findOrFail($id);
         $proc->status = 'approved_by_director';
         $proc->save();
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        if ($proc->report) {
+            $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+            if ($onDutyStaff) {
+                $proc->report->handled_by_director = $onDutyStaff->nama;
+                $proc->report->save();
+            }
+        }
 
         return back()->with('success', 'Pengadaan berhasil di-ACC.');
     }

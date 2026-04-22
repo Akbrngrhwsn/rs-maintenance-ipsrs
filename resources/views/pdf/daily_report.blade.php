@@ -35,12 +35,13 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 10%;">No Tiket</th>
-                <th style="width: 15%;">Pelapor</th>
-                <th style="width: 15%;">Ruangan</th>
-                <th>Keluhan</th>
-                <th style="width: 12%;">Status</th>
-                <th>Tindakan Teknisi</th>
+                <th style="width: 9%;">No Tiket</th>
+                <th style="width: 13%;">Pelapor</th>
+                <th style="width: 12%;">Ruangan</th>
+                <th style="width: 13%;">Keluhan</th>
+                <th style="width: 10%;">Status</th>
+                <th style="width: 13%;">Tindakan Teknisi</th>
+                <th style="width: 20%;">Ditangani Oleh</th>
             </tr>
         </thead>
         <tbody>
@@ -59,11 +60,22 @@
                         {{ $report->status }}
                     </span>
                 </td>
-                <td>{{ $report->tindakan_teknisi ?? '-' }}</td>
+                <td style="font-size: 10px;">{{ $report->tindakan_teknisi ?? '-' }}</td>
+                <td style="font-size: 9px;">
+                    @php
+                        $handlers = [];
+                        if($report->handled_by_admin) $handlers[] = 'Admin: ' . $report->handled_by_admin;
+                        if($report->handled_by_karu) $handlers[] = 'Karu: ' . $report->handled_by_karu;
+                        if($report->handled_by_management) $handlers[] = 'Mgmt: ' . $report->handled_by_management;
+                        if($report->handled_by_bendahara) $handlers[] = 'Bendahara: ' . $report->handled_by_bendahara;
+                        if($report->handled_by_director) $handlers[] = 'Direktur: ' . $report->handled_by_director;
+                    @endphp
+                    {{ implode(' | ', $handlers) ?: '-' }}
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="6" style="text-align: center; font-style: italic; color: #777;">
+                <td colspan="7" style="text-align: center; font-style: italic; color: #777;">
                     Tidak ada laporan pada tanggal ini.
                 </td>
             </tr>

@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications/check', [NotificationController::class, 'check'])->name('notifications.check');
     Route::get('/notifications/latest-report', [NotificationController::class, 'getLatestReport'])->name('notifications.latest_report');
 
+    Route::get('/tracking/export-monthly', [PublicReportController::class, 'exportTrackingMonthly'])->name('tracking.export.monthly');
+
     Route::get('/management/procurements', [ProcurementController::class, 'managementIndex'])->name('management.procurements');
     Route::patch('/management/procurements/{id}/approve', [ProcurementController::class, 'managementApprove'])->name('management.procurements.approve');
     Route::patch('/management/procurements/{id}/reject', [ProcurementController::class, 'managementReject'])->name('management.procurements.reject');

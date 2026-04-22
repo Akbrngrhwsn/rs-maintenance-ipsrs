@@ -36,14 +36,15 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 8%;">No</th>
-                <th style="width: 12%;">No Tiket</th>
-                <th style="width: 12%;">Tanggal Lapor</th>
-                <th style="width: 12%;">Tanggal Selesai</th>
-                <th style="width: 15%;">Ruangan</th>
-                <th style="width: 20%;">Keluhan</th>
-                <th style="width: 12%;">Tindakan</th>
-                <th style="width: 9%;">Status</th>
+                <th style="width: 6%;">No</th>
+                <th style="width: 10%;">No Tiket</th>
+                <th style="width: 10%;">Tanggal Lapor</th>
+                <th style="width: 10%;">Tanggal Selesai</th>
+                <th style="width: 12%;">Ruangan</th>
+                <th style="width: 15%;">Keluhan</th>
+                <th style="width: 10%;">Tindakan</th>
+                <th style="width: 8%;">Status</th>
+                <th style="width: 19%;">Ditangani Oleh</th>
             </tr>
         </thead>
         <tbody>
@@ -54,8 +55,8 @@
                 <td>{{ \Carbon\Carbon::parse($report->created_at)->format('d/m/Y') }}</td>
                 <td>{{ \Carbon\Carbon::parse($report->updated_at)->format('d/m/Y') }}</td>
                 <td>{{ $report->room ? $report->room->name : $report->ruangan }}</td>
-                <td>{{ Str::limit($report->keluhan, 40) }}</td>
-                <td>{{ Str::limit($report->tindakan_teknisi ?? '-', 30) }}</td>
+                <td style="font-size: 10px;">{{ Str::limit($report->keluhan, 35) }}</td>
+                <td style="font-size: 9px;">{{ Str::limit($report->tindakan_teknisi ?? '-', 25) }}</td>
                 <td style="text-align: center;">
                     @if($report->status == 'Selesai')
                         <span class="status-selesai" style="padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: bold;">✓ Selesai</span>
@@ -67,10 +68,21 @@
                         <span style="padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; background-color: #e2e3e5; color: #383d41;">{{ $report->status }}</span>
                     @endif
                 </td>
+                <td style="font-size: 8px;">
+                    @php
+                        $handlers = [];
+                        if($report->handled_by_admin) $handlers[] = 'Admin: ' . $report->handled_by_admin;
+                        if($report->handled_by_karu) $handlers[] = 'Karu: ' . $report->handled_by_karu;
+                        if($report->handled_by_management) $handlers[] = 'Mgmt: ' . $report->handled_by_management;
+                        if($report->handled_by_bendahara) $handlers[] = 'Ben: ' . $report->handled_by_bendahara;
+                        if($report->handled_by_director) $handlers[] = 'Dir: ' . $report->handled_by_director;
+                    @endphp
+                    {{ implode(' | ', $handlers) ?: '-' }}
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="8" style="text-align: center; font-style: italic; color: #777;">
+                <td colspan="9" style="text-align: center; font-style: italic; color: #777;">
                     Tidak ada riwayat kerusakan pada periode ini.
                 </td>
             </tr>
@@ -78,7 +90,7 @@
         </tbody>
         <tfoot>
             <tr style="background-color: #f9f9f9; font-weight: bold;">
-                <td colspan="7" style="text-align: right;">Total Laporan Selesai:</td>
+                <td colspan="8" style="text-align: right;">Total Laporan Selesai:</td>
                 <td style="text-align: center;">{{ count($reports) }}</td>
             </tr>
         </tfoot>

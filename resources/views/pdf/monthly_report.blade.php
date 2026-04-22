@@ -32,13 +32,14 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 10%;">No Tiket</th>
-                <th style="width: 12%;">Tanggal</th>
-                <th style="width: 15%;">Pelapor</th>
-                <th style="width: 15%;">Ruangan</th>
-                <th>Keluhan</th>
-                <th style="width: 10%;">Status</th>
-                <th>Tindakan Teknisi</th>
+                <th style="width: 9%;">No Tiket</th>
+                <th style="width: 10%;">Tanggal</th>
+                <th style="width: 12%;">Pelapor</th>
+                <th style="width: 12%;">Ruangan</th>
+                <th style="width: 13%;">Keluhan</th>
+                <th style="width: 9%;">Status</th>
+                <th style="width: 12%;">Tindakan Teknisi</th>
+                <th style="width: 13%;">Ditangani Oleh</th>
             </tr>
         </thead>
         <tbody>
@@ -48,17 +49,28 @@
                 <td>{{ \Carbon\Carbon::parse($report->created_at)->format('d/m/Y') }}</td>
                 <td>{{ $report->pelapor_nama ?? 'Anonim' }}</td>
                 <td>{{ $report->room ? $report->room->name : $report->ruangan }}</td>
-                <td>{{ $report->keluhan }}</td>
+                <td style="font-size: 10px;">{{ $report->keluhan }}</td>
                 <td style="text-align: center;">
                     <span style="padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; background-color: {{ $report->status == 'Selesai' ? '#d4edda' : ($report->status == 'Diproses' ? '#fff3cd' : '#f8d7da') }};">
                         {{ $report->status }}
                     </span>
                 </td>
-                <td>{{ $report->tindakan_teknisi ?? '-' }}</td>
+                <td style="font-size: 9px;">{{ $report->tindakan_teknisi ?? '-' }}</td>
+                <td style="font-size: 8px;">
+                    @php
+                        $handlers = [];
+                        if($report->handled_by_admin) $handlers[] = 'Admin: ' . $report->handled_by_admin;
+                        if($report->handled_by_karu) $handlers[] = 'Karu: ' . $report->handled_by_karu;
+                        if($report->handled_by_management) $handlers[] = 'Mgmt: ' . $report->handled_by_management;
+                        if($report->handled_by_bendahara) $handlers[] = 'Ben: ' . $report->handled_by_bendahara;
+                        if($report->handled_by_director) $handlers[] = 'Dir: ' . $report->handled_by_director;
+                    @endphp
+                    {{ implode(' | ', $handlers) ?: '-' }}
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="7" style="text-align: center; font-style: italic; color: #777;">
+                <td colspan="8" style="text-align: center; font-style: italic; color: #777;">
                     Tidak ada laporan pada periode ini.
                 </td>
             </tr>
