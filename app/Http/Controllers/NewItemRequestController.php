@@ -70,8 +70,14 @@ class NewItemRequestController extends Controller
                 break;
             case 'bendahara':
                 if($user->role !== 'bendahara') abort(403);
-                $itemRequest->status = 'pending_director';
+                
+                // Langsung ubah status menjadi approved (bypass direktur)
+                $itemRequest->status = 'approved';
                 $itemRequest->qr_bendahara = $qrCodeBase64;
+                
+                // Otomatis buat QR Direktur sebagai tanda sudah diwakilkan
+                $qrDirekturText = "Diwakilkan & Disetujui oleh Direktur Utama pada " . now()->format('Y-m-d H:i:s') . "\nPengajuan: " . $itemRequest->purpose;
+                $itemRequest->qr_direktur = base64_encode(QrCode::format('png')->size(100)->generate($qrDirekturText));
                 break;
             case 'direktur':
                 if($user->role !== 'direktur') abort(403);

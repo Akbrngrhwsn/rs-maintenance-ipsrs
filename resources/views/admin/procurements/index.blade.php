@@ -298,12 +298,13 @@
 
                                             <td class="px-6 py-4 align-top text-center">
                                                 @if($itemReq->status === 'pending_admin')
-                                                    <form action="{{ route('admin.new_items.approve', $itemReq->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Validasi pengajuan barang baru ini dan teruskan ke Management?')">
+                                                    <form action="{{ route('admin.new_items.approve', $itemReq->id) }}" method="POST" class="inline-block" onsubmit="return ">
                                                         @csrf @method('PATCH')
-                                                        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow mb-1">Setujui</button>
+                                                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 transition">
+                                                            ACC
+                                                        </button>
                                                     </form>
-                                                    <br>
-                                                    <button type="button" onclick="document.getElementById('rejectModal-new-{{ $itemReq->id }}').classList.remove('hidden')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow">Tolak</button>
+                                                    <button type="button" onclick="document.getElementById('rejectModal-new-{{ $itemReq->id }}').classList.remove('hidden')" class="inline-flex items-center px-3 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-900 transition">Tolak</button>
                                                     
                                                     <div id="rejectModal-new-{{ $itemReq->id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center">
                                                         <div class="absolute inset-0 bg-gray-900 opacity-60" onclick="document.getElementById('rejectModal-new-{{ $itemReq->id }}').classList.add('hidden')"></div>

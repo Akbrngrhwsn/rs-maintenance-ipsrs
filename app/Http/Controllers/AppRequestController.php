@@ -26,17 +26,24 @@ class AppRequestController extends Controller
     {
         $role = Auth::user()->role;
         
-        // Ambil yang statusnya masih menunggu (termasuk yang perlu diproses Admin/Management/Direktur)
-        $query = AppRequest::with('user')->whereIn('status', [
-            'submitted_to_admin',
-            'submitted_to_management',
-            'submitted_to_bendahara',
-            'submitted_to_director',
-            'pending_director',
-            'approved'
-        ]);
+        // PERBAIKAN: Tampilkan request jika status aplikasinya masih antrean
+        // ATAU jika status pengadaannya sedang menunggu persetujuan (agar Bendahara bisa melihat)
+        $query = AppRequest::with('user')->where(function($q) {
+            $q->whereIn('status', [
+                'submitted_to_admin',
+                'submitted_to_management',
+                'submitted_to_bendahara',
+                'submitted_to_director',
+                'pending_director',
+                'approved'
+            ])
+            ->orWhereIn('procurement_approval_status', [
+                'submitted_to_management',
+                'submitted_to_bendahara',
+                'submitted_to_director'
+            ]);
+        });
         
-        //  hanya melihat miliknya
         if($role == 'kepala_ruang') {
             $query->where('user_id', Auth::id());
         }
@@ -47,19 +54,19 @@ class AppRequestController extends Controller
 
     // === 3. HALAMAN DAFTAR PROYEK BERJALAN ===
     public function ongoing()
-    {
-        $role = Auth::user()->role;
-        
-        // Ambil yang statusnya 'in_progress' atau 'completed'
-        $query = AppRequest::with('user')->whereIn('status', ['in_progress', 'completed']);
-        
-        if($role == 'kepala_ruang') {
-            $query->where('user_id', Auth::id());
-        }
-
-        $projects = $query->latest()->get();
-        return view('apps.ongoing', compact('projects'));
+{
+    $role = Auth::user()->role;
+    
+    // Admin & Management melihat semua yang in_progress
+    $query = AppRequest::with('user')->whereIn('status', ['in_progress', 'completed']);
+    
+    if($role == 'kepala_ruang') {
+        $query->where('user_id', Auth::id());
     }
+
+    $projects = $query->latest()->get();
+    return view('apps.ongoing', compact('projects'));
+}
 
     // === 4. HALAMAN DETAIL PROYEK (SINGLE PAGE) ===
     public function show($id)
@@ -276,15 +283,30 @@ class AppRequestController extends Controller
             return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
         }
 
-        if($app->procurement_approval_status !== 'submitted_to_bendahara') {
-            return back()->with('error', 'Status pengadaan tidak valid untuk persetujuan Bendahara.');
-        }
+        // 1. GENERATE QR BENDAHARA
+        $qrTextBendahara = "Divalidasi oleh Bendahara: " . Auth::user()->name . " pada " . now()->format('d/m/Y H:i');
+        $app->qr_bendahara = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate($qrTextBendahara));
 
-        // Bendahara approve - teruskan ke Direktur
-        $app->procurement_approval_status = 'submitted_to_director';
+        // 2. GENERATE QR DIREKTUR (Mewakili Direktur)
+        $qrTextDirektur = "Disetujui oleh Direktur Utama (Diwakilkan Bendahara) pada " . now()->format('d/m/Y H:i');
+        $app->qr_direktur = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate($qrTextDirektur));
+
+        // 3. SET STATUS APLIKASI JADI IN PROGRESS (Admin langsung bisa kerja)
+        $app->status = 'in_progress';
+
+        // 4. SET STATUS PENGADAAN JADI APPROVED
+        $app->procurement_approval_status = 'approved'; 
+        
         $app->save();
 
-        return back()->with('success', 'Pengajuan pengadaan berhasil disetujui dan diteruskan ke Direktur.');
+        // 5. SINKRONISASI KE TABEL PROCUREMENT UNIVERSAL
+        $procUniversal = \App\Models\Procurement::where('app_request_id', $app->id)->first();
+        if ($procUniversal) {
+            $procUniversal->status = 'approved';
+            $procUniversal->save();
+        }
+
+        return back()->with('success', 'Validasi berhasil! Proyek sekarang berstatus In Progress dan dapat dikerjakan oleh Admin.');
     }
 
     // Bendahara: Reject pengadaan di level AppRequest
@@ -311,26 +333,21 @@ class AppRequestController extends Controller
 
     // Management: Approve or forward app request
     // PERUBAHAN: Memisahkan persetujuan aplikasi dan pengadaan
-    public function managementApprove(Request $request, $id)
-    {
-        if(Auth::user()->role !== 'management') abort(403);
+public function managementApprove(Request $request, $id)
+{
+    $appRequest = AppRequest::findOrFail($id);
+    $user = Auth::user();
 
-        $app = AppRequest::findOrFail($id);
+    // 1. Buat Tanda Tangan Digital Management
+    $qrTextMgmt = "Aplikasi disetujui untuk dikerjakan oleh Management: " . $user->name . " pada " . now()->format('d/m/Y H:i');
+    $appRequest->qr_management = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate($qrTextMgmt));
 
-        // Save management note if provided and column exists
-        if ($request->filled('catatan_management') && \Illuminate\Support\Facades\Schema::hasColumn('app_requests', 'catatan_management')) {
-            $app->catatan_management = $request->catatan_management;
-        }
+    // 2. Ubah status aplikasi agar Tim IT bisa langsung bekerja
+    $appRequest->status = 'in_progress'; 
 
-        // PERUBAHAN: Aplikasi approval terlepas dari procurement
-        // Saat Management menekan "Setujui Aplikasi" aplikasi harus diteruskan
-        // ke Direktur untuk persetujuan akhir. Pengadaan diproses terpisah.
-        $app->status = 'submitted_to_director';
-
-        $app->save();
-
-        return back()->with('success', 'Pengajuan aplikasi berhasil diteruskan ke Direktur untuk persetujuan.');
-    }
+    $appRequest->save();
+    return back()->with('success', 'Aplikasi telah disetujui! Tim IT sekarang dapat mulai mengerjakan proyek.');
+}
 
     public function managementReject(Request $request, $id)
     {
@@ -351,26 +368,26 @@ class AppRequestController extends Controller
     // Management: Approve procurement separately
     // PERUBAHAN: Pengadaan langsung diteruskan ke Bendahara (tidak tertahan di management)
     public function managementApproveProcurementForApp(Request $request, $id)
-    {
-        if(Auth::user()->role !== 'management') abort(403);
-
-        $app = AppRequest::findOrFail($id);
-        
-        if(!$app->needs_procurement) {
-            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
-        }
-
-        // Update procurement approval status langsung ke Bendahara
-        $app->procurement_approval_status = 'submitted_to_bendahara';
-        
-        if ($request->filled('catatan_management_procurement') && \Illuminate\Support\Facades\Schema::hasColumn('app_requests', 'catatan_management_procurement')) {
-            $app->catatan_management_procurement = $request->catatan_management_procurement;
-        }
-
-        $app->save();
-
-        return back()->with('success', 'Pengajuan pengadaan berhasil diteruskan ke Bendahara untuk validasi.');
+{
+    $app = AppRequest::findOrFail($id);
+    
+    if(!$app->needs_procurement) {
+        return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan barang.');
     }
+
+    // Ubah status pengadaan saja, jangan ubah status aplikasi utama
+    $app->procurement_approval_status = 'submitted_to_bendahara';
+    
+    // Sinkronisasi ke tabel pengadaan universal jika ada
+    $procUniversal = \App\Models\Procurement::where('app_request_id', $app->id)->first();
+    if ($procUniversal) {
+        $procUniversal->status = 'submitted_to_bendahara';
+        $procUniversal->save();
+    }
+
+    $app->save();
+    return back()->with('success', 'Pengajuan dana telah diteruskan ke Bendahara untuk validasi anggaran.');
+}
 
     // Management: Reject procurement separately
     public function managementRejectProcurementForApp(Request $request, $id)

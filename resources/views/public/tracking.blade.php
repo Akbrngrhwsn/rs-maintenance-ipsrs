@@ -35,7 +35,7 @@
                 </svg>
             </div>
             <div>
-                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Teknisi IT Standby Hari Ini:</p>
+                <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">Teknisi IT Standby Saat Ini:</p>
                 <p class="text-lg font-black text-blue-900 leading-tight">{{ $onDutyStaff->nama }}</p>
             </div>
         </div>

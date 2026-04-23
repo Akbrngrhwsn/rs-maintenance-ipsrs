@@ -133,7 +133,33 @@
                             </div>
                         @endif
                     </div>
-                    
+                    {{-- Bagian Progress Aplikasi --}}
+<div class="mt-4 w-full">
+    <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
+        <span>Progress</span>
+        <span>{{ $project->progress }}%</span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-2.5">
+        <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ $project->progress }}%"></div>
+    </div>
+
+    {{-- CAUTION: Jika ada pengadaan tapi dana belum di-ACC Bendahara --}}
+    @if($project->needs_procurement && !in_array($project->procurement_approval_status, ['approved', 'finish']))
+        <div class="mt-3 bg-yellow-50 border-l-4 border-yellow-400 p-2 rounded shadow-sm">
+            <div class="flex items-center">
+                <svg class="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <div class="ml-2">
+                    <p class="text-[10px] font-bold text-yellow-800 uppercase leading-tight">
+                        Peringatan: Anggaran Belum Divalidasi
+                    </p>
+                    <p class="text-[9px] text-yellow-700">Pengerjaan fitur berjalan, namun pembelian barang/aset tertunda.</p>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
                     <div class="w-full md:w-auto text-right md:text-left min-w-[200px]">
                         <div class="flex flex-col items-end md:items-end">
                             @php
@@ -533,8 +559,6 @@
                             Unduh Laporan Pengadaan
                         </a>
                     @endif
-
-                    
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -578,7 +602,7 @@
                             // Logika cek apakah status pengadaan mengandung kata tolak/reject
                             $procStatusStr = $project->procurement_approval_status ?? '';
                             $isProcRejected = str_contains(strtolower($procStatusStr), 'tolak') || str_contains(strtolower($procStatusStr), 'reject');
-                        @endphp  
+                        @endphp
                         
                         @if($isProcRejected)
                             <div class="text-xl font-bold mt-2 text-gray-400" style="text-decoration: line-through;">
@@ -587,56 +611,29 @@
                             <div class="text-xs font-bold text-red-600 mt-1">Anggaran Ditolak</div>
                         @else
                             <div class="text-xl font-bold mt-2">Rp {{ number_format($finalTotal ?? 0, 0, ',', '.') }}</div>
+                            <div class="text-xs text-gray-500 mt-2">(Total dihitung dari daftar barang)</div>
                         @endif
 
-                        @if($project->needs_procurement)
-                        <div class="mt-2 flex items-center gap-2">
-                            <span class="text-sm font-medium text-gray-500">Status Pengadaan:</span>
-                            @php
-                                $procStatusLabels = [
-                                    'pending' => ['label' => 'Menunggu Review Admin', 'class' => 'bg-gray-100 text-gray-800'],
-                                    'submitted_to_management' => ['label' => 'Menunggu Management', 'class' => 'bg-indigo-100 text-indigo-800'],
-                                    'submitted_to_bendahara' => ['label' => 'Menunggu Bendahara (Validasi Anggaran)', 'class' => 'bg-yellow-100 text-yellow-800'],
-                                    'submitted_to_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-blue-100 text-blue-800'],
-                                    'approved' => ['label' => 'Pengadaan Disetujui', 'class' => 'bg-green-100 text-green-800'],
-                                    'rejected' => ['label' => 'Pengadaan Ditolak', 'class' => 'bg-red-100 text-red-800'],
-                                    'rejected_by_management' => ['label' => 'Ditolak Management (Revisi)', 'class' => 'bg-red-100 text-red-800'],
-                                ];
-                                $ps = $procStatusLabels[$project->procurement_approval_status] ?? [
-                                    'label' => ucfirst(str_replace('_', ' ', $project->procurement_approval_status)), 
-                                    'class' => 'bg-gray-100 text-gray-800'
-                                ];
-                            @endphp
-                            
-
-                            
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full {{ $ps['class'] }}">
-                                {{ $ps['label'] }}
-                            </span>
-
+                        {{-- TOMBOL PENYELESAIAN PENGADAAN OLEH ADMIN --}}
+                @if($project->status === 'in_progress' && $project->needs_procurement && $project->procurement_approval_status === 'approved')
+                    <div class="mt-6 border-t pt-6">
+                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                            <h4 class="font-bold text-teal-800 mb-3 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Penyelesaian Pengadaan
+                            </h4>
+                            <p class="text-xs text-teal-700 mb-3 bg-teal-100 p-2 rounded">
+                                Pengadaan untuk aplikasi ini telah disetujui sepenuhnya. Jika barang sudah diimplementasikan/selesai diurus, silakan tandai pengadaan sebagai selesai.
+                            </p>
+                            <form action="{{ route('admin.apps.finish_procurement', $project->id) }}" method="POST" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
+                                @csrf @method('PATCH')
+                                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold transition shadow">
+                                    ✓ Tandai Pengadaan Selesai
+                                </button>
+                            </form>
                         </div>
-                    @endif
-
-                    {{-- Tombol Ceklist Selesai untuk Admin --}}
-            @if(Auth::user()->role === 'admin' && $project->procurement_approval_status === 'approved')
-                <form action="{{ route('admin.apps.finish_procurement', $project->id) }}" method="POST" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-teal-500 text-white text-xs font-bold rounded-lg hover:bg-teal-600 transition shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Selesaikan Pengadaan
-                    </button>
-                </form>
-                <p class="text-xs text-gray-500 mt-1">Tandai pengadaan ini sebagai selesai setelah semua barang diterima dan proses administrasi internal selesai.</p>
-            @endif
-
-            @if($project->procurement_approval_status === 'finish')
-                <p class="text-xs text-gray-600 mb-3 bg-gray-100 p-2 rounded">
-                    Pengadaan barang untuk proyek aplikasi ini sudah selesai diimplementasikan.
-                </p>
-            @endif
-
+                    </div>
+                @endif
                     </div>
                 </div>
 
@@ -661,87 +658,63 @@
                 @endif
             </div>
 
-            {{-- Tindakan Management --}}
+           {{-- Tindakan Management --}}
             @if(Auth::user()->role === 'management')
                 @php
-                    $showAppAction = ($project->status === 'submitted_to_management');
-                    $showProcAction = ($project->needs_procurement && 
-                                      in_array($project->procurement_approval_status, ['pending', 'submitted_to_management', null]));
+                    $canApproveApp = ($project->status === 'submitted_to_management');
+                    $canApproveFunds = ($project->needs_procurement && 
+                                       in_array($project->procurement_approval_status, ['pending', 'submitted_to_management', null]));
                 @endphp
 
-                @if($showAppAction || $showProcAction)
+                @if($canApproveApp || $canApproveFunds)
                     <div class="mt-6 border-t pt-6">
                         <h4 class="font-bold mb-4 text-gray-800">Tindakan Management</h4>
-                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            @if($showAppAction)
+                            
+                            {{-- 1. Kotak Persetujuan Pengerjaan Aplikasi --}}
+                            @if($canApproveApp)
                                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
-                                    <h5 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                                    <h5 class="font-bold text-blue-800 mb-2 flex items-center gap-2">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         Persetujuan Aplikasi
                                     </h5>
-                                    <p class="text-xs text-blue-700 mb-3">Tindakan untuk menyetujui konsep/kebutuhan aplikasi agar bisa diteruskan ke Direktur.</p>
-                                    <form action="{{ route('apps.management_approve', $project->id) }}" method="POST" class="space-y-3">
-                                        @csrf @method('PATCH')
-                                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
-                                            ✓ Setujui Aplikasi
-                                        </button>
-                                    </form>
+                                    <p class="text-[11px] text-blue-600 mb-3">Izinkan Tim IT untuk mulai mengembangkan aplikasi ini segera.</p>
+                                    
+                                    <div class="flex gap-2">
+                                        <form action="{{ route('apps.management_approve', $project->id) }}" method="POST" class="flex-1">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold text-xs transition">✓ Setujui</button>
+                                        </form>
 
-                                    <button type="button" onclick="openRejectModal('{{ route('apps.management_reject', $project->id) }}', 'catatan_management', {}, 'Tolak Aplikasi')" 
-                                            class="mt-3 w-full bg-white border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-bold transition">
-                                        Tolak Aplikasi
-                                    </button>
+                                        {{-- Tombol Tolak Aplikasi --}}
+                                        <button type="button" onclick="openRejectModal('{{ route('apps.management_reject', $project->id) }}', 'catatan_management', {}, 'Tolak Aplikasi')" 
+                                                class="flex-1 bg-white border border-red-300 text-red-600 hover:bg-red-50 py-2 rounded-lg font-bold text-xs transition">
+                                            ✕ Tolak
+                                        </button>
+                                    </div>
                                 </div>
                             @endif
 
-                            @if($showProcAction)
+                            {{-- 2. Kotak Persetujuan Pengajuan Dana --}}
+                            @if($canApproveFunds)
                                 <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 shadow-sm">
-                                    <h5 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                        Persetujuan Pengadaan
+                                    <h5 class="font-bold text-amber-800 mb-2 flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                        Persetujuan Dana
                                     </h5>
-                                    <p class="text-xs text-amber-700 mb-3 bg-amber-100 p-2 rounded">
-                                        📌 Anda dapat menunda tindakan ini jika anggaran masih dalam tahap review.
-                                    </p>
+                                    <p class="text-[11px] text-amber-600 mb-3">Teruskan rincian anggaran barang ke Bendahara.</p>
                                     
-                                    <form action="{{ route('management.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
-                                        @csrf @method('PATCH')
-                                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
-                                            ✓ Lanjutkan Pengadaan ke Bendahara
-                                        </button>
-                                    </form>
+                                    <div class="flex gap-2">
+                                        <form action="{{ route('management.app.procurement.approve', $project->id) }}" method="POST" class="flex-1">
+                                            @csrf @method('PATCH')
+                                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg font-bold text-xs transition">✓ Ajukan Dana</button>
+                                        </form>
 
-                                    <button type="button" onclick="openRejectModal('{{ route('management.app.procurement.reject', $project->id) }}', 'catatan_management_procurement', {}, 'Tolak Pengadaan')" 
-                                            class="mt-3 w-full bg-white border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-bold transition text-sm">
-                                        Tolak Pengadaan
-                                    </button>
-                                </div>
-                            @elseif($project->needs_procurement)
-                                {{-- PERBAIKAN: LOG PENGADAAN JIKA DITOLAK --}}
-                                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                    <h5 class="font-bold text-gray-700 mb-2 flex items-center gap-2 text-sm">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        Log Pengadaan
-                                    </h5>
-                                    <div class="text-xs mt-2">
-                                        <span class="font-semibold">Status:</span> 
-                                        @php
-                                            $rawProcStatus = $project->procurement_approval_status ?: 'pending';
-                                            $procLower = strtolower($rawProcStatus);
-                                            $badgeClass = 'bg-gray-200 text-gray-800';
-                                            
-                                            if (str_contains($procLower, 'tolak') || str_contains($procLower, 'reject')) {
-                                                $badgeClass = 'bg-red-100 text-red-800 border-red-200';
-                                            } elseif (str_contains($procLower, 'setuju') || str_contains($procLower, 'approve') || str_contains($procLower, 'completed')) {
-                                                $badgeClass = 'bg-green-100 text-green-800 border-green-200';
-                                            } elseif (str_contains($procLower, 'submitted') || str_contains($procLower, 'pending')) {
-                                                $badgeClass = 'bg-blue-100 text-blue-800 border-blue-200';
-                                            }
-                                        @endphp
-                                        <span class="px-2 py-0.5 rounded border {{ $badgeClass }} font-bold">
-                                            {{ strtoupper(str_replace('_', ' ', $rawProcStatus)) }}
-                                        </span>
+                                        {{-- Tombol Tolak Dana --}}
+                                        <button type="button" onclick="openRejectModal('{{ route('management.app.procurement.reject', $project->id) }}', 'catatan_management_procurement', {}, 'Tolak Pengajuan Dana')" 
+                                                class="flex-1 bg-white border border-red-300 text-red-600 hover:bg-red-50 py-2 rounded-lg font-bold text-xs transition">
+                                            ✕ Tolak
+                                        </button>
                                     </div>
                                 </div>
                             @endif
@@ -751,67 +724,53 @@
             @endif
 
             {{-- Tindakan Direktur (Aplikasi dan Pengadaan independen) --}}
-@php
-    $isDirector = Auth::user()->role === 'direktur';
-    // Cek apakah ada aksi aplikasi yang menunggu
-    $waitingApp = $project->status === 'submitted_to_director';
-    // Cek apakah ada aksi pengadaan yang menunggu
-    $waitingProc = $project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director';
-@endphp
-
-{{-- Pembungkus hanya muncul jika user adalah direktur DAN ada salah satu aksi yang menunggu --}}
-@if($isDirector && ($waitingApp || $waitingProc))
-    <div class="mt-6 border-t pt-6">
-        <h4 class="font-bold mb-4 text-gray-800">Tindakan Direktur</h4>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {{-- PANEL KIRI: Persetujuan Aplikasi --}}
-            @if($waitingApp)
-                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                    <h5 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Persetujuan Aplikasi
-                    </h5>
-                    <form action="{{ route('apps.approve', $project->id) }}" method="POST" class="space-y-3">
-                        @csrf @method('PATCH')
-                        <button type="submit" name="status" value="terima" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
-                            ✓ Setujui Aplikasi
-                        </button>
-                    </form>
-
-                    <button type="button" onclick="openRejectModal('{{ route('apps.approve', $project->id) }}', 'catatan', {status: 'tolak'}, 'Tolak Aplikasi')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm">
-                        Tolak Aplikasi
-                    </button>
-                </div>
-            @endif
-
-            {{-- PANEL KANAN: Persetujuan Pengadaan --}}
-            @if($waitingProc)
-                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-                    <h5 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        Persetujuan Pengadaan
-                        <span class="ml-auto text-xs bg-indigo-200 px-2 py-1 rounded">Final Approval</span>
-                    </h5>
-                    <p class="text-xs text-indigo-700 mb-3 bg-indigo-100 p-2 rounded border border-indigo-200">
-                        ✓ Pengadaan sudah disetujui Bendahara. Silakan berikan approval akhir.
-                    </p>
+            @if(Auth::user()->role === 'direktur' && ($project->status === 'submitted_to_director' || ($project->status === 'approved' && $project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director')))
+                <div class="mt-6 border-t pt-6">
+                    <h4 class="font-bold mb-4">Tindakan Direktur</h4>
                     
-                    <form action="{{ route('director.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
-                        @csrf @method('PATCH')
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
-                            ✓ Setujui Pengadaan
-                        </button>
-                    </form>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        @if($project->status === 'submitted_to_director')
+                            <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                <h5 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7-1a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Persetujuan Aplikasi
+                                </h5>
+                                <form action="{{ route('apps.approve', $project->id) }}" method="POST" class="space-y-3">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" name="status" value="terima" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition">
+                                        ✓ Setujui Aplikasi
+                                    </button>
+                                </form>
 
-                    <button type="button" onclick="openRejectModal('{{ route('director.app.procurement.reject', $project->id) }}', 'catatan', {}, 'Tolak Pengadaan')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm text-sm">
-                        Tolak Pengadaan
-                    </button>
+                                <button type="button" onclick="openRejectModal('{{ route('apps.approve', $project->id) }}', 'catatan', {status: 'tolak'}, 'Tolak Aplikasi')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">Tolak Aplikasi</button>
+                            </div>
+                        @endif
+
+                        @if($project->needs_procurement && $project->procurement_approval_status === 'submitted_to_director')
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                                <h5 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    Persetujuan Pengadaan
+                                    <span class="ml-auto text-xs bg-indigo-200 px-2 py-1 rounded">Final Approval</span>
+                                </h5>
+                                <p class="text-xs text-indigo-700 mb-3 bg-indigo-100 p-2 rounded">
+                                    ✓ Pengadaan sudah disetujui Bendahara. Silakan berikan approval akhir.
+                                </p>
+                                
+                                <form action="{{ route('director.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">
+                                        ✓ Setujui Pengadaan
+                                    </button>
+                                </form>
+
+                                <button type="button" onclick="openRejectModal('{{ route('director.app.procurement.reject', $project->id) }}', 'catatan', {}, 'Tolak Pengadaan')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition text-sm">Tolak Pengadaan</button>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             @endif
-        </div>
-    </div>
-@endif
+
             {{-- Tindakan Bendahara --}}
             @php
                 $procUniversal = isset($procUniversal) ? $procUniversal : \App\Models\Procurement::where('app_request_id', $project->id)->first();

@@ -123,6 +123,28 @@
             Digital Signature<br>
             {{ $waktuValidasi ?? date('d-m-Y') }}
         </span>
+
+        {{-- KOLOM BENDAHARA --}}
+        <td style="width: 25%; border: none;">
+            <p>Verifikasi,</p>
+            @if($app->qr_bendahara)
+                <img src="data:image/png;base64,{{ $app->qr_bendahara }}" style="width: 80px;">
+            @else
+                <div style="height: 80px;"></div>
+            @endif
+            <p><strong>Bendahara</strong></p>
+        </td>
+
+        {{-- KOLOM DIREKTUR (Akan terisi otomatis jika Bendahara sudah ACC) --}}
+        <td style="width: 25%; border: none;">
+            <p>Menyetujui,</p>
+            @if($app->qr_direktur)
+                <img src="data:image/png;base64,{{ $app->qr_direktur }}" style="width: 80px;">
+            @else
+                <div style="height: 80px;"></div>
+            @endif
+            <p><strong>Direktur Utama</strong></p>
+        </td>
     </div>
 
 </body>

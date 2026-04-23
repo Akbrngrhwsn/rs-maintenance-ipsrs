@@ -395,7 +395,8 @@ class ProcurementController extends Controller
         if(Auth::user()->role !== 'bendahara') abort(403);
 
         $proc = Procurement::with('report')->findOrFail($id);
-        $proc->status = 'submitted_to_director';
+       // Langsung bypass ke disetujui direktur
+        $proc->status = 'approved_by_director'; 
         $proc->save();
         
         // Tambahan: Simpan handler dari IT Staff yang bertugas
@@ -406,8 +407,17 @@ class ProcurementController extends Controller
                 $proc->report->save();
             }
         }
+        
+        // Tambahan: Simpan handler dari IT Staff yang bertugas
+        if ($proc->report) {
+            $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
+            if ($onDutyStaff) {
+                $proc->report->handled_by_bendahara = $onDutyStaff->nama;
+                $proc->report->save();
+            }
+        }
 
-        return back()->with('success', 'Pengadaan berhasil diteruskan ke Direktur.');
+        return back()->with('success', 'Pengadaan Disetujui oleh direktur.');
     }
 
     // === BENDAHARA: Reject Pengadaan ===
@@ -550,13 +560,15 @@ class ProcurementController extends Controller
         }
 
         // D. QR Bendahara
-        $statusSetelahBendahara = ['submitted_to_director', 'approved_by_director'];
+        // Tambahkan 'completed' agar ttd tidak hilang saat pengadaan selesai
+        $statusSetelahBendahara = ['submitted_to_director', 'approved_by_director', 'completed']; 
         if (in_array($s, $statusSetelahBendahara)) {
             $qrBendahara = $generateQr("Diverifikasi Bendahara. Anggaran Tersedia.");
         }
 
         // E. QR Direktur
-        if ($s === 'approved_by_director') {
+        // Tambahkan 'completed' juga di sini
+        if (in_array($s, ['approved_by_director', 'completed'])) {
             $qrDirektur = $generateQr("Disetujui Direktur Utama. " . date('d/m/Y'));
         }
 
