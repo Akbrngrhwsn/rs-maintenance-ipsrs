@@ -201,6 +201,7 @@
                                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Laporan Keterangan</label>
                                             <textarea name="tindakan_teknisi" required class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Jelaskan perbaikan..."></textarea>
                                         </div>
+                                        
                                         <div class="flex gap-3">
                                             <button type="submit" name="status_akhir" value="Selesai" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-700 transition">✅ Selesai</button>
                                             <button type="submit" name="status_akhir" value="Tidak Selesai" class="flex-1 bg-white border border-red-200 text-red-600 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-red-50 transition">❌ Gagal/Sparepart</button>
@@ -623,4 +624,39 @@
         }
     });
 </script>
+<script>
+        // Fungsi untuk menembak API ubah status jadi "Dibaca"
+        function sendMarkAsReadSignal() {
+            fetch('{{ route("admin.reports.mark_read") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Status laporan telah diupdate menjadi DIBACA");
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // 1. Cek saat halaman pertama kali termuat, apakah layarnya aktif?
+        if (document.hasFocus()) {
+            sendMarkAsReadSignal();
+        }
+
+        // 2. Deteksi saat Admin kembali fokus ke tab ini dari aplikasi/tab lain
+        window.addEventListener('focus', function() {
+            sendMarkAsReadSignal();
+        });
+
+        // Alternatif pendeteksi visibilitas tab
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                sendMarkAsReadSignal();
+            }
+        });
+    </script>
 </x-app-layout>

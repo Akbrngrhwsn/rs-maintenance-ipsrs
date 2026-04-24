@@ -84,12 +84,30 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-right flex flex-col items-end">
                                         <p class="text-xs text-gray-400">Masuk:</p>
                                         <p class="text-xs font-bold text-gray-600">{{ $report->created_at->format('d M H:i') }}</p>
-                                        <p class="text-[10px] text-red-500 italic mt-1">
+                                        <p class="text-[10px] text-red-500 italic mt-0.5 mb-1">
                                             {{ $report->created_at->diffForHumans() }}
                                         </p>
+                                        
+                                        {{-- INDIKATOR DIBACA (ALA WHATSAPP) --}}
+                                        @if($report->is_read_by_admin)
+                                            <div class="flex items-center gap-1 mt-1 text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100" title="Sudah dilihat Admin IT">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 17l4 4L15 11" opacity="0.5"></path>
+                                                </svg>
+                                                <span class="text-[9px] font-bold uppercase tracking-wider">Dibaca</span>
+                                            </div>
+                                        @else
+                                            <div class="flex items-center gap-1 mt-1 text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-200" title="Belum dilihat Admin IT">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                <span class="text-[9px] font-bold uppercase tracking-wider">Terkirim</span>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 

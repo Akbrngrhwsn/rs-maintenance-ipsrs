@@ -147,7 +147,7 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
         
         // Di dalam group middleware EnsureUserIsAdmin
         Route::get('/admin/reports/export-daily', [AdminReportController::class, 'exportDailyPdf'])->name('admin.export.daily');
-
+        Route::post('/admin/reports/mark-read', [AdminReportController::class, 'markAsRead'])->name('admin.reports.mark_read');
         // Admin: Manag Rooms and assign kepala ruang
         Route::get('/admin/rooms', [AdminRoomsController::class, 'index'])->name('admin.rooms.index');
         Route::post('/admin/rooms', [AdminRoomsController::class, 'store'])->name('admin.rooms.store');

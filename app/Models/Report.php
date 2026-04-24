@@ -16,12 +16,13 @@ class Report extends Model
     'procurement_items_request',
     'procurement_status', 'it_staff_id',
     'handled_by_admin', 'handled_by_karu', 'handled_by_management', 
-    'handled_by_bendahara', 'handled_by_director',
+    'handled_by_bendahara', 'handled_by_director', 'is_read_by_admin',
     ];
 
     protected $casts = [
         'procurement_items_request' => 'array',
         'needs_procurement' => 'boolean',
+        'is_read_by_admin' => 'boolean',
     ];
 
     public function itStaff()

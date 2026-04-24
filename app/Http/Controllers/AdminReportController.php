@@ -15,6 +15,11 @@ class AdminReportController extends Controller
 {
     public function index(Request $request)
     {
+
+        // --- TAMBAHAN: OTOMATIS BACA SEMUA LAPORAN BARU ---
+        // Saat Admin membuka halaman dashboard ini, semua laporan yg belum dibaca otomatis jadi "Sudah Dibaca"
+        //\App\Models\Report::where('is_read_by_admin', false)->update(['is_read_by_admin' => true]);
+
         // --- TAMBAHAN: Ambil teknisi yang sedang bertugas saat ini ---
         $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
 
@@ -457,5 +462,11 @@ public function exportSingleProcurement($id)
         ]);
 
         return $pdf->download('Laporan_Bulanan_' . $startDate->format('M_Y') . '.pdf');
+    }
+    // Method khusus untuk ditembak oleh JavaScript (AJAX) di latar belakang
+    public function markAsRead()
+    {
+        \App\Models\Report::where('is_read_by_admin', false)->update(['is_read_by_admin' => true]);
+        return response()->json(['success' => true]);
     }
 }
