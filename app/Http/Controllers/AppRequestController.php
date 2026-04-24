@@ -515,18 +515,18 @@ public function managementApprove(Request $request, $id)
             // Simpan ke tabel Procurements Universal
             // Jika model Procurement juga pakai protected $casts = ['items' => 'array'],
             // hapus json_encode di sini juga.
-            \App\Models\Procurement::updateOrCreate(
-                ['app_request_id' => $app->id],
-                [
-                    'status' => 'submitted_to_management',
-                    // Gunakan json_encode HANYA JIKA model Procurement TIDAK menggunakan cast array
-                    // 'items' => json_encode($cleanedItems), 
+            // \App\Models\Procurement::updateOrCreate(
+            //     ['app_request_id' => $app->id],
+            //     [
+            //         'status' => 'submitted_to_management',
+            //         // Gunakan json_encode HANYA JIKA model Procurement TIDAK menggunakan cast array
+            //         // 'items' => json_encode($cleanedItems), 
                     
-                    // REKOMENDASI: Jika model Procurement pakai cast array, gunakan ini:
-                    'items' => $cleanedItems, 
-                    'total' => $total > 0 ? $total : ($request->procurement_estimate ?? 0)
-                ]
-            );
+            //         // REKOMENDASI: Jika model Procurement pakai cast array, gunakan ini:
+            //         'items' => $cleanedItems, 
+            //         'total' => $total > 0 ? $total : ($request->procurement_estimate ?? 0)
+            //     ]
+            // );
         } else {
             // Jika benar-benar kosong dan tidak butuh pengadaan
             // (Hanya ambil angka estimasi manual jika ada dan bukan dari daftar barang)
@@ -1013,4 +1013,60 @@ public function destroy($id)
 
     return back()->with('success', 'Permintaan aplikasi berhasil dihapus.');
 }
+
+    // === ADMIN: Edit Pengadaan Aplikasi ===
+    public function editProcurement($id)
+    {
+        if(Auth::user()->role !== 'admin') abort(403);
+        
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+        
+        return view('admin.apps.edit-procurement', compact('app'));
+    }
+
+    // === ADMIN: Update Pengadaan Aplikasi ===
+    public function updateProcurement(Request $request, $id)
+    {
+        if(Auth::user()->role !== 'admin') abort(403);
+        
+        $app = AppRequest::findOrFail($id);
+        
+        if(!$app->needs_procurement) {
+            return back()->with('error', 'Aplikasi ini tidak membutuhkan pengadaan.');
+        }
+
+        // Ambil data items dari form
+        $items = $request->input('items', []);
+        $totalEstimate = 0;
+        $cleanedItems = [];
+        
+        // Hitung total dan bersihkan array
+        foreach ($items as $item) {
+            if (!empty($item['nama'])) {
+                $qty = (int) ($item['jumlah'] ?? 1);
+                $price = (float) ($item['harga_satuan'] ?? 0);
+                $totalEstimate += ($qty * $price);
+                $cleanedItems[] = $item;
+            }
+        }
+        
+        // Update data di AppRequest
+        $app->requested_items = $cleanedItems;
+        $app->procurement_estimate = $totalEstimate;
+        $app->save();
+
+        // Sinkronisasi ke tabel procurements (Universal) jika ada
+        $procUniversal = \App\Models\Procurement::where('app_request_id', $app->id)->first();
+        if ($procUniversal) {
+            $procUniversal->items = $cleanedItems;
+            $procUniversal->total = $totalEstimate;
+            $procUniversal->save();
+        }
+        
+        return redirect()->route('admin.procurements.index')->with('success', 'Pengadaan aplikasi berhasil diperbarui.');
+    }
 }

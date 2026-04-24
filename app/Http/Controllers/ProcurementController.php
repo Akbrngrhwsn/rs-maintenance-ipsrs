@@ -50,7 +50,21 @@ class ProcurementController extends Controller
         }
         $newItemRequests = $newItemsQuery->paginate(20, ['*'], 'new_page')->withQueryString();
 
-        return view('admin.procurements.index', compact('procurements', 'newItemRequests'));
+        // 1. Ambil Pengadaan dari Kerusakan (Maintenance)
+        $procurements = \App\Models\Procurement::with('report')->latest()->get();
+
+        // 2. Ambil Pengadaan Barang Baru (Non-Kerusakan)
+        $newItemRequests = \App\Models\NewItemRequest::with(['user', 'room'])->latest()->get();
+
+        // 3. Ambil Request Aplikasi (HANYA yang sudah masuk ke sistem pengadaan)
+        // Filter: needs_procurement = 1 dan procurement_approval_status !== 'pending'
+        $appProcurements = \App\Models\AppRequest::with('user')
+            ->where('needs_procurement', 1)
+            ->whereNotIn('procurement_approval_status', ['pending'])
+            ->latest()
+            ->get();
+
+        return view('admin.procurements.index', compact('procurements', 'newItemRequests', 'appProcurements'));
     }
 
     // === ADMIN: Form Buat Pengadaan ===
@@ -610,5 +624,12 @@ public function finish($id)
         }
         
         return redirect()->back()->with('error', 'Status pengadaan tidak dapat diubah karena belum disetujui.');
+    }
+
+    public function destroy($id)
+    {
+        $proc = \App\Models\Procurement::findOrFail($id);
+        $proc->delete();
+        return back()->with('success', 'Data pengadaan maintenance berhasil dihapus.');
     }
 }

@@ -105,19 +105,49 @@ class NewItemRequestController extends Controller
 
     // === METHOD EXPORT PDF ===
     public function exportSingle($id)
-{
-    $procurement = NewItemRequest::with(['user', 'room'])->findOrFail($id);
+    {
+        $procurement = NewItemRequest::with(['user', 'room'])->findOrFail($id);
 
-    $data = [
-        'procurement' => $procurement,
-        'qrKaru'      => $procurement->qr_karu,
-        'qrAdmin'     => $procurement->qr_admin,
-        'qrManagement'=> $procurement->qr_management,
-        'qrBendahara' => $procurement->qr_bendahara,
-        'qrDirektur'  => $procurement->qr_direktur,
-    ];
+        $data = [
+            'procurement' => $procurement,
+            'qrKaru'      => $procurement->qr_karu,
+            'qrAdmin'     => $procurement->qr_admin,
+            'qrManagement'=> $procurement->qr_management,
+            'qrBendahara' => $procurement->qr_bendahara,
+            'qrDirektur'  => $procurement->qr_direktur,
+        ];
 
-    $pdf = PDF::loadView('pdf.new_item_single', $data);
-    return $pdf->stream('Laporan_Barang_Baru_' . $procurement->id . '.pdf');
-}
+        $pdf = PDF::loadView('pdf.new_item_single', $data);
+        return $pdf->stream('Laporan_Barang_Baru_' . $procurement->id . '.pdf');
+    }
+
+    public function edit($id)
+    {
+        $procurement = NewItemRequest::findOrFail($id);
+        $rooms = \App\Models\Room::all();
+        return view('admin.new_items.edit', compact('procurement', 'rooms'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $item = NewItemRequest::findOrFail($id);
+        $request->validate([
+            'purpose' => 'required|string',
+            'status' => 'required'
+        ]);
+
+        $item->update([
+            'purpose' => $request->purpose,
+            'items' => $request->items, // Data array dari form
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.procurements.index')->with('success', 'Pengadaan barang baru berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        NewItemRequest::findOrFail($id)->delete();
+        return back()->with('success', 'Pengadaan barang baru berhasil dihapus.');
+    }
 }

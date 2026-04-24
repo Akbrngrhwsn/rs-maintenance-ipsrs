@@ -115,6 +115,18 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
     // Diproteksi oleh Middleware EnsureUserIsAdmin
     Route::middleware(EnsureUserIsAdmin::class)->group(function () {
 
+        Route::middleware(['auth', 'admin'])->group(function () {
+    // Maintenance Procurements
+    Route::delete('/admin/procurements/{id}', [ProcurementController::class, 'destroy'])->name('admin.procurements.destroy');
+    
+    // New Item Procurements
+    Route::get('/admin/new-items/{id}/edit', [NewItemRequestController::class, 'edit'])->name('admin.new_items.edit');
+    Route::patch('/admin/new-items/{id}/update', [NewItemRequestController::class, 'update'])->name('admin.new_items.update');
+    Route::delete('/admin/new-items/{id}/destroy', [NewItemRequestController::class, 'destroy'])->name('admin.new_items.destroy');
+
+    // App Procurements (Gunakan route yang sudah dibuat sebelumnya di AppRequestController)
+});
+
         // CRUD & Penugasan Teknisi IT
         Route::get('/admin/it-staff', [App\Http\Controllers\ItStaffController::class, 'index'])->name('admin.it_staff.index');
         Route::post('/admin/it-staff', [App\Http\Controllers\ItStaffController::class, 'store'])->name('admin.it_staff.store');
@@ -137,6 +149,8 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
         Route::get('/admin/apps/{id}/edit', [AppRequestController::class, 'edit'])->name('admin.apps.edit');
         Route::patch('/admin/apps/{id}/update', [AppRequestController::class, 'update'])->name('admin.apps.update');
         Route::delete('/admin/apps/{id}/delete', [AppRequestController::class, 'destroy'])->name('admin.apps.destroy');
+        Route::get('/admin/apps/{id}/edit-procurement', [AppRequestController::class, 'editProcurement'])->name('admin.apps.edit-procurement');
+        Route::patch('/admin/apps/{id}/update-procurement', [AppRequestController::class, 'updateProcurement'])->name('admin.apps.update-procurement');
 
         // Pengadaan (Procurement)
         Route::get('/admin/report/{id}/procurement', [ProcurementController::class, 'create'])->name('procurement.create');
