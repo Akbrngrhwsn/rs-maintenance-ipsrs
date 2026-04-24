@@ -128,16 +128,7 @@
                                 @endif
 
                                 <div class="flex justify-end gap-2">
-                                    {{-- Tombol Pengadaan (Muncul hanya jika ada label needs_procurement) --}}
-                                    @if($report->needs_procurement && $report->procurement_status == 'pending_admin')
-                                        <form action="{{ route('admin.procurement.convert', $report->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="inline-flex items-center gap-1 bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition shadow-sm">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                                                Proses Pengadaan
-                                            </button>
-                                        </form>
-                                    @endif
+                                    
 
                                     {{-- Tombol ACC Biasa --}}
                                     <form action="{{ route('admin.acc', $report->id) }}" method="POST">
@@ -222,11 +213,24 @@
                                             <textarea name="tindakan_teknisi" required class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Jelaskan perbaikan..."></textarea>
                                         </div>
                                         
-                                        <div class="flex gap-3">
-                                            <button type="submit" name="status_akhir" value="Selesai" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-700 transition">✅ Selesai</button>
-                                            <button type="submit" name="status_akhir" value="Tidak Selesai" class="flex-1 bg-white border border-red-200 text-red-600 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-red-50 transition">❌ Gagal/Sparepart</button>
+                                        <div class="flex gap-3">  
+                                        <button type="submit" name="status_akhir" value="Selesai" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-700 transition">✅ Selesai</button>
+                                        <button type="submit" name="status_akhir" value="Tidak Selesai" class="flex-1 bg-white border border-red-200 text-red-600 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-red-50 transition">❌ Gagal/Sparepart</button>
                                         </div>
                                     </form>
+                                    {{-- Tombol Pengadaan (Muncul hanya jika ada label needs_procurement) --}}
+                                    @if($report->needs_procurement && $report->procurement_status == 'pending_admin')
+                                        <form action="{{ route('admin.procurement.convert', $report->id) }}" method="POST" class="mt-2">
+                                            @csrf
+                                            
+                                            <button type="submit" class="inline-flex items-center justify-center w-full gap-1 bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition shadow-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                                </svg>
+                                                Proses Pengadaan
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         @empty
