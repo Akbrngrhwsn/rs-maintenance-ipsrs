@@ -980,4 +980,37 @@ public function reprocessProcurement(Request $request, $id)
 
     return back()->with('success', 'Status pengadaan berhasil ditandai sebagai Selesai (Barang dibeli).');
 }
+public function edit($id)
+{
+    $appRequest = AppRequest::findOrFail($id);
+    return view('apps.edit', compact('appRequest'));
+}
+
+public function update(Request $request, $id)
+    {
+        $appRequest = AppRequest::findOrFail($id);
+        
+        // Sesuaikan nama kolom dengan struktur database
+        $request->validate([
+            'nama_aplikasi' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'status' => 'required|string',
+        ]);
+
+        $appRequest->update([
+            'nama_aplikasi' => $request->nama_aplikasi,
+            'deskripsi' => $request->deskripsi,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('apps.pending')->with('success', 'Permintaan aplikasi berhasil diperbarui.');
+    }
+
+public function destroy($id)
+{
+    $appRequest = AppRequest::findOrFail($id);
+    $appRequest->delete();
+
+    return back()->with('success', 'Permintaan aplikasi berhasil dihapus.');
+}
 }

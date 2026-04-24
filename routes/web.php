@@ -132,6 +132,12 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
         Route::get('/admin/report/{id}/edit', [AdminReportController::class, 'edit'])->name('admin.report.edit');
         Route::patch('/admin/report/{id}/update', [AdminReportController::class, 'update'])->name('admin.report.update');
         Route::delete('/admin/report/{id}/delete', [AdminReportController::class, 'destroy'])->name('admin.report.destroy');
+        
+        // --- ROUTE EDIT & HAPUS REQUEST APLIKASI ---
+        Route::get('/admin/apps/{id}/edit', [AppRequestController::class, 'edit'])->name('admin.apps.edit');
+        Route::patch('/admin/apps/{id}/update', [AppRequestController::class, 'update'])->name('admin.apps.update');
+        Route::delete('/admin/apps/{id}/delete', [AppRequestController::class, 'destroy'])->name('admin.apps.destroy');
+
         // Pengadaan (Procurement)
         Route::get('/admin/report/{id}/procurement', [ProcurementController::class, 'create'])->name('procurement.create');
         Route::post('/admin/report/{id}/procurement', [ProcurementController::class, 'store'])->name('procurement.store');

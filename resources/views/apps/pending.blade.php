@@ -47,39 +47,52 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">{{ $app->user->name }}</td>
                             <td class="px-6 py-4">
-    @php
-        $statusLabels = [
-            'submitted_to_admin' => ['label' => 'Menunggu Admin', 'class' => 'bg-blue-100 text-blue-800'],
-            'submitted_to_management' => ['label' => 'Menunggu Management', 'class' => 'bg-indigo-100 text-indigo-800'],
-            'submitted_to_bendahara' => ['label' => 'Menunggu Bendahara', 'class' => 'bg-yellow-100 text-yellow-800'],
-            'submitted_to_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
-            'pending_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
-            'approved' => ['label' => 'Disetujui', 'class' => 'bg-green-100 text-green-800'],
-            'rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
-        ];
-        
-        $s = $statusLabels[$app->status] ?? ['label' => ucfirst(str_replace('_',' ',$app->status)), 'class' => 'bg-gray-100 text-gray-800'];
-        
-        // Logika Khusus Bendahara: Menandai item yang butuh aksinya
-        $isNeedsBendaharaAction = Auth::user()->role === 'bendahara' && 
-                                 $app->procurement_approval_status === 'submitted_to_bendahara';
-    @endphp
+                                @php
+                                    $statusLabels = [
+                                        'submitted_to_admin' => ['label' => 'Menunggu Admin', 'class' => 'bg-blue-100 text-blue-800'],
+                                        'submitted_to_management' => ['label' => 'Menunggu Management', 'class' => 'bg-indigo-100 text-indigo-800'],
+                                        'submitted_to_bendahara' => ['label' => 'Menunggu Bendahara', 'class' => 'bg-yellow-100 text-yellow-800'],
+                                        'submitted_to_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
+                                        'pending_director' => ['label' => 'Menunggu Direktur', 'class' => 'bg-yellow-100 text-yellow-800'],
+                                        'approved' => ['label' => 'Disetujui', 'class' => 'bg-green-100 text-green-800'],
+                                        'rejected' => ['label' => 'Ditolak', 'class' => 'bg-red-100 text-red-800'],
+                                    ];
+                                    
+                                    $s = $statusLabels[$app->status] ?? ['label' => ucfirst(str_replace('_',' ',$app->status)), 'class' => 'bg-gray-100 text-gray-800'];
+                                    
+                                    // Logika Khusus Bendahara: Menandai item yang butuh aksinya
+                                    $isNeedsBendaharaAction = Auth::user()->role === 'bendahara' && 
+                                                            $app->procurement_approval_status === 'submitted_to_bendahara';
+                                @endphp
 
-    <div class="flex flex-col gap-1">
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $s['class'] }}">
-            {{ $s['label'] }}
-        </span>
+                                <div class="flex flex-col gap-1">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $s['class'] }}">
+                                        {{ $s['label'] }}
+                                    </span>
 
-        {{-- Label Tambahan Khusus Bendahara --}}
-        @if($isNeedsBendaharaAction)
-            <span class="px-2 inline-flex text-[10px] leading-4 font-bold rounded-full bg-red-600 text-white animate-pulse">
-                BUTUH VALIDASI ANGGARAN
-            </span>
-        @endif
-    </div>
-</td>
+                                    {{-- Label Tambahan Khusus Bendahara --}}
+                                    @if($isNeedsBendaharaAction)
+                                        <span class="px-2 inline-flex text-[10px] leading-4 font-bold rounded-full bg-red-600 text-white animate-pulse">
+                                            BUTUH VALIDASI ANGGARAN
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
                             <td class="px-6 py-4 text-sm font-medium">
-                                <a href="{{ route('apps.show', $app->id) }}" class="text-indigo-600 hover:text-indigo-900 font-bold">Buka Detail</a>
+                                <div class="flex items-center gap-3">
+                                    <a href="{{ route('apps.show', $app->id) }}" class="text-indigo-600 hover:text-indigo-900 font-bold bg-indigo-50 px-3 py-1.5 rounded hover:bg-indigo-100 transition">Buka Detail</a>
+                                    
+                                    {{-- TOMBOL EDIT DAN HAPUS UNTUK ADMIN --}}
+                                    @if(Auth::user()->role === 'admin')
+                                        <a href="{{ route('admin.apps.edit', $app->id) }}" class="text-amber-600 hover:text-amber-900 font-bold bg-amber-50 px-3 py-1.5 rounded hover:bg-amber-100 transition">Edit</a>
+                                        
+                                        <form action="{{ route('admin.apps.destroy', $app->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus permintaan aplikasi ini secara permanen?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Hapus</button>
+                                        </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                         @empty

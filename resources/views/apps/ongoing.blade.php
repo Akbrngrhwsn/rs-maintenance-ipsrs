@@ -3,7 +3,8 @@
         <div class="flex justify-between items-center">
             <h2 class="font-bold text-xl text-gray-800">{{ __('Proyek Sedang Berjalan') }}</h2>
             <div class="flex gap-2">
-                {{-- Tombol Laporan Bulanan Baru --}}
+                {{-- Tombol Laporan Bulanan Baru (Hanya Admin) --}}
+                @if(Auth::user()->role === 'admin')
                 <button type="button" onclick="openAppMonthlyModal()"
                     class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg shadow hover:bg-indigo-700 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
@@ -11,6 +12,7 @@
                     </svg>
                     Laporan Bulanan
                 </button>
+                @endif
 
                 <a href="{{ route('apps.pending') }}"
                 class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 transition">
@@ -23,19 +25,21 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($projects as $app)
-            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition">
-                <div class="p-6">
+            <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition flex flex-col">
+                <div class="p-6 flex flex-col flex-1">
                     <div class="flex justify-between items-start mb-2">
                         <span class="bg-blue-100 text-blue-800 text-[10px] font-mono px-2 py-1 rounded">{{ $app->ticket_number }}</span>
                         <span class="text-xs font-bold text-gray-400">{{ $app->created_at->format('d M Y') }}</span>
                     </div>
+                    
                     {{-- Gunakan app_name jika nama_aplikasi error --}}
                     <h3 class="text-lg font-bold text-gray-800 mb-1">{{ $app->nama_aplikasi ?? $app->app_name }}</h3>
+                    
                     {{-- Gunakan description jika deskripsi error --}}
                     <p class="text-sm text-gray-600 mb-4 h-10 overflow-hidden">{{ Str::limit($app->deskripsi ?? $app->description, 60) }}</p>
                     
                     {{-- Progress Bar Mini --}}
-                    <div class="mb-4">
+                    <div class="mb-4 mt-auto">
                         <div class="flex justify-between text-xs mb-1">
                             <span>Progress</span>
                             <span class="font-bold">{{ $app->progress }}%</span>
@@ -45,9 +49,26 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('apps.show', $app->id) }}" class="block w-full text-center bg-gray-50 border border-gray-200 text-gray-700 font-bold py-2 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition">
-                        Lihat Proyek
-                    </a>
+                    {{-- Kumpulan Tombol Aksi --}}
+                    <div class="flex items-center gap-2 mt-2">
+                        <a href="{{ route('apps.show', $app->id) }}" class="flex-1 text-center bg-gray-50 border border-gray-200 text-gray-700 font-bold py-2 px-3 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition text-sm">
+                            Lihat Proyek
+                        </a>
+                        
+                        {{-- Tombol Edit dan Hapus Khusus Admin --}}
+                        @if(Auth::user()->role === 'admin')
+                            <a href="{{ route('admin.apps.edit', $app->id) }}" class="flex-none bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-100 hover:text-amber-700 font-bold py-2 px-3 rounded-lg transition text-sm" title="Edit">
+                                Edit
+                            </a>
+                            <form action="{{ route('admin.apps.destroy', $app->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus permintaan aplikasi ini secara permanen?')" class="flex-none">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 hover:text-red-700 font-bold py-2 px-3 rounded-lg transition text-sm" title="Hapus">
+                                    Hapus
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             </div>
             @empty
@@ -72,7 +93,7 @@
                 </div>
                 
                 <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                    <button type="button" onclick="closeAppMonthlyModal()" class="bg-white border px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
+                    <button type="button" onclick="closeAppMonthlyModal()" class="bg-white border px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">Batal</button>
                     <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-indigo-700 shadow-md transition">Unduh PDF</button>
                 </div>
             </form>
