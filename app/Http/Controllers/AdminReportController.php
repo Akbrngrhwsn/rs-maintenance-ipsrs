@@ -469,4 +469,54 @@ public function exportSingleProcurement($id)
         \App\Models\Report::where('is_read_by_admin', false)->update(['is_read_by_admin' => true]);
         return response()->json(['success' => true]);
     }
+    // === METHOD EDIT LAPORAN ===
+    public function edit($id)
+    {
+        $report = Report::findOrFail($id);
+        $rooms = \App\Models\Room::orderBy('name')->get(); // Mengambil daftar ruangan
+        
+        return view('admin.reports.edit', compact('report', 'rooms'));
+    }
+
+    // === METHOD UPDATE LAPORAN ===
+    public function update(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+        
+        $request->validate([
+            'room_id' => 'required|exists:rooms,id',
+            'keluhan' => 'required|string',
+            'urgency' => 'required|in:rendah,sedang,tinggi',
+            'status' => 'required|string',
+            'tindakan_teknisi' => 'nullable|string',
+        ]);
+
+        $room = \App\Models\Room::find($request->room_id);
+
+        $report->update([
+            'room_id' => $request->room_id,
+            'ruangan' => $room->name,
+            'keluhan' => $request->keluhan,
+            'urgency' => $request->urgency,
+            'status' => $request->status,
+            'tindakan_teknisi' => $request->tindakan_teknisi,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Data laporan berhasil diperbarui.');
+    }
+
+    // === METHOD HAPUS LAPORAN ===
+    public function destroy($id)
+    {
+        $report = Report::findOrFail($id);
+        
+        // Hapus juga data pengadaan yang terkait jika ada
+        if ($report->procurement) {
+            $report->procurement->delete();
+        }
+        
+        $report->delete();
+
+        return back()->with('success', 'Laporan beserta data terkait berhasil dihapus permanen.');
+    }
 }

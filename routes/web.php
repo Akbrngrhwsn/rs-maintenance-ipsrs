@@ -128,6 +128,10 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
         Route::patch('/admin/report/{id}/validate', [AdminReportController::class, 'validasi'])->name('admin.validate');
         Route::get('/admin/new-reports', [AdminReportController::class, 'checkNewReports'])->name('admin.new-reports');
 
+        // --- TAMBAHAN: ROUTE EDIT & HAPUS LAPORAN KERUSAKAN ---
+        Route::get('/admin/report/{id}/edit', [AdminReportController::class, 'edit'])->name('admin.report.edit');
+        Route::patch('/admin/report/{id}/update', [AdminReportController::class, 'update'])->name('admin.report.update');
+        Route::delete('/admin/report/{id}/delete', [AdminReportController::class, 'destroy'])->name('admin.report.destroy');
         // Pengadaan (Procurement)
         Route::get('/admin/report/{id}/procurement', [ProcurementController::class, 'create'])->name('procurement.create');
         Route::post('/admin/report/{id}/procurement', [ProcurementController::class, 'store'])->name('procurement.store');

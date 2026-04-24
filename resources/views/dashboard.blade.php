@@ -146,6 +146,15 @@
                                             ACC & Proses
                                         </button>
                                     </form>
+                                    <a href="{{ route('admin.report.edit', $report->id) }}" class="inline-flex items-center justify-center w-10 h-10 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition shadow-sm" title="Edit Laporan">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </a>
+                                    <form action="{{ route('admin.report.destroy', $report->id) }}" method="POST" onsubmit="return confirm('Yakin hapus laporan ini?');" class="inline-block">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center justify-center w-10 h-10 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition shadow-sm" title="Hapus Laporan">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         @empty
@@ -177,6 +186,17 @@
                     <div class="p-6 space-y-6 flex-1 overflow-y-auto">
                         @forelse($processedReports as $report)
                             <div class="bg-white rounded-xl p-5 border border-blue-100 shadow-sm relative">
+                                <div class="absolute top-4 right-4 flex gap-1 z-20">
+                                    <a href="{{ route('admin.report.edit', $report->id) }}" class="text-amber-500 hover:text-amber-700 p-1.5 bg-amber-50 rounded hover:bg-amber-100" title="Edit">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </a>
+                                    <form action="{{ route('admin.report.destroy', $report->id) }}" method="POST" onsubmit="return confirm('Yakin hapus laporan ini?');">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="text-red-500 hover:text-red-700 p-1.5 bg-red-50 rounded hover:bg-red-100" title="Hapus">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
                                 <div class="relative z-10">
                                     <div class="flex flex-col gap-1 mb-2">
                                         @if($report->ticket_number)
@@ -353,7 +373,7 @@
                                 <th class="px-6 py-4 text-left">Ruangan / Tiket</th>
                                 <th class="px-6 py-4 text-left">Masalah</th>
                                 <th class="px-6 py-4 text-left">Tindakan</th>
-                                <th class="px-6 py-4 text-left">Detail</th>
+                                <th class="px-6 py-4 text-left">Aksi</th>
                                 <th class="px-6 py-4 text-center">Status</th>
                             </tr>
                         </thead>
@@ -394,8 +414,16 @@
                                         {{ $report->tindakan_teknisi ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600">
-                                        <button type="button" onclick="document.getElementById('detail-modal-{{ $report->id }}').classList.remove('hidden')" class="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-800 transition shadow-sm w-full md:w-auto">Lihat Detail</button>
-
+                                        <div class="flex flex-col gap-2 w-full md:w-auto">
+                                            <button type="button" onclick="document.getElementById('detail-modal-{{ $report->id }}').classList.remove('hidden')" class="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-800 transition shadow-sm w-full text-center">Lihat Detail</button>
+                                            <div class="flex gap-2">
+                                                <a href="{{ route('admin.report.edit', $report->id) }}" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-amber-600 transition shadow-sm w-full text-center">Edit</a>
+                                                <form action="{{ route('admin.report.destroy', $report->id) }}" method="POST" onsubmit="return confirm('Yakin hapus laporan ini? Pengadaan terkait (jika ada) juga akan dihapus.')" class="w-full">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-700 transition shadow-sm w-full text-center">Hapus</button>
+                                                </form>
+                                            </div>
+                                        </div>
                                         <div id="detail-modal-{{ $report->id }}" class="hidden fixed inset-0 z-50 flex items-center justify-center">
                                             <div class="absolute inset-0 bg-gray-900 opacity-60" onclick="document.getElementById('detail-modal-{{ $report->id }}').classList.add('hidden')"></div>
                                             <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full relative z-10 overflow-hidden transform transition-all m-4">
