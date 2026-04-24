@@ -174,7 +174,7 @@
                                                 <div class="flex flex-col items-center justify-center gap-1.5">
                                                     @php
                                                         // Status yang memungkinkan edit
-                                                        $editableStatuses = ['submitted_to_kepala_ruang', 'submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'rejected'];
+                                                        $editableStatuses = ['submitted_to_kepala_ruang', 'submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'rejected', 'approved_by_director', 'completed'];
                                                     @endphp
                                                     @if(in_array($proc->status, $editableStatuses))
                                                         <a href="{{ route('procurement.edit', $proc->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-xs font-bold hover:bg-amber-600 transition shadow-sm">Edit</a>
@@ -329,6 +329,16 @@
                                                                 </form>
                                                             </div>
                                                         </div>
+                                                    @endif
+
+                                                    {{-- TAMBAHKAN INI: Tombol Sudah Dibeli jika status sudah Approved --}}
+                                                    @if($itemReq->status === 'approved')
+                                                        <form action="{{ route('admin.new_items.finish', $itemReq->id) }}" method="POST" class="w-full" onsubmit="return confirm('Tandai barang ini sebagai sudah dibeli?')">
+                                                            @csrf @method('PATCH')
+                                                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-xs shadow-sm">
+                                                                Sudah Dibeli
+                                                            </button>
+                                                        </form>
                                                     @endif
 
                                                     <a href="{{ route('admin.new_items.edit', $itemReq->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-xs font-bold hover:bg-amber-600 transition shadow-sm">Edit</a>

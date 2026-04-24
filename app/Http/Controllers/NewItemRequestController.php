@@ -150,4 +150,20 @@ class NewItemRequestController extends Controller
         NewItemRequest::findOrFail($id)->delete();
         return back()->with('success', 'Pengadaan barang baru berhasil dihapus.');
     }
+
+    public function finish($id)
+    {
+        $item = \App\Models\NewItemRequest::findOrFail($id);
+
+        // Pastikan hanya pengajuan yang sudah di-approve yang bisa ditandai selesai
+        if ($item->status === 'approved') {
+            $item->update([
+                'status' => 'completed' // Anda bisa mengubah ini menjadi 'finished' jika kolom status di DB mendukung string tersebut
+            ]);
+
+            return back()->with('success', 'Barang berhasil ditandai sebagai sudah dibeli.');
+        }
+
+        return back()->with('error', 'Status pengajuan tidak valid untuk aksi ini.');
+    }
 }

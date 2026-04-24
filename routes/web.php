@@ -115,10 +115,13 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
     // Diproteksi oleh Middleware EnsureUserIsAdmin
     Route::middleware(EnsureUserIsAdmin::class)->group(function () {
 
-        Route::middleware(['auth', 'admin'])->group(function () {
+    Route::middleware(['auth', 'admin'])->group(function () {
     // Maintenance Procurements
     Route::delete('/admin/procurements/{id}', [ProcurementController::class, 'destroy'])->name('admin.procurements.destroy');
     
+    // Tambahkan ini di dalam Route::middleware(EnsureUserIsAdmin::class)->group(function () { ... })
+    Route::patch('/admin/new-items/{id}/finish', [App\Http\Controllers\NewItemRequestController::class, 'finish'])->name('admin.new_items.finish');
+
     // New Item Procurements
     Route::get('/admin/new-items/{id}/edit', [NewItemRequestController::class, 'edit'])->name('admin.new_items.edit');
     Route::patch('/admin/new-items/{id}/update', [NewItemRequestController::class, 'update'])->name('admin.new_items.update');
