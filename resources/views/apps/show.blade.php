@@ -84,84 +84,73 @@
             @endif
 
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                <div class="flex flex-col md:flex-row justify-between items-start gap-6">
-                    <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-gray-800">Deskripsi</h3>
-                        <p class="text-gray-600 mt-1 whitespace-pre-line">{{ $project->deskripsi }}</p>
+                <div class="flex flex-col md:flex-row justify-between items-start gap-8">
+                    {{-- Bagian Kiri: Informasi Utama --}}
+                    <div class="flex-1 w-full space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Deskripsi Proyek</h3>
+                            <p class="text-gray-600 mt-2 whitespace-pre-line leading-relaxed italic border-l-4 border-gray-200 pl-4">
+                                {{ $project->deskripsi }}
+                            </p>
+                        </div>
                         
-                        <div class="mt-4 flex flex-wrap gap-4 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100 inline-flex">
-                            <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        {{-- Metadata: User & Tanggal --}}
+                        <div class="flex flex-wrap gap-4 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100 inline-flex">
+                            <span class="flex items-center gap-2 font-medium">
+                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 {{ $project->user->name ?? 'User Tidak Dikenal' }}
                             </span>
-                            <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 {{ $project->created_at->translatedFormat('d F Y') }}
                             </span>
                         </div>
                         
+                        {{-- Bagian Catatan --}}
                         @if($project->catatan_direktur || $project->catatan_admin || $project->catatan_management)
-                        <div class="mt-4 space-y-2">
-                             @if($project->catatan_direktur)
-                                <div class="text-xs bg-yellow-50 p-2 border border-yellow-200 rounded text-yellow-800 flex items-start gap-2">
-                                    <span class="font-bold">Catatan Direktur:</span> 
-                                    <span>{{ $project->catatan_direktur }}</span>
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Review & Catatan</h4>
+                            
+                            @if($project->catatan_direktur)
+                                <div class="text-xs bg-yellow-50 p-3 border border-yellow-200 rounded-lg text-yellow-800 flex items-start gap-3 shadow-sm">
+                                    <span class="bg-yellow-200 px-2 py-0.5 rounded font-bold uppercase text-[9px]">Direktur</span>
+                                    <span class="flex-1">{{ $project->catatan_direktur }}</span>
                                 </div>
-                             @endif
-                             @if($project->catatan_admin)
-                                <div class="text-xs bg-indigo-50 p-2 border border-indigo-200 rounded text-indigo-800 flex items-start gap-2">
-                                    <span class="font-bold">Catatan Admin:</span>
-                                    <span>{{ $project->catatan_admin }}</span>
+                            @endif
+
+                            @if($project->catatan_admin)
+                                <div class="text-xs bg-indigo-50 p-3 border border-indigo-200 rounded-lg text-indigo-800 flex items-start gap-3 shadow-sm">
+                                    <span class="bg-indigo-200 px-2 py-0.5 rounded font-bold uppercase text-[9px]">Admin</span>
+                                    <span class="flex-1">{{ $project->catatan_admin }}</span>
                                 </div>
-                             @endif
-                             @if($project->catatan_management)
-                                <div class="text-xs bg-blue-50 p-2 border border-blue-200 rounded text-blue-800 flex items-start gap-2">
-                                    <span class="font-bold">Catatan Management:</span>
-                                    <span>{{ $project->catatan_management }}</span>
+                            @endif
+
+                            @if($project->catatan_management)
+                                <div class="text-xs bg-blue-50 p-3 border border-blue-200 rounded-lg text-blue-800 flex items-start gap-3 shadow-sm">
+                                    <span class="bg-blue-200 px-2 py-0.5 rounded font-bold uppercase text-[9px]">Mgmt</span>
+                                    <span class="flex-1">{{ $project->catatan_management }}</span>
                                 </div>
-                             @endif
+                            @endif
                         </div>
                         @endif
 
+                        {{-- Download Button --}}
                         @if($project->status === 'completed')
-                            <div class="mt-6">
+                            <div class="pt-4">
                                 <a href="{{ route('apps.export.single', $project->id) }}" target="_blank" 
-                                class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow transition gap-2">
+                                class="inline-flex items-center px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg shadow-md transition-all gap-2 transform hover:-translate-y-0.5">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                     Unduh Laporan PDF
                                 </a>
                             </div>
                         @endif
                     </div>
-                    {{-- Bagian Progress Aplikasi --}}
-<div class="mt-4 w-full">
-    <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
-        <span>Progress</span>
-        <span>{{ $project->progress }}%</span>
-    </div>
-    <div class="w-full bg-gray-200 rounded-full h-2.5">
-        <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ $project->progress }}%"></div>
-    </div>
 
-    {{-- CAUTION: Jika ada pengadaan tapi dana belum di-ACC Bendahara --}}
-    @if($project->needs_procurement && !in_array($project->procurement_approval_status, ['approved', 'finish']))
-        <div class="mt-3 bg-yellow-50 border-l-4 border-yellow-400 p-2 rounded shadow-sm">
-            <div class="flex items-center">
-                <svg class="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-                <div class="ml-2">
-                    <p class="text-[10px] font-bold text-yellow-800 uppercase leading-tight">
-                        Peringatan: Anggaran Belum Divalidasi
-                    </p>
-                    <p class="text-[9px] text-yellow-700">Pengerjaan fitur berjalan, namun pembelian barang/aset tertunda.</p>
-                </div>
-            </div>
-        </div>
-    @endif
-</div>
-                    <div class="w-full md:w-auto text-right md:text-left min-w-[200px]">
-                        <div class="flex flex-col items-end md:items-end">
+                    {{-- Bagian Kanan: Status & Progress --}}
+                    <div class="w-full md:w-72 flex flex-col items-stretch md:items-end gap-6">
+                        
+                        {{-- Status Badge --}}
+                        <div class="text-right">
                             @php
                                 $colors = [
                                     'pending_director' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -174,20 +163,37 @@
                                 ];
                                 $label = str_replace('_', ' ', $project->status);
                             @endphp
-                            <span class="px-4 py-1.5 text-sm font-bold rounded-full border {{ $colors[$project->status] ?? 'bg-gray-100 border-gray-200' }}">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-1 mr-1">Status Proyek</p>
+                            <span class="inline-block px-4 py-2 text-xs font-black rounded-full border shadow-sm {{ $colors[$project->status] ?? 'bg-gray-100 border-gray-200' }}">
                                 {{ strtoupper($label) }}
                             </span>
-                            
-                            <div class="mt-4 w-full">
-                                <div class="flex justify-between text-xs font-bold text-gray-700 mb-1">
-                                    <span>Progress</span>
-                                    <span>{{ $project->progress }}%</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ $project->progress }}%"></div>
-                                </div>
+                        </div>
+
+                        {{-- Progress Bar --}}
+                        <div class="w-full">
+                            <div class="flex justify-between text-xs font-bold text-gray-700 mb-1.5 px-1">
+                                <span>Progress Pengerjaan</span>
+                                <span class="text-blue-600">{{ $project->progress }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3 border border-gray-100 overflow-hidden shadow-inner">
+                                <div class="bg-blue-600 h-3 rounded-full transition-all duration-700 ease-in-out" style="width: {{ $project->progress }}%"></div>
                             </div>
                         </div>
+
+                        {{-- Peringatan Anggaran --}}
+                        @if($project->needs_procurement && !in_array($project->procurement_approval_status, ['approved', 'finish']))
+                            <div class="bg-yellow-50 border-r-4 border-yellow-400 p-3 rounded-l-lg shadow-sm w-full">
+                                <div class="flex items-start">
+                                    <svg class="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                    <div class="ml-3">
+                                        <p class="text-[10px] font-black text-yellow-800 uppercase leading-none">Anggaran Tertunda</p>
+                                        <p class="text-[9px] text-yellow-700 mt-1 leading-tight">Pengerjaan fitur tetap berjalan, namun pengadaan barang menunggu validasi.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
