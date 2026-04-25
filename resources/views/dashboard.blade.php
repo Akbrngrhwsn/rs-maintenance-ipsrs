@@ -290,7 +290,7 @@
                 <div class="px-6 pt-4 pb-0">
     <div class="flex items-center justify-end gap-3">
         
-        {{-- Form Ekspor PDF Harian --}}
+        {{-- Form Ekspor PDF Harians --}}
         <form action="{{ route('admin.export.daily') }}" method="GET" class="flex gap-2 items-center">
             <input type="hidden" name="date" value="{{ request('date', date('Y-m-d')) }}">
             {{-- UPDATED: Tombol disamakan stylenya dengan yang lain (Solid Button) --}}
