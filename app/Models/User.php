@@ -41,9 +41,9 @@ class User extends Authenticatable
     /**
      * Relasi ke Room: Seorang User (Kepala Ruang) mengepalai satu ruangan
      */
-    public function room()
+    public function rooms()
     {
         // Ubah 'manaid' menjadi 'kepala_ruang_id'
-        return $this->hasOne(Room::class, 'kepala_ruang_id');
+        return $this->hasMany(Room::class, 'kepala_ruang_id');
     }
 }

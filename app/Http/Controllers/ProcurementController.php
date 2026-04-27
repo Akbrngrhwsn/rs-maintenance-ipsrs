@@ -150,16 +150,20 @@ class ProcurementController extends Controller
 
         $query = Procurement::with('report');
 
-        // Hanya pengadaan untuk ruangan yang dikelola user ini
-        $room = Auth::user()->room; // hasOne Room
-        if ($room) {
-            $query->whereHas('report', function($q) use ($room) {
-                $q->where('room_id', $room->id);
+        // 1. Ambil semua ID ruangan yang dikelola user ini (Relasi hasMany)
+        $roomIds = Auth::user()->rooms()->pluck('id')->toArray();
+
+        // Jika array ID ruangan tidak kosong
+        // GANTI MENJADI SEPERTI INI:
+        if (!empty($roomIds)) {
+            $query->whereHas('report', function($q) use ($roomIds) {
+                $q->whereIn('room_id', $roomIds); 
             });
         } else {
-            // Jika belum punya ruangan, kembalikan kosong
+            // Jika belum punya ruangan sama sekali, kembalikan kosong
             $procurements = collect();
-            return view('kepala_ruang.procurements', compact('procurements', 'tab'));
+            $newItemRequests = collect(); // Pastikan variabel ini dikirim juga agar Blade tidak error
+            return view('kepala_ruang.procurements', compact('procurements', 'tab', 'newItemRequests'));
         }
 
         if($tab === 'history') {
@@ -203,7 +207,7 @@ class ProcurementController extends Controller
 
         // --- TAMBAHAN: Ambil data Pengajuan Barang Baru milik Ruangan Karu ini ---
         $newItemsQuery = \App\Models\NewItemRequest::with(['user', 'room'])
-            ->where('room_id', Auth::user()->room_id ?? Auth::user()->room->id); // Hanya ambil milik ruangannya sendiri
+            ->whereIn('room_id', $roomIds); // 2. Gunakan whereIn dan $roomIds di sini juga
 
         if($tab === 'history') {
             $newItemsQuery->whereIn('status', ['approved', 'rejected', 'completed']);
@@ -217,15 +221,16 @@ class ProcurementController extends Controller
     }
 
     // === KEPALA RUANG: Approve Pengadaan (teruskan ke Management) ===
+    // === KEPALA RUANG: Approve Pengadaan (teruskan ke Management) ===
     public function kepalaRuangApprove($id)
     {
         if(Auth::user()->role !== 'kepala_ruang') abort(403);
 
         $proc = Procurement::with('report')->findOrFail($id);
 
-        // Validasi: pastikan procurement untuk ruangan ini
-        $room = Auth::user()->room;
-        if (!$room || $proc->report->room_id != $room->id) {
+        // Validasi: pastikan procurement untuk salah satu ruangan yang dikelola karu ini
+        $roomIds = Auth::user()->rooms->pluck('id')->toArray();
+        if (empty($roomIds) || !in_array($proc->report->room_id, $roomIds)) {
             abort(403, 'Anda tidak berwenang memproses pengadaan untuk ruangan ini.');
         }
 
@@ -251,9 +256,9 @@ class ProcurementController extends Controller
 
         $proc = Procurement::with('report')->findOrFail($id);
 
-        // Validasi: pastikan procurement untuk ruangan ini
-        $room = Auth::user()->room;
-        if (!$room || $proc->report->room_id != $room->id) {
+        // Validasi: pastikan procurement untuk salah satu ruangan yang dikelola karu ini
+        $roomIds = Auth::user()->rooms->pluck('id')->toArray();
+        if (empty($roomIds) || !in_array($proc->report->room_id, $roomIds)) {
             abort(403, 'Anda tidak berwenang memproses pengadaan untuk ruangan ini.');
         }
 
@@ -421,16 +426,6 @@ class ProcurementController extends Controller
                 $proc->report->save();
             }
         }
-        
-        // Tambahan: Simpan handler dari IT Staff yang bertugas
-        if ($proc->report) {
-            $onDutyStaff = \App\Models\ItStaff::where('is_on_duty', true)->first();
-            if ($onDutyStaff) {
-                $proc->report->handled_by_bendahara = $onDutyStaff->nama;
-                $proc->report->save();
-            }
-        }
-
         return back()->with('success', 'Pengadaan Disetujui oleh direktur.');
     }
 

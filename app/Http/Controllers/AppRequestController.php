@@ -188,12 +188,22 @@ class AppRequestController extends Controller
         
         $projects = AppRequest::where('user_id', Auth::id())->latest()->get(); // Project biarkan get() atau paginate juga boleh
         
-        // Pagination Laporan untuk Kepala Ruang
+        // Pagination Laporan untuk Kepala Ruang - filter by managed rooms
+        $user = Auth::user();
+        $roomIds = $user->rooms()->pluck('id')->toArray();
+        
         $query = Report::orderByRaw("CASE 
             WHEN status = 'Belum Diproses' THEN 1 
             WHEN status = 'Diproses' THEN 2 
             ELSE 3 END")
         ->orderBy('created_at', 'desc');
+        
+        if (!empty($roomIds)) {
+            $query->whereIn('room_id', $roomIds);
+        } else {
+            // Jika belum punya ruangan, tampilkan kosong
+            $query->where('room_id', 0);
+        }
         
         if ($request->has('date') && $request->date) {
             $query->whereDate('created_at', $request->date);

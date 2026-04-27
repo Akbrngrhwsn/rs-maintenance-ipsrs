@@ -161,9 +161,10 @@ class PublicReportController extends Controller
         // --- FILTER KHUSUS KEPALA RUANG ---
         $user = \Illuminate\Support\Facades\Auth::user();
         if ($user->role === 'kepala_ruang') {
-            if ($user->room) {
+            $roomIds = $user->rooms()->pluck('id')->toArray();
+            if (!empty($roomIds)) {
                 // Hanya ambil laporan dari ruangan Karu tersebut
-                $query->where('room_id', $user->room->id);
+                $query->whereIn('room_id', $roomIds);
             } else {
                 // Jika Karu belum diassign ruangan, jangan tampilkan apa-apa
                 $query->where('room_id', 0); 
@@ -174,8 +175,15 @@ class PublicReportController extends Controller
         $validator = $user->name;
         $dateString = $startDate->locale('id')->translatedFormat('F Y');
 
-        // Detail QR Code
-        $ruanganCetak = $user->role === 'kepala_ruang' ? ($user->room->name ?? 'Belum ada ruang') : 'Semua Ruangan (RS)';
+        // Detail QR Code - untuk multiple rooms, tampilkan jumlah ruangan yang dilaporkan
+        $ruanganNames = [];
+        if ($user->role === 'kepala_ruang') {
+            $ruanganNames = $user->rooms()->pluck('name')->toArray();
+            $ruanganCetak = !empty($ruanganNames) ? implode(', ', $ruanganNames) : 'Belum ada ruang';
+        } else {
+            $ruanganCetak = 'Semua Ruangan (RS)';
+        }
+        
         $qrData = "Diunduh oleh: " . $validator . " (" . strtoupper($user->role) . ")\n" .
                   "Ruangan: " . $ruanganCetak . "\n" .
                   "Periode: " . $dateString . "\n" .

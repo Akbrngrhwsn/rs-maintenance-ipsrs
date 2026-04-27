@@ -14,38 +14,52 @@ class NewItemRequestController extends Controller
     public function create()
     {
         if(Auth::user()->role !== 'kepala_ruang') abort(403);
-        $room = Auth::user()->room;
-        if(!$room) return back()->with('error', 'Anda belum ditugaskan ke ruangan manapun.');
         
-        return view('kepala_ruang.new_items.create', compact('room'));
+        $rooms = Auth::user()->rooms()->orderBy('name')->get();
+        if($rooms->isEmpty()) {
+            return back()->with('error', 'Anda belum ditugaskan ke ruangan manapun.');
+        }
+        
+        return view('kepala_ruang.new_items.create', compact('rooms'));
     }
 
     // === SIMPAN PENGAJUAN KEPALA RUANG ===
     public function store(Request $request)
-{
-    $request->validate([
-        'purpose' => 'required|string|max:255',
-        'items.*.nama' => 'required|string',
-        'items.*.harga_satuan' => 'required|numeric|min:0',
-        'items.*.jumlah' => 'required|numeric|min:1',
-    ]);
+    {
+        $request->validate([
+            'room_id' => 'required|exists:rooms,id',
+            'purpose' => 'required|string|max:255',
+            'items.*.nama' => 'required|string',
+            'items.*.harga_satuan' => 'required|numeric|min:0',
+            'items.*.jumlah' => 'required|numeric|min:1',
+        ]);
 
-    // --- GENERATE QR UNTUK KARU ---
-    $user = Auth::user();
-    $qrText = "Diajukan oleh: " . $user->name . "\nRuangan: " . ($user->room->name ?? '-') . "\nTanggal: " . now()->format('d/m/Y H:i');
-    $qrKaru = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate($qrText));
+        $user = Auth::user();
+        $roomId = $request->input('room_id');
+        
+        // Validasi: pastikan room_id adalah salah satu ruangan yang dikelola kepala_ruang ini
+        $userRoomIds = $user->rooms()->pluck('id')->toArray();
+        if (!in_array($roomId, $userRoomIds)) {
+            abort(403, 'Anda tidak berwenang membuat pengajuan untuk ruangan ini.');
+        }
+        
+        $room = \App\Models\Room::find($roomId);
+        
+        // --- GENERATE QR UNTUK KARU ---
+        $qrText = "Diajukan oleh: " . $user->name . "\nRuangan: " . ($room->name ?? '-') . "\nTanggal: " . now()->format('d/m/Y H:i');
+        $qrKaru = base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate($qrText));
 
-    NewItemRequest::create([
-        'user_id' => $user->id,
-        'room_id' => $user->room->id,
-        'qr_karu' => $qrKaru, // Simpan QR Karu
-        'purpose' => $request->purpose,
-        'items' => $request->items,
-        'status' => 'pending_admin'
-    ]);
+        NewItemRequest::create([
+            'user_id' => $user->id,
+            'room_id' => $roomId,
+            'qr_karu' => $qrKaru, // Simpan QR Karu
+            'purpose' => $request->purpose,
+            'items' => $request->items,
+            'status' => 'pending_admin'
+        ]);
 
-    return redirect()->route('kepala-ruang.procurements.index')->with('success', 'Pengajuan barang baru berhasil dikirim.');
-}
+        return redirect()->route('kepala-ruang.procurements.index')->with('success', 'Pengajuan barang baru berhasil dikirim.');
+    }
 
     // === METHOD APPROVAL UNTUK MASING-MASING ROLE ===
     public function approve(Request $request, $id, $role)

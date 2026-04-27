@@ -113,12 +113,12 @@ class NotificationController extends Controller
         // --- KEPALA RUANG ---
         elseif ($role === 'kepala_ruang') {
             // Memantau pengadaan dari Admin IT, tapi hanya untuk ruangan yang dikelolanya
-            $room = $user->room; // hasOne(Room::class)
+            $roomIds = $user->rooms()->pluck('id')->toArray();
 
-            if ($room) {
+            if (!empty($roomIds)) {
                 $pendingProcurements = Procurement::where('status', 'submitted_to_kepala_ruang')
-                    ->whereHas('report', function ($q) use ($room) {
-                        $q->where('room_id', $room->id);
+                    ->whereHas('report', function ($q) use ($roomIds) {
+                        $q->whereIn('room_id', $roomIds);
                     })->count();
             } else {
                 $pendingProcurements = 0;

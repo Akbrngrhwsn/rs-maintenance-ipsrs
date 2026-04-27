@@ -19,31 +19,35 @@ class UserManagementController extends Controller
         return view('admin.users.index', compact('users', 'rooms'));
     }
 
-    // Assign a room to a man (or remove assignment)
+    // Assign multiple rooms to a kepala ruang
     public function assignRoom(Request $request, $id)
     {
         $request->validate([
-            'room_id' => 'nullable|exists:rooms,id',
+            'room_ids' => 'nullable|array',
+            'room_ids.*' => 'exists:rooms,id',
         ]);
 
         $user = User::findOrFail($id);
 
-        // Only allow assigning if user is a manag
+        // Only allow assigning if user is a kepala_ruang
         if ($user->role !== 'kepala_ruang') {
             return back()->with('error', 'Hanya pengguna dengan role Kepala Ruang yang dapat ditetapkan ke ruangan.');
         }
 
-        // Remove this user as kepala ruang from any rooms they currently manage
+        // Remove this user as kepala_ruang from all rooms they currently manage
         Room::where('kepala_ruang_id', $user->id)->update(['kepala_ruang_id' => null]);
 
-        if ($request->room_id) {
-            $room = Room::findOrFail($request->room_id);
-            // Overwrite previous kepala ruang (if any)
-            $room->kepala_ruang_id = $user->id;
-            $room->save();
+        // Assign new rooms if any are provided
+        if ($request->room_ids && is_array($request->room_ids)) {
+            Room::whereIn('id', $request->room_ids)->update(['kepala_ruang_id' => $user->id]);
         }
 
-        return back()->with('success', "Kepala Ruang {$user->name} berhasil diperbarui untuk ruangan.");
+        $roomCount = count($request->room_ids ?? []);
+        $message = $roomCount > 0 
+            ? "Kepala Ruang {$user->name} berhasil diassign ke {$roomCount} ruangan."
+            : "Semua ruangan berhasil dihapus dari Kepala Ruang {$user->name}.";
+            
+        return back()->with('success', $message);
     }
 
     // Admin: create new user from admin UI
@@ -54,7 +58,8 @@ class UserManagementController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => 'required|in:admin,direktur,kepala_ruang,bendahara,staff',
-            'room_id' => 'nullable|exists:rooms,id',
+            'room_ids' => 'nullable|array',
+            'room_ids.*' => 'exists:rooms,id',
         ]);
 
         $user = User::create([
@@ -64,10 +69,9 @@ class UserManagementController extends Controller
             'role' => $request->role,
         ]);
 
-        
-        if ($request->role === 'kepala_ruang' && $request->room_id) {
-            // Remove previou assignment for that room (if any)
-            Room::where('id', $request->room_id)->update(['kepala_ruang_id' => $user->id]);
+        if ($request->role === 'kepala_ruang' && $request->room_ids && is_array($request->room_ids)) {
+            // Assign multiple rooms to the new kepala_ruang
+            Room::whereIn('id', $request->room_ids)->update(['kepala_ruang_id' => $user->id]);
         }
 
         return back()->with('success', "User {$user->name} berhasil dibuat.");

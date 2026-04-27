@@ -13,14 +13,30 @@ class MeetingController extends Controller
 {
     /**
      * Determine the division filter value for the given user.
-     * Returns room name for when available, otherwise the user's role.
+     * Returns room names for when available, otherwise the user's role.
      */
-    private function getUserDivision($user)
+    private function getUserDivisionNames($user)
     {
-        if ($user->role === 'kepala_ruang' && isset($user->room) && $user->room && $user->room->name) {
-            return $user->room->name;
+        if ($user->role === 'kepala_ruang') {
+            $rooms = $user->rooms()->pluck('name')->toArray();
+            if (!empty($rooms)) {
+                return $rooms;
+            }
         }
-        return $user->role;
+        return [$user->role];
+    }
+    
+    /**
+     * Check if user has access to a meeting based on division_role
+     */
+    private function userHasAccessToMeeting($user, $divisionRole)
+    {
+        if (in_array($user->role, ['admin', 'direktur'])) {
+            return true;
+        }
+        
+        $allowedDivisions = $this->getUserDivisionNames($user);
+        return in_array($divisionRole, $allowedDivisions);
     }
 
     // List meetings (history)
@@ -32,12 +48,8 @@ class MeetingController extends Controller
         // Prefer filtering by division_role if the column exists; otherwise fall back to ownership (created_by)
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                // For 
-                $divisionFilter = $user->role;
-                if ($user->role === 'kepala_ruang' && isset($user->room) && $user->room && $user->room->name) {
-                    $divisionFilter = $user->room->name;
-                }
-                $query->where('division_role', $divisionFilter);
+                $allowedDivisions = $this->getUserDivisionNames($user);
+                $query->whereIn('division_role', $allowedDivisions);
             } else {
                 $query->where('created_by', $user->id);
             }
@@ -62,16 +74,26 @@ class MeetingController extends Controller
         ]);
 
         $user = Auth::user();
+        
         // Determine division value:
-        // - If user isand has a room, use the room name
+        // - If user is kepala_ruang and has rooms, use the division_role from request (must be one of their rooms)
         // - If admin and provided a division_role, allow it
         // - Otherwise use the user's role
-        if ($user->role === 'kepala_ruang' && isset($user->room) && $user->room && $user->room->name) {
-            $division = $user->room->name;
+        $division = $user->role;
+        
+        if ($user->role === 'kepala_ruang') {
+            $allowedRooms = $user->rooms()->pluck('name')->toArray();
+            if (!empty($allowedRooms)) {
+                // If division_role provided, validate it's one of their rooms
+                if ($request->filled('division_role') && in_array($request->input('division_role'), $allowedRooms)) {
+                    $division = $request->input('division_role');
+                } else {
+                    // Default to first room if not provided
+                    $division = $allowedRooms[0] ?? $user->role;
+                }
+            }
         } elseif ($user->role === 'admin' && $request->filled('division_role')) {
             $division = $request->input('division_role');
-        } else {
-            $division = $user->role;
         }
 
         // Build data array conditionally to avoid DB errors if columns are missing
@@ -99,8 +121,9 @@ class MeetingController extends Controller
         // Authorization: allow admin/direktur; otherwise check division_role or ownership
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                $divisionFilter = $this->getUserDivision($user);
-                if ($meeting->division_role !== $divisionFilter) abort(403);
+                if (!$this->userHasAccessToMeeting($user, $meeting->division_role)) {
+                    abort(403);
+                }
             } else {
                 if ($meeting->created_by !== $user->id) abort(403);
             }
@@ -114,16 +137,22 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($id);
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                $divisionFilter = $this->getUserDivision($user);
-                if ($meeting->division_role !== $divisionFilter) abort(403);
+                if (!$this->userHasAccessToMeeting($user, $meeting->division_role)) {
+                    abort(403);
+                }
             } else {
                 if ($meeting->created_by !== $user->id) abort(403);
             }
         }
+        
         $rooms = [];
         if ($user && $user->role === 'admin') {
             $rooms = Room::orderBy('name')->get();
+        } elseif ($user && $user->role === 'kepala_ruang') {
+            // For kepala_ruang, show only their managed rooms
+            $rooms = $user->rooms()->orderBy('name')->get();
         }
+        
         return view('meetings.edit', compact('meeting', 'rooms'));
     }
 
@@ -140,8 +169,9 @@ class MeetingController extends Controller
         // Authorization: allow admin/direktur; otherwise check division_role or ownership
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                $divisionFilter = $this->getUserDivision($user);
-                if ($meeting->division_role !== $divisionFilter) abort(403);
+                if (!$this->userHasAccessToMeeting($user, $meeting->division_role)) {
+                    abort(403);
+                }
             } else {
                 if ($meeting->created_by !== $user->id) abort(403);
             }
@@ -149,10 +179,19 @@ class MeetingController extends Controller
 
         if (Schema::hasColumn('meetings', 'title')) $meeting->title = $request->title;
         if (Schema::hasColumn('meetings', 'minutes')) $meeting->minutes = $request->minutes;
-        // Allow admin to update division_role (may be a role or a room name)
-        if ($user->role === 'admin' && Schema::hasColumn('meetings', 'division_role') && $request->filled('division_role')) {
-            $meeting->division_role = $request->input('division_role');
+        
+        // Allow admin/kepala_ruang to update division_role (may be a role or a room name)
+        if (Schema::hasColumn('meetings', 'division_role') && $request->filled('division_role')) {
+            if ($user->role === 'admin') {
+                $meeting->division_role = $request->input('division_role');
+            } elseif ($user->role === 'kepala_ruang') {
+                $allowedRooms = $user->rooms()->pluck('name')->toArray();
+                if (in_array($request->input('division_role'), $allowedRooms)) {
+                    $meeting->division_role = $request->input('division_role');
+                }
+            }
         }
+        
         if (Schema::hasColumn('meetings', 'edited_by')) $meeting->edited_by = $user->id;
         $meeting->save();
 
@@ -165,8 +204,9 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($id);
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                $divisionFilter = $this->getUserDivision($user);
-                if ($meeting->division_role !== $divisionFilter) abort(403);
+                if (!$this->userHasAccessToMeeting($user, $meeting->division_role)) {
+                    abort(403);
+                }
             } else {
                 if ($meeting->created_by !== $user->id) abort(403);
             }
@@ -181,8 +221,9 @@ class MeetingController extends Controller
         $meeting = Meeting::findOrFail($id);
         if (!in_array($user->role, ['admin', 'direktur'])) {
             if (Schema::hasColumn('meetings', 'division_role')) {
-                $divisionFilter = $this->getUserDivision($user);
-                if ($meeting->division_role !== $divisionFilter) abort(403);
+                if (!$this->userHasAccessToMeeting($user, $meeting->division_role)) {
+                    abort(403);
+                }
             } else {
                 if ($meeting->created_by !== $user->id) abort(403);
             }
