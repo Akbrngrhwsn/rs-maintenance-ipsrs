@@ -553,6 +553,11 @@
                 }
             @endphp
 
+            {{-- Tampilkan Status Pengadaan jika aplikasi memerlukan pengadaan --}}
+            @if($project->needs_procurement)
+                <x-procurement-status-timeline :project="$project" />
+            @endif
+
             <div class="mt-6 border-t pt-6">
                 <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
                     <h4 class="font-bold mb-0">Rincian Pengajuan & Pengadaan</h4>
@@ -621,7 +626,7 @@
                         @endif
 
                         {{-- TOMBOL PENYELESAIAN PENGADAAN OLEH ADMIN --}}
-                @if($project->status === 'in_progress' && $project->needs_procurement && $project->procurement_approval_status === 'approved')
+                @if(Auth::user()->role === 'admin' && $project->status === 'in_progress' && $project->needs_procurement && $project->procurement_approval_status === 'approved')
                     <div class="mt-6 border-t pt-6">
                         <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
                             <h4 class="font-bold text-teal-800 mb-3 flex items-center gap-2">
@@ -870,19 +875,25 @@
                         </form>
                     </div>
 
-                    @if($project->progress == 100 && $project->features->count() > 0)
-                    <div class="bg-green-50 p-5 rounded-xl border border-green-200 shadow-sm text-center">
-                        <div class="mb-3 flex justify-center text-green-600">
-                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    {{-- TOMBOL PENYELESAIAN PENGADAAN OLEH ADMIN --}}
+                    @if(Auth::user()->role === 'admin' && $project->status === 'in_progress' && $project->needs_procurement && $project->procurement_approval_status === 'approved')
+                        <div class="mt-6 border-t pt-6">
+                            <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                                <h4 class="font-bold text-teal-800 mb-3 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Penyelesaian Pengadaan
+                                </h4>
+                                <p class="text-xs text-teal-700 mb-3 bg-teal-100 p-2 rounded">
+                                    Pengadaan untuk aplikasi ini telah disetujui sepenuhnya. Jika barang sudah diimplementasikan/selesai diurus, silakan tandai pengadaan sebagai selesai.
+                                </p>
+                                <form action="{{ route('admin.apps.finish_procurement', $project->id) }}" method="POST" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold transition shadow">
+                                        ✓ Tandai Pengadaan Selesai
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <p class="text-sm text-green-800 mb-4 font-bold">Semua fitur telah selesai dikerjakan.</p>
-                        <form action="{{ route('apps.complete', $project->id) }}" method="POST">
-                            @csrf @method('PATCH')
-                            <button class="w-full bg-green-600 text-white py-2.5 rounded-lg shadow hover:bg-green-700 font-bold text-sm transition flex items-center justify-center gap-2">
-                                <span>🚀</span> Tandai Project Selesai
-                            </button>
-                        </form>
-                    </div>
                     @endif
                 </div>
                 @endif

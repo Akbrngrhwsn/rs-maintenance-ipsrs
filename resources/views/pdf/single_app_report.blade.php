@@ -101,51 +101,51 @@
 <p style="margin-bottom: 6px">Demikian laporan ini disusun untuk memberikan gambaran mengenai Pembuatan Aplikasi.
         Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>
 
-    {{-- TANDA TANGAN DENGAN QR --}}
-    <div class="footer-signature">
-        <p style="margin-bottom: 5px;">Disahkan/Divalidasi Oleh,</p>
-        
-        {{-- Tampilkan QR Code --}}
-        @if(isset($qrCode))
-            <img src="data:{{ $qrMime ?? 'image/png' }};base64, {!! $qrCode !!}" alt="QR Validasi" style="width: 90px; height: 90px; margin: 10px 0;">
-        @else
-            <br><br><br><br>
-        @endif
-        
-        <br>
-        
-        {{-- Nama Validator --}}
-        <span style="font-size: 12px; font-weight: bold; text-decoration: underline;">
-            {{ $validator ?? Auth::user()->name }}
-        </span>
-        <br>
-        <span style="font-size: 10px; color: #555;">
-            Digital Signature<br>
-            {{ $waktuValidasi ?? date('d-m-Y') }}
-        </span>
+    {{-- TANDA TANGAN DENGAN QR DIBUNGKUS DALAM TABLE --}}
+    <table style="width: 100%; text-align: center; margin-top: 50px; border-collapse: collapse; border: none;">
+        <tr>
+            <!-- {{-- KOLOM BENDAHARA --}}
+            <td style="width: 33%; border: none; vertical-align: bottom;">
+                <p style="margin-bottom: 5px;">Verifikasi,</p>
+                @if($app->qr_bendahara)
+                    <img src="data:image/png;base64,{{ $app->qr_bendahara }}" style="width: 80px; height: 80px; margin: 10px 0; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; margin: 10px auto;"></div>
+                @endif
+                <p style="margin: 0;"><strong>Bendahara</strong></p>
+            </td>
 
-        {{-- KOLOM BENDAHARA --}}
-        <td style="width: 25%; border: none;">
-            <p>Verifikasi,</p>
-            @if($app->qr_bendahara)
-                <img src="data:image/png;base64,{{ $app->qr_bendahara }}" style="width: 80px;">
-            @else
-                <div style="height: 80px;"></div>
-            @endif
-            <p><strong>Bendahara</strong></p>
-        </td>
+            {{-- KOLOM DIREKTUR --}}
+            <td style="width: 33%; border: none; vertical-align: bottom;">
+                <p style="margin-bottom: 5px;">Menyetujui,</p>
+                @if($app->qr_direktur)
+                    <img src="data:image/png;base64,{{ $app->qr_direktur }}" style="width: 80px; height: 80px; margin: 10px 0; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; margin: 10px auto;"></div>
+                @endif
+                <p style="margin: 0;"><strong>Direktur Utama</strong></p>
+            </td> -->
 
-        {{-- KOLOM DIREKTUR (Akan terisi otomatis jika Bendahara sudah ACC) --}}
-        <td style="width: 25%; border: none;">
-            <p>Menyetujui,</p>
-            @if($app->qr_direktur)
-                <img src="data:image/png;base64,{{ $app->qr_direktur }}" style="width: 80px;">
-            @else
-                <div style="height: 80px;"></div>
-            @endif
-            <p><strong>Direktur Utama</strong></p>
-        </td>
-    </div>
+            {{-- KOLOM ADMIN / VALIDATOR --}}
+            <td style="width: 33%; border: none; vertical-align: bottom; text-align: right;">
+                <p style="margin-bottom: 5px;">Disahkan/Divalidasi Oleh,</p>
+                @if(isset($qrCode))
+                    <img src="data:{{ $qrMime ?? 'image/png' }};base64, {!! $qrCode !!}" alt="QR Validasi" style="width: 80px; height: 80px; margin: 10px 0; object-fit: contain;">
+                @else
+                    <div style="width: 80px; height: 80px; margin: 10px auto;"></div>
+                @endif
+                <br>
+                <span style="font-size: 12px; font-weight: bold; text-decoration: underline;">
+                    {{ $validator ?? Auth::user()->name }}
+                </span>
+                <br>
+                <span style="font-size: 10px; color: #555;">
+                    Digital Signature<br>
+                    {{ $waktuValidasi ?? date('d-m-Y') }}
+                </span>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>
