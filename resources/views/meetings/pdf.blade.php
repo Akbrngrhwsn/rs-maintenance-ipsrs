@@ -59,8 +59,8 @@
             <td>: {{ \Carbon\Carbon::parse($meeting->meeting_date)->translatedFormat('d F Y') }}</td>
         </tr>
         <tr>
-            <td><strong>Divisi</strong></td>
-            <td>: {{ $meeting->division_role ?? 'Umum' }}</td>
+            <td><strong>Oleh</strong></td>
+            <td>: {{ $meeting->user->name ?? 'Sistem' }}</td>
         </tr>
     </table>
 
@@ -70,21 +70,21 @@
     
     <hr>
     <p style="font-size: 0.9em; color: gray;">
-        Dicatat oleh: {{ optional($meeting->creator)->name ?? '-' }} pada {{ $meeting->created_at->format('Y-m-d H:i') }}
+        Dicatat oleh: {{ $meeting->user->name ?? '-' }} pada {{ $meeting->created_at->format('d-m-Y H:i') }}
         @if($meeting->edited_by)
-            | Diedit pada: {{ $meeting->updated_at->format('Y-m-d H:i') }}
+            | Diedit pada: {{ $meeting->updated_at->format('d-m-Y H:i') }}
         @endif
     </p>
 
     <div class="signature-section">
         <div class="signature-box">
             <p>Mengetahui,</p>
-            <p><strong>{{ $meeting->division_role ?? 'Kepala Divisi' }}</strong></p>
+            <p><strong>{{ strtoupper($meeting->user->name ?? 'SISTEM') }}</strong></p>
             
             <br>
             
             <img src="data:image/png;base64, {!! base64_encode(\SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate(
-                'Dokumen ini disetujui secara digital oleh Divisi: ' . ($meeting->division_role ?? 'Terkait') . 
+                'Dokumen ini disetujui secara digital oleh: ' . ($meeting->user->name ?? 'Sistem') . 
                 ' | ID Rapat: ' . $meeting->id . 
                 ' | Tanggal: ' . $meeting->meeting_date
             )) !!} ">

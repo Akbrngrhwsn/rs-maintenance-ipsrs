@@ -43,7 +43,7 @@ class MeetingController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $query = Meeting::query();
+        $query = Meeting::with('user');
 
         // Prefer filtering by division_role if the column exists; otherwise fall back to ownership (created_by)
         if (!in_array($user->role, ['admin', 'direktur'])) {
@@ -153,9 +153,12 @@ class MeetingController extends Controller
             $rooms = $user->rooms()->orderBy('name')->get();
         }
         
-        return view('meetings.edit', compact('meeting', 'rooms'));
+        // 👇 TAMBAHKAN BARIS INI UNTUK MENGAMBIL DATA USER 👇
+        $users = \App\Models\User::all(); 
+        
+        // 👇 TAMBAHKAN 'users' KE DALAM COMPACT 👇
+        return view('meetings.edit', compact('meeting', 'rooms', 'users'));
     }
-
     public function update(Request $request, $id)
     {
         $request->validate([

@@ -40,20 +40,11 @@
                     </dd>
                 </div>
 
-                @php
-                    $divisionDisplay = $meeting->division_role;
-                    if (!$divisionDisplay && optional($meeting->creator)->role === 'kepala_ruang' && optional($meeting->creator->room)->name) {
-                        $divisionDisplay = $meeting->creator->room->name;
-                    }
-                    if (!$divisionDisplay) {
-                        $divisionDisplay = optional($meeting->creator)->role ?? '-';
-                    }
-                @endphp
                 <div class="sm:col-span-1">
-                    <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Divisi / Unit</dt>
+                    <dt class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Oleh</dt>
                     <dd class="mt-2 text-sm text-gray-900">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                            {{ $divisionDisplay }}
+                        <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 uppercase">
+                            {{ $meeting->user->name ?? 'SISTEM' }}
                         </span>
                     </dd>
                 </div>

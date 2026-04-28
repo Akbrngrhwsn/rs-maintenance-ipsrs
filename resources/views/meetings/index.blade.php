@@ -95,71 +95,72 @@
 
             {{-- Riwayat Rapat --}}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 bg-gray-50/30 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-gray-800">Riwayat Rapat</h3>
-                </div>
+    <div class="p-6 border-b border-gray-100">
+        <h3 class="text-lg font-bold text-gray-800">Riwayat Rapat</h3>
+    </div>
 
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-auto">
-                        <thead class="bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4 text-left">ID</th>
-                                <th class="px-6 py-4 text-left">Informasi Rapat</th>
-                                <th class="px-6 py-4 text-left">Divisi</th>
-                                <th class="px-6 py-4 text-left">Dibuat Pada</th>
-                                <th class="px-6 py-4 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse($meetings as $m)
-                                <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
-                                        #{{ $m->id }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-bold text-gray-900">{{ $m->title }}</div>
-                                        <div class="text-xs text-blue-600 mt-0.5 flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                            {{ \Carbon\Carbon::parse($m->meeting_date)->translatedFormat('d F Y') }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold uppercase border border-blue-100">
-                                            {{ $m->division_role ?? '-' }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
-                                        {{ $m->created_at->format('Y-m-d H:i') }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-center space-x-1">
-                                        <a href="{{ route('meetings.show', $m->id) }}" class="inline-flex items-center px-3 py-1 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase">
-                                            Lihat
-                                        </a>
-                                        <a href="{{ route('meetings.export', $m->id) }}" class="inline-flex items-center px-3 py-1 bg-amber-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase">
-                                            PDF
-                                        </a>
-                                        <a href="{{ route('meetings.edit', $m->id) }}" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase">
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('meetings.destroy', $m->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus rapat ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="inline-flex items-center px-3 py-1 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic">
-                                        Belum ada data rapat tersimpan.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full table-auto text-left">
+            <thead class="bg-gray-50 border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                <tr>
+                    <th class="px-6 py-4">ID</th>
+                    <th class="px-6 py-4">Informasi Rapat</th>
+                    <th class="px-6 py-4">Oleh</th>
+                    <th class="px-6 py-4">Dibuat Pada</th>
+                    <th class="px-6 py-4 text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($meetings as $m)
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
+                            #{{ $m->id }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-bold text-gray-900">{{ $m->title }}</div>
+                            <div class="text-xs text-blue-600 mt-1 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                {{ \Carbon\Carbon::parse($m->meeting_date)->translatedFormat('d F Y') }}
+                            </div>
+                        </td>
+                        <<td class="px-6 py-4 whitespace-nowrap">
+    <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 uppercase">
+        {{ $m->user->name ?? 'SISTEM' }}
+    </span>
+</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ $m->created_at->format('Y-m-d H:i') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center space-x-1.5">
+                            <a href="{{ route('meetings.show', $m->id) }}" class="inline-flex items-center px-3 py-1.5 bg-[#10b981] hover:bg-emerald-600 rounded-md font-bold text-[10px] text-white uppercase tracking-wide transition-colors">
+                                Lihat
+                            </a>
+                            <a href="{{ route('meetings.export', $m->id) }}" class="inline-flex items-center px-3 py-1.5 bg-[#d97706] hover:bg-amber-700 rounded-md font-bold text-[10px] text-white uppercase tracking-wide transition-colors">
+                                PDF
+                            </a>
+                            <a href="{{ route('meetings.edit', $m->id) }}" class="inline-flex items-center px-3 py-1.5 bg-[#4f46e5] hover:bg-indigo-700 rounded-md font-bold text-[10px] text-white uppercase tracking-wide transition-colors">
+                                Edit
+                            </a>
+                            <form action="{{ route('meetings.destroy', $m->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus rapat ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="inline-flex items-center px-3 py-1.5 bg-[#e11d48] hover:bg-rose-700 rounded-md font-bold text-[10px] text-white uppercase tracking-wide transition-colors">
+                                    Hapus
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic text-sm">
+                            Belum ada data rapat tersimpan.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 
                 @if($meetings->hasPages())
                     <div class="p-4 border-t border-gray-100 bg-gray-50/30">
