@@ -160,11 +160,27 @@ class PublicReportController extends Controller
 
         // --- FILTER KHUSUS KEPALA RUANG ---
         $user = \Illuminate\Support\Facades\Auth::user();
+        $selectedRoomIds = []; // Track which rooms were selected
+        
         if ($user->role === 'kepala_ruang') {
-            $roomIds = $user->rooms()->pluck('id')->toArray();
-            if (!empty($roomIds)) {
-                // Hanya ambil laporan dari ruangan Karu tersebut
-                $query->whereIn('room_id', $roomIds);
+            $userRoomIds = $user->rooms()->pluck('id')->toArray();
+            
+            // CEK APAKAH ADA ROOM SELECTION DARI REQUEST
+            $requestRoomIds = $request->input('room_ids', []);
+            if (!empty($requestRoomIds)) {
+                // Validate bahwa user hanya pilih rooms yang dia kelola
+                $selectedRoomIds = array_intersect($requestRoomIds, $userRoomIds);
+                if (empty($selectedRoomIds)) {
+                    $selectedRoomIds = $userRoomIds; // Fallback ke semua rooms user
+                }
+            } else {
+                // Jika tidak ada selection, gunakan semua rooms
+                $selectedRoomIds = $userRoomIds;
+            }
+            
+            if (!empty($selectedRoomIds)) {
+                // Hanya ambil laporan dari ruangan yang dipilih
+                $query->whereIn('room_id', $selectedRoomIds);
             } else {
                 // Jika Karu belum diassign ruangan, jangan tampilkan apa-apa
                 $query->where('room_id', 0); 
@@ -175,10 +191,16 @@ class PublicReportController extends Controller
         $validator = $user->name;
         $dateString = $startDate->locale('id')->translatedFormat('F Y');
 
-        // Detail QR Code - untuk multiple rooms, tampilkan jumlah ruangan yang dilaporkan
+        // Detail QR Code - untuk multiple rooms, tampilkan ruangan yang dipilih
         $ruanganNames = [];
         if ($user->role === 'kepala_ruang') {
-            $ruanganNames = $user->rooms()->pluck('name')->toArray();
+            if (!empty($selectedRoomIds)) {
+                // Ambil nama ruangan dari rooms yang dipilih
+                $ruanganNames = \App\Models\Room::whereIn('id', $selectedRoomIds)
+                    ->orderBy('name')
+                    ->pluck('name')
+                    ->toArray();
+            }
             $ruanganCetak = !empty($ruanganNames) ? implode(', ', $ruanganNames) : 'Belum ada ruang';
         } else {
             $ruanganCetak = 'Semua Ruangan (RS)';

@@ -254,8 +254,40 @@
                         <input type="month" name="month" value="{{ date('Y-m') }}" 
                             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-sm" required />
                     </div>
+
+                    {{-- ROOM SELECTION (Hanya untuk Kepala Ruang dengan Multiple Rooms) --}}
+                    @auth
+                        @if(Auth::user()->role === 'kepala_ruang')
+                            @php
+                                $userRooms = Auth::user()->rooms()->orderBy('name')->get();
+                            @endphp
+                            @if($userRooms->count() > 1)
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Ruangan (Optional)</label>
+                                    <p class="text-xs text-gray-500 mb-2">Jika tidak dipilih, akan mencakup semua ruangan Anda</p>
+                                    <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-3 bg-gray-50">
+                                        @foreach($userRooms as $room)
+                                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded transition">
+                                                <input type="checkbox" name="room_ids[]" value="{{ $room->id }}" 
+                                                    class="rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer" />
+                                                <span class="text-sm text-gray-700">{{ $room->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @elseif($userRooms->count() === 1)
+                                <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+                                    <p class="text-xs font-medium text-blue-700">
+                                        📍 Ruangan: <strong>{{ $userRooms->first()->name }}</strong>
+                                    </p>
+                                    <input type="hidden" name="room_ids[]" value="{{ $userRooms->first()->id }}" />
+                                </div>
+                            @endif
+                        @endif
+                    @endauth
+
                     <p class="text-xs text-gray-500 italic">
-                        📌 Laporan akan mencakup semua laporan kerusakan yang diselesaikan (Selesai, Ditolak, Pengadaan) pada bulan yang dipilih.
+                        📌 Laporan akan mencakup laporan kerusakan yang diselesaikan (Selesai, Ditolak, Pengadaan) pada bulan yang dipilih.
                     </p>
                 </div>
                 <div class="px-6 py-4 border-t bg-gray-50 text-right space-x-2">
