@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ITNoteController;
 use App\Http\Controllers\NewItemRequestController;
+use App\Http\Controllers\UserRequestController;
 
 // === USER 1: PUBLIC (Tanpa Login) ===
 Route::get('/', [PublicReportController::class, 'index'])->name('public.home');
@@ -212,6 +213,9 @@ Route::post('/admin/apps/{id}/add-procurement', [\App\Http\Controllers\AppReques
     Route::get('/admin/it-notes', [ITNoteController::class, 'index'])->name('it-notes.index');
     Route::post('/admin/it-notes', [ITNoteController::class, 'store'])->name('it-notes.store');
     Route::get('/admin/it-notes/export', [ITNoteController::class, 'exportPdf'])->name('it-notes.export');
+    Route::resource('user-requests', UserRequestController::class);
+    Route::patch('user-requests/{id}/status', [UserRequestController::class, 'updateStatus'])->name('user-requests.update-status');
+    Route::get('user-requests-export', [UserRequestController::class, 'exportPdf'])->name('user-requests.export');
     });
 
     // --- GROUP APP REQUEST (Project Aplikasi) - UPDATED ---

@@ -38,6 +38,12 @@
                         <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="text-[13px] font-bold tracking-tight text-gray-500">
                             {{ __('User') }}
                         </x-nav-link>
+
+                        {{-- TAMBAHAN: MENU REQUEST USER UNTUK ADMIN --}}
+                        <x-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="text-[13px] font-bold tracking-tight text-indigo-700">
+                            {{ __('Req. User') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="text-[13px] font-bold tracking-tight text-gray-500">
                             {{ __('Ruangan') }}
                         </x-nav-link>
@@ -155,6 +161,12 @@
                         <x-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Form Req. Aplikasi') }}
                         </x-nav-link>
+
+                        {{-- TAMBAHAN: MENU REQUEST USER UNTUK KEPALA RUANG --}}
+                        <x-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="text-[13px] font-bold tracking-tight text-indigo-700">
+                            {{ __('Req. User') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight text-gray-500">
                             {{ __('Daftar Request') }}
                         </x-nav-link>
@@ -266,6 +278,10 @@
                     @endif
                 </div>
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('User') }}</x-responsive-nav-link>
+                
+                {{-- TAMBAHAN: MENU REQUEST USER UNTUK ADMIN MOBILE --}}
+                <x-responsive-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="rounded-lg font-bold text-[13px] text-indigo-700">{{ __('Req. User') }}</x-responsive-nav-link>
+
                 <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Ruangan') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.procurements.index')" :active="request()->routeIs('admin.procurements.*')" class="rounded-lg font-bold text-[13px]">{{ __('Pengadaan') }}</x-responsive-nav-link>
                 <span id="badge-admin-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-green-600 text-white hidden">0</span>
@@ -364,6 +380,10 @@
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold text-[13px]">{{ __('Form Req. Aplikasi') }}</x-responsive-nav-link>
+
+                {{-- TAMBAHAN: MENU REQUEST USER UNTUK KEPALA RUANG MOBILE --}}
+                <x-responsive-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="rounded-lg font-bold text-[13px] text-indigo-700">{{ __('Req. User') }}</x-responsive-nav-link>
+
                 <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Daftar Request') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
