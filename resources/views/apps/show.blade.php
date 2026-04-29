@@ -790,23 +790,23 @@
 
             @if(Auth::user()->role === 'bendahara' && $isSubmittedToBendahara)
                 <div class="mt-6 border-t pt-6">
-                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200 shadow-sm">
                         <h4 class="font-bold text-yellow-800 mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                             Validasi Pengadaan
                         </h4>
-                        <p class="text-xs text-yellow-700 mb-3 bg-yellow-100 p-2 rounded">
-                            📋 Silakan validasi detail pengadaan dan teruskan ke Direktur untuk persetujuan akhir.
+                        <p class="text-xs text-amber-700 mb-3 p-2 rounded">
+                            Silakan validasi detail pengadaan dan teruskan ke Direktur untuk persetujuan akhir.
                         </p>
                         
                         <form action="{{ route('bendahara.app.procurement.approve', $project->id) }}" method="POST" class="space-y-3">
                             @csrf @method('PATCH')
-                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition">
-                                ✓ Validasi & Teruskan ke Direktur
+                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg font-bold text transition">
+                                ✓ Validasi Pengadaan
                             </button>
                         </form>
 
-                        <button type="button" onclick="openRejectModal('{{ route('bendahara.app.procurement.reject', $project->id) }}', 'catatan', {}, 'Tolak Pengadaan')" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">Tolak Pengadaan</button>
+                        <button type="button" onclick="openRejectModal('{{ route('bendahara.app.procurement.reject', $project->id) }}', 'catatan', {}, 'Tolak Pengadaan')" class="mt-3 w-full bg-white border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg font-bold transition">✕ Tolak Pengadaan</button>
                     </div>
                 </div>
             @endif
