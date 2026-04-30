@@ -1,106 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
     <title>Laporan Mingguan Maintenance</title>
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
-        th { background: #f3f4f6; text-align: center; font-size: 10px; text-transform: uppercase; }
-        
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; font-size: 11px; }
+        th { background-color: #f2f2f2; text-align: center; }
+        h2 { text-align: center; margin-bottom: 5px; }
+        p.date { text-align: center; margin-top: 0; font-size: 14px; color: #555; }
         .bg-date { background-color: #f9fafb; font-weight: bold; }
-        .text-center { text-align: center; }
-        .font-bold { font-weight: bold; }
-        .italic { font-style: italic; }
-        
-        .item-table { width: 100%; border: none; }
-        .item-table td { border: none; padding: 1px 0; font-size: 9px; color: #555; }
-
-        .footer-signature {
-            float: right; 
-            width: 220px; 
-            text-align: center; 
-            margin-top: 30px;
-            page-break-inside: avoid;
-        }
     </style>
 </head>
 <body>
-    <div style="text-align:center; margin-bottom:8px;">
-        @php $hasImage = extension_loaded('gd') || extension_loaded('imagick'); @endphp
-        @if($hasImage)
-            @php
-                $kopFile = public_path('images/KOPSurat.jfif');
-                $hasKopImage = file_exists($kopFile);
-            @endphp
-            @if($hasKopImage)
-                <img src="{{ $kopFile }}" alt="Kop Surat" style="width:100%; max-height:120px; object-fit:contain;" />
-            @else
-                <div style="text-align:center; margin-bottom:6px;">
-                    <div style="font-weight:700; font-size:16px;">{{ config('app.name', 'KOP SURAT') }}</div>
-                    <div style="font-size:12px;">Laporan Maintenance & Perbaikan Fasilitas IT</div>
-                </div>
-                <hr />
-            @endif
+    <div style="text-align:center; margin-bottom:20px;">
+        @php
+            $kopPath = public_path('images/KOPSurat.jfif');
+        @endphp
+        
+        @if(file_exists($kopPath))
+            <img src="{{ $kopPath }}" alt="Kop Surat" style="width:100%; max-height:120px; object-fit:contain;" />
+        @else
+            <h1 style="margin:0;">{{ config('app.name') }}</h1>
+            <p style="margin:0;">Laporan Maintenance & Perbaikan Fasilitas</p>
+            <hr style="border: 1px solid black; margin-top: 10px;">
         @endif
     </div>
 
-    <h3 style="text-align: center; margin-bottom: 5px;">LAPORAN MINGGUAN MAINTENANCE</h3>
-    {{-- Menggunakan $dateLabel jika ada, fallback ke $weekLabel --}}
-    <div style="text-align: center;">Periode: {{ $dateLabel ?? ($weekLabel ?? '') }}</div>
-    <br>
+    <h2>Laporan Mingguan Pemeliharaan</h2>
+    <p class="date">Periode: {{ $dateLabel ?? ($weekLabel ?? '') }}</p>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 7%;">Waktu</th>
-                <th style="width: 15%;">Ruangan / Tiket</th>
-                <th style="width: 18%;">Masalah</th>
-                <th style="width: 18%;">Tindakan</th>
-                <th style="width: 19%;">Detail (Item)</th>
-                <th style="width: 10%;">Status</th>
+                <th style="width: 9%;">No Tiket</th>
+                <th style="width: 10%;">Tanggal</th>
+                <th style="width: 12%;">Pelapor</th>
+                <th style="width: 12%;">Ruangan</th>
+                <th style="width: 13%;">Keluhan</th>
+                <th style="width: 9%;">Status</th>
+                <th style="width: 12%;">Tindakan Teknisi</th>
                 <th style="width: 13%;">Ditangani Oleh</th>
             </tr>
         </thead>
         <tbody>
             @php
-                $groupedHistory = $reports->groupBy(function($item) {
-                    return $item->created_at->format('Y-m-d');
+                // Grouping berdasarkan tanggal tetap dipertahankan agar rapi untuk laporan mingguan
+                $groupedReports = $reports->groupBy(function($item) {
+                    return \Carbon\Carbon::parse($item->created_at)->format('Y-m-d');
                 });
             @endphp
 
-            @forelse($groupedHistory as $date => $items)
+            @forelse($groupedReports as $date => $items)
                 <tr class="bg-date">
-                    <td colspan="7">
-                        📅 {{ \Carbon\Carbon::parse($date)->locale('id')->isoFormat('dddd, D MMMM Y') }}
-                        <span style="font-weight: normal; font-size: 9px;">({{ $items->count() }} Laporan)</span>
+                    <td colspan="8" style="background-color: #f9fafb;">
+                         {{ \Carbon\Carbon::parse($date)->locale('id')->isoFormat('dddd, D MMMM Y') }}
                     </td>
                 </tr>
-
                 @foreach($items as $report)
                 <tr>
-                    <td class="text-center" style="font-size: 10px;">{{ $report->created_at->format('H:i') }}</td>
-                    <td style="font-size: 10px;">
-                        <div class="font-bold">{{ $report->ruangan }}</div>
-                        @if($report->ticket_number)
-                            <div style="font-family: monospace; font-size: 9px; color: #666;">{{ $report->ticket_number }}</div>
-                        @endif
-                    </td>
+                    <td>{{ $report->ticket_number }}</td>
+                    <td>{{ \Carbon\Carbon::parse($report->created_at)->format('d/m/Y') }}<br><small>{{ \Carbon\Carbon::parse($report->created_at)->format('H:i') }}</small></td>
+                    <td>{{ $report->pelapor_nama ?? 'Anonim' }}</td>
+                    <td>{{ $report->room ? $report->room->name : $report->ruangan }}</td>
                     <td style="font-size: 10px;">{{ $report->keluhan }}</td>
-                    <td class="italic" style="font-size: 9px;">{{ $report->tindakan_teknisi ?? '-' }}</td>
-                    <td style="font-size: 9px;">
-                        @if($report->procurement && !empty($report->procurement->items))
-                            <table class="item-table">
-                                @foreach($report->procurement->items as $it)
-                                    <tr><td>• {{ $it['nama'] ?? '-' }} ({{ $it['jumlah'] ?? 1 }}x)</td></tr>
-                                @endforeach
-                            </table>
-                        @else
-                            -
-                        @endif
+                    <td style="text-align: center;">
+                        <span style="padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; background-color: {{ $report->status == 'Selesai' ? '#d4edda' : ($report->status == 'Diproses' ? '#fff3cd' : '#f8d7da') }};">
+                            {{ $report->status }}
+                        </span>
                     </td>
-                    <td class="text-center font-bold" style="font-size: 9px;">{{ $report->status }}</td>
+                    <td style="font-size: 9px;">{{ $report->tindakan_teknisi ?? '-' }}</td>
                     <td style="font-size: 8px;">
                         @php
                             $handlers = [];
@@ -115,39 +84,32 @@
                 </tr>
                 @endforeach
             @empty
-                <tr><td colspan="7" class="text-center italic" style="color: #777; padding: 20px;">Data tidak ditemukan.</td></tr>
+                <tr>
+                    <td colspan="8" style="text-align: center; font-style: italic; color: #777;">
+                        Tidak ada laporan pada periode ini.
+                    </td>
+                </tr>
             @endforelse
         </tbody>
     </table>
 
-    <p style="margin-top: 15px; margin-bottom: 6px">
-        Demikian laporan ini disusun untuk memberikan gambaran mengenai pemeliharaan sistem IT periode ini.
-        Atas perhatian dan kerja samanya, kami ucapkan terima kasih.
-    </p>
+    <p style="margin-top: 20px; font-size: 12px;">Demikian laporan ini disusun untuk memberikan gambaran mengenai Pemeliharaan Sistem IT periode ini. Atas perhatiannya, kami ucapkan terima kasih.</p>
 
-    {{-- TANDA TANGAN DENGAN QR --}}
-    <div class="footer-signature">
-        <p style="margin-bottom: 5px;">Disahkan/Divalidasi Oleh,</p>
+    <div style="float: right; width: 200px; text-align: center; margin-top: 30px;">
+        <p style="margin-bottom: 5px; font-size: 12px;">Mengetahui/Validasi,</p>
         
-        {{-- Tampilkan QR Code --}}
         @if(isset($qrCode))
-            <img src="data:{{ $qrMime ?? 'image/png' }};base64, {!! $qrCode !!}" alt="QR Validasi" style="width: 90px; height: 90px; margin: 10px 0;">
+            <img src="data:image/png;base64, {!! $qrCode !!}" alt="QR Validasi" style="width: 80px; height: 80px; margin: 5px 0;">
         @else
-            <br><br><br><br>
+            <br><br><br>
         @endif
         
         <br>
-        
-        {{-- Nama Validator --}}
         <span style="font-size: 12px; font-weight: bold; text-decoration: underline;">
             {{ $validator ?? Auth::user()->name }}
         </span>
         <br>
-        <span style="font-size: 10px; color: #555;">
-            Digital Signature<br>
-            {{ $waktuValidasi ?? date('d-m-Y') }}
-        </span>
+        <span style="font-size: 10px; color: #555;">Digital Signature</span>
     </div>
-    
 </body>
 </html>
