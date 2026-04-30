@@ -200,7 +200,7 @@
                     <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
                         @php
                             // List status setelah Management menyetujui
-                            $afterManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved', 'completed'];
+                            $afterManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved', 'completed', 'finish'];
                         @endphp
                         {{-- QR muncul jika status sudah melewati management --}}
                         @if(in_array($project->procurement_approval_status, $afterManagement) && !empty($qrCodes['management']))
@@ -220,7 +220,7 @@
                     <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
                         @php
                             // List status setelah Bendahara menyetujui
-                            $afterBendahara = ['submitted_to_director', 'approved', 'completed'];
+                            $afterBendahara = ['submitted_to_director', 'approved', 'completed', 'finish'];
                         @endphp
                         {{-- QR muncul jika status sudah melewati bendahara --}}
                         @if(in_array($project->procurement_approval_status, $afterBendahara) && !empty($qrCodes['bendahara']))
@@ -238,8 +238,8 @@
                 <td class="text-center" style="border: none; vertical-align: top;">
                     <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Direktur</p>
                     <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
-                        {{-- QR muncul jika status final disetujui atau ditolak --}}
-                        @if(in_array($project->procurement_approval_status, ['approved', 'completed', 'rejected']) && !empty($qrCodes['direktur']))
+                        {{-- QR muncul jika status final disetujui, selesai, atau ditolak --}}
+                        @if(in_array($project->procurement_approval_status, ['approved', 'completed', 'finish', 'rejected']) && !empty($qrCodes['direktur']))
                             <img src="data:image/png;base64,{{ $qrCodes['direktur'] }}" style="width: 100%;">
                         @else
                             <div style="height: 65px; border: 1px dashed #ccc;"></div>

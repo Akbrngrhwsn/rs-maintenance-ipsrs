@@ -851,19 +851,19 @@ public function downloadProcurementReport($id)
     // 4. LOGIKA ESTAFET: QR tetap ada jika status sudah melewati atau berada di tahap tersebut
     
     // Management muncul jika status sudah masuk ke Bendahara, Direktur, atau Final
-    $afterManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved', 'completed'];
+    $afterManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved', 'completed', 'finish'];
     if (in_array($s, $afterManagement)) {
         $qrManagement = $generateQr("Divalidasi Management. Tanggal: " . now()->format('d/m/Y'));
     }
 
     // Bendahara muncul jika status sudah masuk ke Direktur atau Final
-    $afterBendahara = ['submitted_to_director', 'approved', 'completed'];
+    $afterBendahara = ['submitted_to_director', 'approved', 'completed', 'finish'];
     if (in_array($s, $afterBendahara)) {
         $qrBendahara = $generateQr("Diverifikasi Bendahara. Anggaran Tersedia.");
     }
 
-    // Direktur muncul jika status sudah Final (Approved/Completed)
-    $afterDirector = ['approved', 'completed'];
+    // Direktur muncul jika status sudah Final (Approved/Completed/Finish)
+    $afterDirector = ['approved', 'completed', 'finish'];
     if (in_array($s, $afterDirector)) {
         $qrDirektur = $generateQr("Disetujui Direktur Utama. " . now()->format('d/m/Y'));
     }
@@ -979,7 +979,7 @@ public function reprocessProcurement(Request $request, $id)
 {
     $project = AppRequest::findOrFail($id);
 
-    // Pastikan hanya pengadaan yang sudah disetujui Direktur yang bisa di-finish
+    // Pastikan hanya pengadaan yang sudah disetujui Direktur yang bisa 
     if ($project->procurement_approval_status !== 'approved') {
         return back()->with('error', 'Pengadaan harus disetujui direktur terlebih dahulu.');
     }
