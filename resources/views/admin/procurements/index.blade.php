@@ -171,26 +171,46 @@
                                             </td>
 
                                             <td class="px-6 py-4 align-top text-center">
-                                                <div class="flex flex-col items-center justify-center gap-1.5">
-                                                    @php
-                                                        // Status yang memungkinkan edit
-                                                        $editableStatuses = ['submitted_to_kepala_ruang', 'submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'rejected', 'approved_by_director', 'completed'];
-                                                    @endphp
-                                                    @if(in_array($proc->status, $editableStatuses))
-                                                        <a href="{{ route('procurement.edit', $proc->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-xs font-bold hover:bg-amber-600 transition shadow-sm">Edit</a>
-                                                    @elseif($proc->status === 'approved_by_director')
-                                                        <form action="{{ route('admin.procurement.finish', $proc->id) }}" method="POST" class="w-full" onsubmit="return confirm('Tandai pengadaan ini sebagai selesai?')">
-                                                            @csrf @method('PATCH')
-                                                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-1 px-2 rounded text-xs shadow-sm">Tandai Selesai</button>
-                                                        </form>
-                                                    @endif
-                                                    
-                                                    <form action="{{ route('admin.procurements.destroy', $proc->id) }}" method="POST" class="w-full" onsubmit="return confirm('Hapus permanen pengadaan maintenance ini?')">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="w-full px-3 py-1 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 rounded text-xs font-bold transition border border-transparent hover:border-red-300">Hapus</button>
+                                            <div class="flex flex-col items-center justify-center gap-1.5">
+                                                @php
+                                                    // HAPUS 'approved_by_director' dari sini agar tidak bentrok
+                                                    $editableStatuses = [
+                                                        'submitted_to_kepala_ruang', 
+                                                        'submitted_to_management', 
+                                                        'submitted_to_bendahara', 
+                                                        'submitted_to_director', 
+                                                        'rejected',
+                                                        'completed'
+                                                    ];
+                                                @endphp
+
+                                                {{-- 1. Cek apakah status sudah disetujui direktur (Prioritas Utama) --}}
+                                                @if($proc->status === 'approved_by_director')
+                                                    <form action="{{ route('admin.procurement.finish', $proc->id) }}" method="POST" class="w-full" onsubmit="return confirm('Tandai pengadaan ini sebagai sudah dibeli?')">
+                                                        @csrf @method('PATCH')
+                                                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase shadow-sm transition">
+                                                            Sudah Dibeli
+                                                        </button>
                                                     </form>
-                                                </div>
-                                            </td>
+                                                    {{-- Tetap tampilkan tombol edit jika admin masih ingin mengubah data meski sudah disetujui --}}
+                                                    <a href="{{ route('procurement.edit', $proc->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-[10px] font-bold hover:bg-amber-600 transition shadow-sm uppercase">Edit</a>
+                                                
+                                                {{-- 2. Cek status lainnya yang hanya boleh edit saja --}}
+                                                @elseif(in_array($proc->status, $editableStatuses))
+                                                    <a href="{{ route('procurement.edit', $proc->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-[10px] font-bold hover:bg-amber-600 transition shadow-sm uppercase">Edit</a>
+                                                
+                                                {{-- 3. Jika sudah selesai (completed) --}}
+                                                @elseif($proc->status === 'completed')
+                                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 uppercase w-full text-center">Selesai Dibeli</span>
+                                                @endif
+                                                
+                                                {{-- Tombol Hapus selalu muncul --}}
+                                                <form action="{{ route('admin.procurements.destroy', $proc->id) }}" method="POST" class="w-full" onsubmit="return confirm('Hapus permanen pengadaan maintenance ini?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="w-full px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-[10px] font-bold transition border border-red-100 uppercase">Hapus</button>
+                                                </form>
+                                            </div>
+                                        </td>
                                         </tr>
                                     @endforeach
                                 @endif
@@ -403,15 +423,40 @@
                                             </td>
 
                                             <td class="px-6 py-4 align-top text-center">
-                                                <div class="flex flex-col items-center justify-center gap-1.5">
-                                                    <a href="{{ route('admin.apps.edit-procurement', $app->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-xs font-bold hover:bg-amber-600 transition shadow-sm">Edit Pengadaan</a>
-                                                    
-                                                    <form action="{{ route('admin.apps.destroy', $app->id) }}" method="POST" class="w-full" onsubmit="return confirm('Hapus permanen request aplikasi ini?')">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="w-full px-3 py-1 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 rounded text-xs font-bold transition border border-transparent hover:border-red-300">Hapus</button>
-                                                    </form>
-                                                </div>
-                                            </td>
+    <div class="flex flex-col items-center justify-center gap-1.5">
+        
+        {{-- 1. TOMBOL PENYELESAIAN PENGADAAN (Jika sudah Approved) --}}
+        @if($app->procurement_approval_status === 'approved')
+            <form action="{{ route('admin.apps.finish_procurement', $app->id) }}" method="POST" class="w-full" onsubmit="return confirm('Tandai pengadaan aplikasi ini sebagai selesai?')">
+                @csrf @method('PATCH')
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-2 rounded text-[10px] uppercase shadow-sm transition">
+                    Sudah Dibeli
+                </button>
+            </form>
+        @endif
+
+        {{-- 2. TOMBOL EDIT PENGADAAN --}}
+        {{-- Tombol edit tetap ditampilkan kecuali jika status sudah 'completed' (jika ada status tersebut) --}}
+        @if($app->procurement_approval_status !== 'completed')
+            <a href="{{ route('admin.apps.edit-procurement', $app->id) }}" class="w-full text-center px-3 py-1 bg-amber-500 text-white rounded text-[10px] font-bold hover:bg-amber-600 transition shadow-sm uppercase">
+                Edit Pengadaan
+            </a>
+        @else
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 uppercase w-full text-center">
+                Selesai Dibeli
+            </span>
+        @endif
+        
+        {{-- 3. TOMBOL HAPUS --}}
+        <form action="{{ route('admin.apps.destroy', $app->id) }}" method="POST" class="w-full" onsubmit="return confirm('Hapus permanen request aplikasi ini?')">
+            @csrf @method('DELETE')
+            <button type="submit" class="w-full px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded text-[10px] font-bold transition border border-red-100 uppercase">
+                Hapus
+            </button>
+        </form>
+
+    </div>
+</td>
                                         </tr>
                                         @endif
                                     @endforeach
