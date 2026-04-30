@@ -142,71 +142,75 @@
         </div>
     @endif
 
-    {{-- AREA TANDA TANGAN (5 KOLOM) --}}
+    {{-- AREA TANDA TANGAN (5 KOLOM SIMETRIS) --}}
   
 <div style="margin-top: 30px;">
-    <table style="border: none;">
+    <table style="border: none; width: 100%;">
         <tr style="border: none;">
             
             {{-- ADMIN IT --}}
-            <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                <p class="text-bold" style="margin-bottom: 5px;">Diajukan Oleh</p>
-                @if(!empty($qrAdmin))
-                    <img src="data:image/png;base64,{{ trim($qrAdmin) }}" style="width: 65px; height: 65px;" />
-                @endif
-                <br><span style="font-size: 8pt;">Admin IT</span>
+            <td width="20%" class="text-center" style="border: none; vertical-align: top; padding: 5px;">
+                <p class="text-bold" style="margin-bottom: 8px; font-size: 9pt;">Diajukan Oleh</p>
+                <div style="width: 70px; height: 70px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border: 1px solid #ddd;">
+                    @if(!empty($qrAdmin))
+                        <img src="data:image/png;base64,{{ trim($qrAdmin) }}" style="width: 65px; height: 65px;" />
+                    @else
+                        <span style="color: #757575; font-size: 8pt;">-</span>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; display: block;">Admin IT</span>
             </td>
 
             {{-- KEPALA RUANG --}}
-            <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                <p class="text-bold" style="margin-bottom: 5px;">Mengetahui</p>
-                @if(!empty($qrkepala_ruang))
-                    <img src="data:image/png;base64,{{ trim($qrkepala_ruang) }}" style="width: 65px; height: 65px;" />
-                @else
-                    <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                        (Belum Validasi)
-                    </div>
-                @endif
-                <br><span style="font-size: 8pt;">Kepala Ruang</span>
+            <td width="20%" class="text-center" style="border: none; vertical-align: top; padding: 5px;">
+                <p class="text-bold" style="margin-bottom: 8px; font-size: 9pt;">Mengetahui</p>
+                <div style="width: 70px; height: 70px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border: 1px solid #ddd;">
+                    @if(!empty($qrkepala_ruang))
+                        <img src="data:image/png;base64,{{ trim($qrkepala_ruang) }}" style="width: 65px; height: 65px;" />
+                    @else
+                        <span style="color: #757575; font-size: 8pt;">-</span>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; display: block;">Kepala Ruang</span>
             </td>
 
             {{-- MANAGEMENT --}}
-            <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                <p class="text-bold" style="margin-bottom: 5px;">Validasi</p>
-                @if(!empty($qrManagement))
-                    <img src="data:image/png;base64,{{ trim($qrManagement) }}" style="width: 65px; height: 65px;" />
-                @else
-                    <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                        -
-                    </div>
-                @endif
-                <br><span style="font-size: 8pt;">Management</span>
+            <td width="20%" class="text-center" style="border: none; vertical-align: top; padding: 5px;">
+                <p class="text-bold" style="margin-bottom: 8px; font-size: 9pt;">Validasi</p>
+                <div style="width: 70px; height: 70px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border: 1px solid #ddd;">
+                    @if(!empty($qrManagement))
+                        <img src="data:image/png;base64,{{ trim($qrManagement) }}" style="width: 65px; height: 65px;" />
+                    @else
+                        <span style="color: #757575; font-size: 8pt;">-</span>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; display: block;">Management</span>
             </td>
 
             {{-- BENDAHARA --}}
-            <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                <p class="text-bold" style="margin-bottom: 5px;">Verifikasi</p>
-                @if(!empty($qrBendahara))
-                    <img src="data:image/png;base64,{{ trim($qrBendahara) }}" style="width: 65px; height: 65px;" />
-                @else
-                    <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                        -
-                    </div>
-                @endif
-                <br><span style="font-size: 8pt;">Bendahara</span>
+            <td width="20%" class="text-center" style="border: none; vertical-align: top; padding: 5px;">
+                <p class="text-bold" style="margin-bottom: 8px; font-size: 9pt;">Verifikasi</p>
+                <div style="width: 70px; height: 70px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border: 1px solid #ddd;">
+                    @if(!empty($qrBendahara))
+                        <img src="data:image/png;base64,{{ trim($qrBendahara) }}" style="width: 65px; height: 65px;" />
+                    @else
+                        <span style="color: #757575; font-size: 8pt;">-</span>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; display: block;">Bendahara</span>
             </td>
 
             {{-- DIREKTUR --}}
-            <td width="20%" class="text-center" style="border: none; vertical-align: top;">
-                <p class="text-bold" style="margin-bottom: 5px;">Menyetujui</p>
-                @if(!empty($qrDirektur))
-                    <img src="data:image/png;base64,{{ trim($qrDirektur) }}" style="width: 65px; height: 65px;" />
-                @else
-                    <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">
-                        -
-                    </div>
-                @endif
-                <br><span style="font-size: 8pt;">Direktur Utama</span>
+            <td width="20%" class="text-center" style="border: none; vertical-align: top; padding: 5px;">
+                <p class="text-bold" style="margin-bottom: 8px; font-size: 9pt;">Menyetujui</p>
+                <div style="width: 70px; height: 70px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border: 1px solid #ddd;">
+                    @if(!empty($qrDirektur))
+                        <img src="data:image/png;base64,{{ trim($qrDirektur) }}" style="width: 65px; height: 65px;" />
+                    @else
+                        <span style="color: #757575; font-size: 8pt;">-</span>
+                    @endif
+                </div>
+                <span style="font-size: 8pt; display: block;">Direktur Utama</span>
             </td>
 
         </tr>

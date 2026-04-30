@@ -221,7 +221,6 @@ class ProcurementController extends Controller
     }
 
     // === KEPALA RUANG: Approve Pengadaan (teruskan ke Management) ===
-    // === KEPALA RUANG: Approve Pengadaan (teruskan ke Management) ===
     public function kepalaRuangApprove($id)
     {
         if(Auth::user()->role !== 'kepala_ruang') abort(403);
@@ -279,7 +278,7 @@ class ProcurementController extends Controller
 
         if($tab === 'history') {
             // History: Sudah disetujui management (lanjut ke bendahara/direktur) atau ditolak
-            $query->whereIn('status', ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'completed', 'rejected']); // <-- TAMBAHKAN COMPLETED
+            $query->whereIn('status', ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'completed', 'finish', 'rejected']); // <-- TAMBAHKAN COMPLETED DAN FINISH
         }else {
             // Pending: Menunggu persetujuan Management
             $query->where('status', 'submitted_to_management');
@@ -557,13 +556,13 @@ class ProcurementController extends Controller
         $qrAdmin = $generateQr($infoAdmin);
 
         // B. QR Kepala Ruang
-        $statusSetelahKapro = ['submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'];
+        $statusSetelahKapro = ['submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'completed'];
         if (in_array($s, $statusSetelahKapro)) {
             $qrkepala_ruang = $generateQr("Divalidasi Kepala ruang Unit. ID: " . $procurement->id);
         }
 
         // C. QR Management
-        $statusSetelahManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director'];
+        $statusSetelahManagement = ['submitted_to_bendahara', 'submitted_to_director', 'approved_by_director', 'completed'];
         if (in_array($s, $statusSetelahManagement)) {
             $qrManagement = $generateQr("Divalidasi oleh Management. Tanggal: " . date('d/m/Y'));
         }
