@@ -66,7 +66,12 @@
             updateElement('badge-admin-reports', counts.reports);
             updateElement('badge-admin-apps', counts.apps);
             updateElement('badge-admin-request-apps', counts.request_apps);
-            updateElement('badge-admin-procurements', counts.procurements);
+            // Jika field all_visible_procurements ada, gunakan itu, jika tidak fallback ke counts.procurements
+            if (typeof counts.all_visible_procurements !== 'undefined') {
+                updateElement('badge-admin-procurements', counts.all_visible_procurements);
+            } else {
+                updateElement('badge-admin-procurements', counts.procurements);
+            }
         } 
         else if (role === 'direktur') {
             updateElement('badge-director-request-apps', counts.request_apps);

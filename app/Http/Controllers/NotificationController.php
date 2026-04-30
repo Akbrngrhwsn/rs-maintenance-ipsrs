@@ -15,149 +15,93 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
         $role = $user->role;
+        
+        // Standarisasi key JSON agar frontend (JavaScript) mudah membacanya 
+        // tanpa mempedulikan siapa role yang sedang login.
         $response = [
             'role' => $role,
             'has_notification' => false,
-            'counts' => [] 
+            'counts' => [
+                'reports'      => 0,
+                'request_apps' => 0,
+                'procurements' => 0,
+                'apps'         => 0, // Khusus badge anggaran aplikasi Bendahara
+            ]
         ];
 
-        // --- ADMIN (Tetap) ---
+        // --- ADMIN ---
         if ($role === 'admin') {
-            $reportCount = Report::where('status', 'Belum Diproses')->count();
-            // Hitung AppRequest yang baru masuk ke alur Admin IT
-            $appCount = AppRequest::where('status', 'submitted_to_admin')->count();
-            // Hitung semua request apps yang pending
-            $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_admin' ])->count();
+            $response['counts']['reports'] = Report::where('status', 'Belum Diproses')->count();
+            $response['counts']['request_apps'] = AppRequest::where('status', 'submitted_to_admin')->count();
 
-            // Hitung pengadaan yang menunggu diselesaikan admin (sudah di-ACC direktur)
-            $approvedProcurements = Procurement::whereIn('status', ['approved_by_director', 'approved'])->count();
-
-            // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest)
-            $newItemsCount = NewItemRequest::where('status', 'pending_admin')->count();
-
-            // 2. TAMBAHAN: Hitung Aplikasi yang sudah disetujui Direktur (status 'in_progress' atau 'approved')
-            // Sesuaikan status 'in_progress' jika itu menandakan aplikasi baru saja disetujui direktur
-            $approvedApps = AppRequest::where('status', 'in_progress')->count();
-
-            // 3. TAMBAHAN: Hitung Pengadaan Khusus Aplikasi yang sudah disetujui Direktur
-            $approvedAppProcurements = AppRequest::where('needs_procurement', true)
-                ->where('procurement_approval_status', 'approved')
-                ->count();
-
-            $response['counts'] = [
-                'reports' => $reportCount,
-                'apps' => $appCount,
-                'request_apps' => $requestAppsCount,
-                'procurements' => $approvedProcurements + $newItemsCount, // Gabungkan dengan new items
-                'approved_apps' => $approvedApps, // Data baru
-                'approved_app_procurements' => $approvedAppProcurements // Data baru
-            ];
-
-            // PERBAIKAN: Tambahkan $approvedProcurements ke dalam kondisi if
-            if($reportCount > 0 || $appCount > 0 || $requestAppsCount > 0 || $approvedProcurements > 0 || $newItemsCount > 0) {
-                $response['has_notification'] = true;
-            }
+            // PENGADAAN (Gabungan 3 Sumber: Laporan IT, Barang Baru, dan Kebutuhan Aplikasi)
+            $procGeneral = Procurement::whereIn('status', ['approved_by_director', 'approved'])->count();
+            $procNewItem = NewItemRequest::whereIn('status', ['pending_admin', 'approved'])->count();
+            $procApp     = AppRequest::where('needs_procurement', true)
+                            ->whereIn('procurement_approval_status', ['approved_by_director', 'approved'])
+                            ->count();
+                            
+            $response['counts']['procurements'] = $procGeneral + $procNewItem + $procApp;
         } 
-        // --- DIREKTUR (TAMBAHAN: tangani submitted_to_director dan pending_director) ---
+        
+        // --- DIREKTUR ---
         elseif ($role === 'direktur') {
-        // 1. Notifikasi Persetujuan Aplikasi (Alur Utama)
-        $pendingApps = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
-        
-        // 2. Notifikasi Pengadaan Barang Umum (Model Procurement)
-        $pendingProcurements = Procurement::where('status', 'submitted_to_director')->count();
-        
-        // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest) untuk Direktur
-        $newItemsCount = NewItemRequest::where('status', 'pending_director')->count();
-        
-        // 3. Notifikasi Pengadaan Khusus Aplikasi (Model AppRequest - BARU)
-        // Menghitung aplikasi yang butuh pengadaan dan statusnya sudah sampai di Direktur
-        $appProcurementForDirector = AppRequest::where('needs_procurement', true)
-            ->where('procurement_approval_status', 'submitted_to_director')
-            ->count();
-
-        $requestAppsCount = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
-
-        $response['counts'] = [
-            'pending_apps' => $pendingApps,
-            'pending_procurements' => $pendingProcurements + $newItemsCount, // Gabungkan dengan new items
-            'request_apps' => $requestAppsCount,
-            'app_procurements' => $appProcurementForDirector // Data baru untuk indikator
-        ];
-
-        // Notifikasi aktif jika ada aplikasi, pengadaan umum, ATAU pengadaan aplikasi yang pending
-        if($pendingApps > 0 || $pendingProcurements > 0 || $requestAppsCount > 0 || $appProcurementForDirector > 0 || $newItemsCount > 0) {
-            $response['has_notification'] = true;
-        }
-    }
-
-        // --- MANAGEMENT (BARU) ---
-        elseif ($role === 'management') {
-            // Management harus melihat AppRequest yang diteruskan dari Admin
-            $appsForManagement = AppRequest::where('status', 'submitted_to_management')->count();
-            // dan juga pengadaan yang dialihkan ke management (jika ada)
-            $procurementsForManagement = Procurement::where('status', 'submitted_to_management')->count();
+            $response['counts']['request_apps'] = AppRequest::whereIn('status', ['submitted_to_director', 'pending_director'])->count();
             
-            // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest) untuk Management
-            $newItemsCount = NewItemRequest::where('status', 'pending_management')->count();
+            // PENGADAAN (Gabungan 3 Sumber)
+            $procGeneral = Procurement::where('status', 'submitted_to_director')->count();
+            $procNewItem = NewItemRequest::where('status', 'pending_director')->count();
+            $procApp     = AppRequest::where('needs_procurement', true)
+                            ->where('procurement_approval_status', 'submitted_to_director')
+                            ->count();
 
-            $response['counts'] = [
-                'submitted_apps' => $appsForManagement,
-                'submitted_procurements' => $procurementsForManagement + $newItemsCount, // Gabungkan dengan new items
-                'request_apps' => $appsForManagement
-            ];
-
-            if($appsForManagement > 0 || $procurementsForManagement > 0 || $newItemsCount > 0) {
-                $response['has_notification'] = true;
-            }
+            $response['counts']['procurements'] = $procGeneral + $procNewItem + $procApp;
         }
+
+        // --- MANAGEMENT ---
+        elseif ($role === 'management') {
+            $response['counts']['request_apps'] = AppRequest::where('status', 'submitted_to_management')->count();
+            
+            // PENGADAAN (Gabungan 3 Sumber)
+            $procGeneral = Procurement::where('status', 'submitted_to_management')->count();
+            $procNewItem = NewItemRequest::where('status', 'pending_management')->count();
+            $procApp     = AppRequest::where('needs_procurement', true)
+                            ->where('procurement_approval_status', 'submitted_to_management')
+                            ->count();
+
+            $response['counts']['procurements'] = $procGeneral + $procNewItem + $procApp;
+        }
+        
+        // --- BENDAHARA ---
+        elseif ($role === 'bendahara') {
+            // Badge Anggaran Aplikasi
+            $response['counts']['apps'] = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
+            
+            // Badge Validasi Keuangan (Pengadaan Umum + Barang Baru)
+            $procGeneral = Procurement::where('status', 'submitted_to_bendahara')->count();
+            $procNewItem = NewItemRequest::where('status', 'pending_bendahara')->count();
+            
+            $response['counts']['procurements'] = $procGeneral + $procNewItem;
+        }
+
         // --- KEPALA RUANG ---
         elseif ($role === 'kepala_ruang') {
-            // Memantau pengadaan dari Admin IT, tapi hanya untuk ruangan yang dikelolanya
             $roomIds = $user->rooms()->pluck('id')->toArray();
 
             if (!empty($roomIds)) {
-                $pendingProcurements = Procurement::where('status', 'submitted_to_kepala_ruang')
+                $response['counts']['procurements'] = Procurement::where('status', 'submitted_to_kepala_ruang')
                     ->whereHas('report', function ($q) use ($roomIds) {
                         $q->whereIn('room_id', $roomIds);
                     })->count();
-            } else {
-                $pendingProcurements = 0;
-            }
-
-            $response['counts'] = [
-                'pending_procurements' => $pendingProcurements,
-            ];
-
-            if ($pendingProcurements > 0) {
-                $response['has_notification'] = true;
             }
         }
-        // --- BENDAHARA (SESUAI REVISI) ---
-        elseif ($role === 'bendahara') {
-            // 1. Hitung pengadaan barang umum (dari model Procurement)
-            $pendingProcurements = Procurement::where('status', 'submitted_to_bendahara')->count();
-            
-            // TAMBAHAN: Hitung pengadaan barang baru (NewItemRequest) untuk Bendahara
-            $newItemsCount = NewItemRequest::where('status', 'pending_bendahara')->count();
-            
-            // 2. Hitung validasi anggaran untuk pengadaan aplikasi (dari model AppRequest)
-            $appsProcurementCount = AppRequest::where('procurement_approval_status', 'submitted_to_bendahara')->count();
-            
-            $response['counts'] = [
-                'apps' => $appsProcurementCount, // Label untuk pengadaan aplikasi
-                'pending_procurements' => $pendingProcurements + $newItemsCount, // Gabungkan dengan new items
-            ];
 
-            // Notifikasi aktif jika salah satu ada yang pending
-            if($pendingProcurements > 0 || $appsProcurementCount > 0 || $newItemsCount > 0) {
-                $response['has_notification'] = true;
-            }
-        }
+        // Cek secara otomatis apakah ada notifikasi secara keseluruhan (Jika total count > 0)
+        $response['has_notification'] = array_sum($response['counts']) > 0;
 
         return response()->json($response);
     }
 
-    // Method untuk mendapatkan detail laporan terbaru (untuk TTS)
     public function getLatestReport()
     {
         $user = Auth::user();
