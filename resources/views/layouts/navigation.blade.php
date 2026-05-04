@@ -154,7 +154,7 @@
                         </x-nav-link>
                         
                         {{-- TOMBOL BARU: FORM PENGADAAN BARANG BARU --}}
-                        <x-nav-link :href="route('kepala-ruang.new_items.create')" :active="request()->routeIs('kepala-ruang.new_items.*')" class="text-[13px] font-bold tracking-tight text-emerald-700">
+                        <x-nav-link :href="route('kepala-ruang.new_items.create')" :active="request()->routeIs('kepala-ruang.new_items.*')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Pengadaan Baru') }}
                         </x-nav-link>
 
@@ -167,7 +167,7 @@
                             {{ __('Req. User') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight text-gray-500">
+                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Daftar Request') }}
                         </x-nav-link>
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
@@ -375,18 +375,18 @@
                 </div>
                 
                 {{-- TOMBOL BARU MOBILE: FORM PENGADAAN BARANG BARU --}}
-                <x-responsive-nav-link :href="route('kepala-ruang.new_items.create')" :active="request()->routeIs('kepala-ruang.new_items.*')" class="rounded-lg font-bold text-[13px] text-emerald-700">
+                <x-responsive-nav-link :href="route('kepala-ruang.new_items.create')" :active="request()->routeIs('kepala-ruang.new_items.*')" class="rounded-lg font-bold text-[13px]">
                     {{ __('Pengadaan Baru') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold text-[13px]">{{ __('Form Req. Aplikasi') }}</x-responsive-nav-link>
 
                 {{-- TAMBAHAN: MENU REQUEST USER UNTUK KEPALA RUANG MOBILE --}}
-                <x-responsive-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Req. User') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="rounded-lg font-bold text-[13px]">{{ __('Req. User') }}</x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Daftar Request') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] ">{{ __('Daftar Request') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px]">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- RESPONSIVE SETTINGS OPTIONS (LOGOUT & PROFILE) --}}
