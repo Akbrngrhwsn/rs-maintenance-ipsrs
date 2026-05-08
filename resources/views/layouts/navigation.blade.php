@@ -25,23 +25,9 @@
                             {{ __('Pemeliharaan') }}
                             <span id="badge-admin-reports" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
                         </x-nav-link>
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Req. Aplikasi') }}
-                            <span id="badge-admin-request-apps" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                        </x-nav-link>
-                        <x-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Projek') }}
-                            @if($ongoingAppsCount > 0)
-                                <span class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white">{{ $ongoingAppsCount }}</span>
-                            @endif
-                        </x-nav-link>
+                                                
                         <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="text-[13px] font-bold tracking-tight text-gray-500">
                             {{ __('User') }}
-                        </x-nav-link>
-
-                        {{-- TAMBAHAN: MENU REQUEST USER UNTUK ADMIN --}}
-                        <x-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Req. User') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="text-[13px] font-bold tracking-tight text-gray-500">
@@ -53,13 +39,6 @@
                         </x-nav-link>
                         <x-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Catatan IT') }}
-                        </x-nav-link>
-                    @endif
-
-                    {{-- === RAPAT === --}}
-                    @if(Auth::check())
-                        <x-nav-link :href="route('meetings.index')" :active="request()->routeIs('meetings.*')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Rapat') }}
                         </x-nav-link>
                     @endif
 
@@ -75,16 +54,7 @@
                             {{-- Badge untuk Pengadaan Aplikasi (Status: submitted_to_director) --}}
                             
                         </x-nav-link>
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Req. Aplikasi') }}
-                            <span id="badge-director-request-apps" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                        </x-nav-link>
-                        <x-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Projek') }}
-                            @if($ongoingAppsCount > 0)
-                                <span class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white">{{ $ongoingAppsCount }}</span>
-                            @endif
-                        </x-nav-link>
+                      
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
@@ -98,16 +68,7 @@
                         <x-nav-link :href="route('management.reports')" :active="request()->routeIs('management.reports')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Monitoring') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Req. Aplikasi') }}
-                            <span id="badge-management-request-apps" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                        </x-nav-link>
-                        <x-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Projek') }}
-                            @if($ongoingAppsCount > 0)
-                                <span class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white">{{ $ongoingAppsCount }}</span>
-                            @endif
-                        </x-nav-link>
+                        
                         <x-nav-link :href="route('management.procurements')" :active="request()->routeIs('management.procurements')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Persetujuan') }}
                             <span id="badge-management-procurements" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-600 text-white hidden">0</span>
@@ -124,12 +85,6 @@
                     @if(Auth::check() && Auth::user()->role === 'bendahara')
                         <x-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Monitoring') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Anggaran Aplikasi') }}
-                            {{-- ID diubah agar sesuai dengan logic JS (counts.apps) --}}
-                            <span id="badge-bendahara-apps" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
                         </x-nav-link>
 
                         <x-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="text-[13px] font-bold tracking-tight">
@@ -158,18 +113,6 @@
                             {{ __('Pengadaan Baru') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Form Req. Aplikasi') }}
-                        </x-nav-link>
-
-                        {{-- TAMBAHAN: MENU REQUEST USER UNTUK KEPALA RUANG --}}
-                        <x-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Req. User') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Daftar Request') }}
-                        </x-nav-link>
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
@@ -267,21 +210,9 @@
                     <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Pemeliharaan') }}</x-responsive-nav-link>
                     <span id="badge-admin-reports-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
                 </div>
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                    <span id="badge-admin-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                </div>
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
-                    @if($ongoingAppsCount > 0)
-                        <span class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white">{{ $ongoingAppsCount }}</span>
-                    @endif
-                </div>
+                
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('User') }}</x-responsive-nav-link>
                 
-                {{-- TAMBAHAN: MENU REQUEST USER UNTUK ADMIN MOBILE --}}
-                <x-responsive-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Req. User') }}</x-responsive-nav-link>
-
                 <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Ruangan') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.procurements.index')" :active="request()->routeIs('admin.procurements.*')" class="rounded-lg font-bold text-[13px]">{{ __('Pengadaan') }}</x-responsive-nav-link>
                 <span id="badge-admin-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-green-600 text-white hidden">0</span>
@@ -300,18 +231,6 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                    <span id="badge-director-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                </div>
-
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
-                    @if($ongoingAppsCount > 0)
-                        <span class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white">{{ $ongoingAppsCount }}</span>
-                    @endif
-                </div>
-
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
@@ -319,16 +238,7 @@
             {{-- MANAGEMENT MOBILE --}}
             @if(Auth::user()->role === 'management')
                 <x-responsive-nav-link :href="route('management.reports')" :active="request()->routeIs('management.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Req. Aplikasi') }}</x-responsive-nav-link>
-                    <span id="badge-management-request-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-orange-600 text-white hidden">0</span>
-                </div>
-                <div class="flex items-center justify-between px-3 py-2">
-                    <x-responsive-nav-link :href="route('apps.ongoing')" :active="request()->routeIs('apps.ongoing', 'apps.show')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Projek') }}</x-responsive-nav-link>
-                    @if($ongoingAppsCount > 0)
-                        <span class="px-1.5 py-0.5 text-[10px] rounded-full bg-blue-600 text-white">{{ $ongoingAppsCount }}</span>
-                    @endif
-                </div>
+                            
                 <div class="flex items-center justify-between px-3 py-2">
                     <x-responsive-nav-link :href="route('management.procurements')" :active="request()->routeIs('management.procurements')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Persetujuan') }}</x-responsive-nav-link>
                     <span id="badge-management-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-600 text-white hidden">0</span>
@@ -342,14 +252,6 @@
     <x-responsive-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="rounded-lg font-bold text-[13px]">
         {{ __('Monitoring') }}
     </x-responsive-nav-link>
-
-    <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100">
-        <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">
-            {{ __('Anggaran Aplikasi') }}
-        </x-responsive-nav-link>
-        {{-- ID diubah agar sesuai dengan logic JS (updateElement) --}}
-        <span id="badge-bendahara-apps-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
-    </div>
 
     <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <x-responsive-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">
@@ -379,12 +281,6 @@
                     {{ __('Pengadaan Baru') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('kepala-ruang.apps.index')" :active="request()->routeIs('kepala-ruang.apps.index')" class="rounded-lg font-bold text-[13px]">{{ __('Form Req. Aplikasi') }}</x-responsive-nav-link>
-
-                {{-- TAMBAHAN: MENU REQUEST USER UNTUK KEPALA RUANG MOBILE --}}
-                <x-responsive-nav-link :href="route('user-requests.index')" :active="request()->routeIs('user-requests.*')" class="rounded-lg font-bold text-[13px]">{{ __('Req. User') }}</x-responsive-nav-link>
-
-                <x-responsive-nav-link :href="route('apps.pending')" :active="request()->routeIs('apps.pending')" class="rounded-lg font-bold text-[13px] ">{{ __('Daftar Request') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px]">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif

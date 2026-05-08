@@ -37,7 +37,7 @@
                     {{-- Input Keluhan --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Deskripsi Kerusakan</label>
-                        <textarea name="keluhan" rows="4" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" placeholder="Contoh: Wifi mati, Printer macet..."></textarea>
+                        <textarea name="keluhan" rows="4" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" placeholder="Contoh: Lampu tidak menyala, AC tidak dingin..."></textarea>
                         <x-input-error :messages="$errors->get('keluhan')" class="mt-2" />
                     </div>
 
