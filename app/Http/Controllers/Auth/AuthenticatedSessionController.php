@@ -45,17 +45,18 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        if ($user->role === 'manager') {
-            if ($shouldIgnoreIntended) {
-                return redirect()->route('public.home');
-            }
-            return redirect()->intended(route('public.home', absolute: false));
-        } else {
-            // Admin IT dan Direktur ke dashboard
+        // Admin IT ke dashboard, semua role lain ke form laporan kerusakan
+        if ($user->role === 'admin') {
             if ($shouldIgnoreIntended) {
                 return redirect()->route('dashboard');
             }
             return redirect()->intended(route('dashboard', absolute: false));
+        } else {
+            // Semua role kecuali admin (manager, direktur, bendahara, kepala-ruang) ke public.home
+            if ($shouldIgnoreIntended) {
+                return redirect()->route('public.home');
+            }
+            return redirect()->intended(route('public.home', absolute: false));
         }
     }
 
