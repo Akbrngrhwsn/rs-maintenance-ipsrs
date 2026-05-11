@@ -128,7 +128,7 @@
                 <br><span style="font-size: 8pt;">Kepala Ruang</span>
             </td>
 
-                {{-- ADMIN IT --}}
+                {{-- ADMIN --}}
                 <td width="20%" class="text-center" style="border: none; vertical-align: top;">
                     <p class="text-bold" style="margin-bottom: 5px;">Mengetahui</p>
                     @php
@@ -144,7 +144,7 @@
                     @else
                         <div style="height: 65px; line-height: 65px; color: #757575; font-style: italic; font-size: 8pt;">(Belum Validasi)</div>
                     @endif
-                    <br><span style="font-size: 8pt;">Admin IT</span>
+                    <br><span style="font-size: 8pt;">Admin ipsrs</span>
                 </td>
 
                 {{-- MANAGEMENT --}}

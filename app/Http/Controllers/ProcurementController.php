@@ -552,7 +552,7 @@ class ProcurementController extends Controller
         $s = $procurement->status; 
 
         // A. QR Admin (Selalu Ada)
-        $infoAdmin = "Diajukan oleh Admin IT. Tiket: " . ($procurement->report->ticket_number ?? '-') . ". Tgl: " . $procurement->created_at->format('d/m/Y');
+        $infoAdmin = "Diajukan oleh Admin ipsrs. Tiket: " . ($procurement->report->ticket_number ?? '-') . ". Tgl: " . $procurement->created_at->format('d/m/Y');
         $qrAdmin = $generateQr($infoAdmin);
 
         // B. QR Kepala Ruang

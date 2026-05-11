@@ -180,7 +180,7 @@
 
                 {{-- 2. ADMIN IT --}}
                 <td class="text-center" style="border: none; vertical-align: top;">
-                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">Admin IT</p>
+                    <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">admin ipsrs</p>
                     <div style="height: 70px; margin: 0 auto 5px; width: 70px;">
                         {{-- QR Admin IT muncul jika estimasi biaya sudah diisi --}}
                         @if(!empty($project->procurement_estimate) && !empty($qrCodes['admin_it']))
@@ -190,7 +190,7 @@
                         @endif
                     </div>
                     <span style="font-size: 8pt; border-top: 1px solid #000; display: block; padding-top: 2px; margin: 0 10px;">
-                        Admin IT
+                        Admin ipsrs
                     </span>
                 </td>
 

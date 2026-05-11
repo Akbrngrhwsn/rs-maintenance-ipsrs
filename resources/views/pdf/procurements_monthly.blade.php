@@ -95,7 +95,7 @@
     </table>
 
     {{-- BAGIAN 2: PENGADAAN APLIKASI --}}
-    <div class="section-title">B. Pengadaan Pengembangan Aplikasi</div>
+    <!-- <div class="section-title">B. Pengadaan Pengembangan Aplikasi</div>
     <table>
         <thead>
             <tr>
@@ -165,7 +165,7 @@
                 </tr>
             @endforelse
         </tbody>
-    </table>
+    </table> -->
 
     <p style="margin-top: 20px;">Demikian laporan pengadaan ini disusun sebagai dokumentasi aset dan pengeluaran sistem IT. 
     Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>

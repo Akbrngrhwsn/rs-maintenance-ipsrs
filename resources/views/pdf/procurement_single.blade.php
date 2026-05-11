@@ -158,7 +158,7 @@
                         <span style="color: #757575; font-size: 8pt;">-</span>
                     @endif
                 </div>
-                <span style="font-size: 8pt; display: block;">Admin IT</span>
+                <span style="font-size: 8pt; display: block;">Admin ipsrs</span>
             </td>
 
             {{-- KEPALA RUANG --}}
