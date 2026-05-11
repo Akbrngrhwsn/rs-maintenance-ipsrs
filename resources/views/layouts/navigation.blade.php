@@ -4,7 +4,7 @@
             <div class="flex">
                 <div class="shrink-0 flex items-center">
                     <a href="{{ url('/') }}" class="transition-transform hover:scale-105 duration-200">
-                        <x-application-logo class="block h-9 w-auto fill-current text-blue-900" />
+                        <x-application-logo class="block h-9 w-auto fill-current text-green-900" />
                     </a>
                 </div>
 
@@ -58,7 +58,7 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -76,7 +76,7 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -96,7 +96,7 @@
                             {{ __('Tracking') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -116,7 +116,7 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -126,7 +126,7 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking Laporan') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-blue-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-grey-700">
                             {{ __('Buat Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -137,9 +137,9 @@
                 @if(Auth::check())
                     <x-dropdown align="right" width="56">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-bold rounded-xl text-blue-900 bg-blue-50 hover:bg-blue-100 transition ease-in-out duration-200">
+                            <button class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm leading-4 font-bold rounded-xl text-green-900 bg-green-50 hover:bg-green-100 transition ease-in-out duration-200">
                                 <div class="flex items-center gap-2">
-                                    <div class="h-7 w-7 rounded-full bg-blue-900 flex items-center justify-center text-[11px] text-white shadow-sm font-bold">
+                                    <div class="h-7 w-7 rounded-full bg-green-900 flex items-center justify-center text-[11px] text-white shadow-sm font-bold">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                     </div>
                                     <span class="max-w-[100px] truncate">{{ Auth::user()->name }}</span>
@@ -150,11 +150,11 @@
                         <x-slot name="content">
                             <div class="px-4 py-3 border-b border-gray-100 bg-white rounded-t-xl">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Signed in as</p>
-                                <p class="text-sm font-bold text-blue-900 truncate">{{ Auth::user()->email }}</p>
+                                <p class="text-sm font-bold text-green-900 truncate">{{ Auth::user()->email }}</p>
                                 @php
                                     $roleColors = [
                                         'admin' => 'bg-purple-100 text-purple-800',
-                                        'direktur' => 'bg-blue-100 text-blue-800',
+                                        'direktur' => 'bg-green-100 text-green-800',
                                         'kepala_ruang' => 'bg-yellow-100 text-yellow-800',
                                         'staff' => 'bg-gray-100 text-gray-800',
                                         'bendahara' => 'bg-green-100 text-green-800',
@@ -181,14 +181,14 @@
                         </x-slot>
                     </x-dropdown>
                 @else
-                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-blue-900 rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-blue-800 transition">
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 bg-green-900 rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-green-800 transition">
                         {{ __('Login') }}
                     </a>
                 @endif
             </div>
 
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="p-2.5 rounded-xl text-gray-400 hover:text-blue-900 hover:bg-blue-50 transition">
+                <button @click="open = ! open" class="p-2.5 rounded-xl text-gray-400 hover:text-green-900 hover:bg-green-50 transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -232,7 +232,7 @@
                 </div>
 
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- MANAGEMENT MOBILE --}}
@@ -244,7 +244,7 @@
                     <span id="badge-management-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-600 text-white hidden">0</span>
                 </div>
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- BENDAHARA MOBILE --}}
@@ -264,7 +264,7 @@
         {{ __('Tracking') }}
     </x-responsive-nav-link>
 
-    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">
+    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">
         {{ __('Laporan Baru') }}
     </x-responsive-nav-link>
 @endif
@@ -282,17 +282,17 @@
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px]">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- RESPONSIVE SETTINGS OPTIONS (LOGOUT & PROFILE) --}}
             <div class="pt-4 pb-1 border-t border-gray-200 mt-4">
                 <div class="px-4 flex items-center">
-                    <div class="h-10 w-10 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold shadow-sm">
+                    <div class="h-10 w-10 rounded-full bg-green-900 flex items-center justify-center text-white font-bold shadow-sm">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                     <div class="ms-3">
-                        <div class="font-bold text-sm text-blue-900">{{ Auth::user()->name }}</div>
+                        <div class="font-bold text-sm text-green-900">{{ Auth::user()->name }}</div>
                         <div class="font-medium text-xs text-gray-500">{{ Auth::user()->email }}</div>
                     </div>
                 </div>
@@ -314,11 +314,11 @@
         @else
             {{-- MENU UNTUK GUEST --}}
             <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking Laporan') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-blue-700">{{ __('Buat Laporan Baru') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Buat Laporan Baru') }}</x-responsive-nav-link>
             
             {{-- TOMBOL LOGIN MOBILE --}}
             <div class="pt-4 pb-2 border-t border-gray-100 mt-2 px-4">
-                <a href="{{ route('login') }}" class="flex justify-center items-center w-full px-4 py-3 bg-blue-900 rounded-xl font-bold text-sm text-white uppercase tracking-widest hover:bg-blue-800 transition shadow-sm">
+                <a href="{{ route('login') }}" class="flex justify-center items-center w-full px-4 py-3 bg-green-900 rounded-xl font-bold text-sm text-white uppercase tracking-widest hover:bg-green-800 transition shadow-sm">
                     {{ __('Login') }}
                 </a>
             </div>

@@ -5,7 +5,7 @@
         <div class="max-w-xl w-full">
             
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-extrabold text-blue-900">Lapor Kerusakan</h2>
+                <h2 class="text-3xl font-extrabold text-green-700">Lapor Kerusakan</h2>
                 <p class="mt-2 text-gray-500">Silakan isi detail kerusakan perangkat atau fasilitas di bawah ini.</p>
             </div>
 
@@ -18,14 +18,14 @@
                 </div>
             @endif
 
-            <div class="bg-white rounded-2xl shadow-xl border-t-4 border-blue-900 p-8">
+            <div class="bg-white rounded-2xl shadow-xl border-t-4 border-green-700 p-8">
                 <form method="POST" action="{{ route('public.store') }}" class="space-y-6">
                     @csrf
 
                     {{-- Input Ruangan (Searchable Select) --}}
                     <div class="relative">
                         <label class="block text-sm font-bold text-gray-700 mb-2">Lokasi Ruangan</label>
-                        <select name="room_id" id="room_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" placeholder="Cari atau pilih ruangan...">
+                        <select name="room_id" id="room_id" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500 py-3" placeholder="Cari atau pilih ruangan...">
                             <option value="">Pilih ruangan...</option>
                             @foreach($rooms as $r)
                                 <option value="{{ $r->id }}">{{ $r->name }}</option>
@@ -37,14 +37,14 @@
                     {{-- Input Keluhan --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Deskripsi Kerusakan</label>
-                        <textarea name="keluhan" rows="4" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-3" placeholder="Contoh: Lampu tidak menyala, AC tidak dingin..."></textarea>
+                        <textarea name="keluhan" rows="4" class="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500 py-3" placeholder="Contoh: Lampu tidak menyala, AC tidak dingin..."></textarea>
                         <x-input-error :messages="$errors->get('keluhan')" class="mt-2" />
                     </div>
 
                     {{-- Input Urgensi --}}
                     <div class="mb-4">
                         <x-input-label for="urgency" :value="__('Tingkat Urgensi')" />
-                        <select name="urgency" id="urgency" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                        <select name="urgency" id="urgency" class="block mt-1 w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm">
                             <option value="rendah">Rendah</option>
                             <option value="sedang">Sedang</option>
                             <option value="tinggi">Tinggi</option>
@@ -55,19 +55,19 @@
                     {{-- Alasan Urgensi --}}
                     <div class="mb-4 hidden" id="urgency_reason_wrapper">
                         <x-input-label for="urgency_reason" :value="__('Alasan (wajib untuk Sedang/Tinggi)')" />
-                        <textarea name="urgency_reason" id="urgency_reason" rows="3" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" placeholder="Jelaskan mengapa tingkat ini diperlukan..."></textarea>
+                        <textarea name="urgency_reason" id="urgency_reason" rows="3" class="block mt-1 w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm" placeholder="Jelaskan mengapa tingkat ini diperlukan..."></textarea>
                         <x-input-error :messages="$errors->get('urgency_reason')" class="mt-2" />
                     </div>
 
-                    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                         <label class="inline-flex items-center">
                             <input type="checkbox" id="checkProcurement" name="needs_procurement" value="1" 
-                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-semibold text-blue-800">Ajukan Pengadaan Barang Langsung</span>
+                                class="rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500">
+                            <span class="ml-2 text-sm font-semibold text-green-800">Ajukan Pengadaan Barang Langsung</span>
                         </label>
                     </div>
 
-                    <div id="procurementForm" class="hidden mt-2 p-4 bg-white border border-blue-200 rounded-lg shadow-inner">
+                    <div id="procurementForm" class="hidden mt-2 p-4 bg-white border border-green-200 rounded-lg shadow-inner">
                         <h4 class="text-sm font-bold text-gray-700 mb-2">Daftar Barang yang Dibutuhkan:</h4>
                         <div id="itemsContainer">
                             <div class="flex gap-2 mb-2 item-row">
@@ -75,7 +75,7 @@
                                 <input type="number" name="item_qtys[]" placeholder="Jml" class="w-20 rounded-md border-gray-300 text-sm">
                             </div>
                         </div>
-                        <button type="button" onclick="addItemRow()" class="text-xs text-blue-600 font-medium">+ Tambah Barang Lain</button>
+                        <button type="button" onclick="addItemRow()" class="text-xs text-green-600 font-medium">+ Tambah Barang Lain</button>
                     </div>
 
                     <script>
@@ -93,7 +93,7 @@
                         }
                     </script>
 
-                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-green-900 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
                         Kirim Laporan
                     </button>
                 </form>

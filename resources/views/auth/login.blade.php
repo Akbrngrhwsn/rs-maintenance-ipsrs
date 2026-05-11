@@ -3,12 +3,12 @@
         
         <div class="mb-8 text-center">
             <a href="/" class="inline-flex flex-col items-center group">   
-                <h1 class="text-2xl font-bold text-blue-900">Pemeliharaan Unit IT</h1>
+                <h1 class="text-2xl font-bold text-green-900">Pemeliharaan Unit IT</h1>
                 <p class="text-sm text-green-600 font-bold tracking-widest uppercase">RSU PKU Muhammadiyah</p>
             </a>
         </div>
 
-        <div class="w-full sm:max-w-md bg-white shadow-xl rounded-2xl border-t-4 border-blue-900 overflow-hidden">
+        <div class="w-full sm:max-w-md bg-white shadow-xl rounded-2xl border-t-4 border-green-900 overflow-hidden">
             <div class="p-8">
                 
                 <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Masuk ke Dashboard</h2>
@@ -27,7 +27,7 @@
                                 </svg>
                             </div>
                             <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" 
-                                class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 transition ease-in-out duration-150" 
+                                class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500 py-2.5 transition ease-in-out duration-150" 
                                 placeholder="nama@rsupku.com">
                         </div>
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
@@ -42,7 +42,7 @@
                                 </svg>
                             </div>
                             <input id="password" type="password" name="password" required autocomplete="current-password"
-                                class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 py-2.5 transition ease-in-out duration-150" 
+                                class="pl-10 block w-full rounded-lg border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500 py-2.5 transition ease-in-out duration-150" 
                                 placeholder="••••••••">
                         </div>
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
@@ -50,13 +50,13 @@
 
                     <div class="flex items-center justify-between mt-4">
                         <label for="remember_me" class="inline-flex items-center cursor-pointer group">
-                            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-blue-900 shadow-sm focus:ring-blue-500 cursor-pointer" name="remember">
-                            <span class="ml-2 text-sm text-gray-600 group-hover:text-blue-800 transition">Ingat saya</span>
+                            <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-green-900 shadow-sm focus:ring-green-500 cursor-pointer" name="remember">
+                            <span class="ml-2 text-sm text-gray-600 group-hover:text-green-800 transition">Ingat saya</span>
                         </label>
                     </div>
 
                     <div class="pt-2">
-                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5">
+                        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-bold text-white bg-green-900 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all transform hover:-translate-y-0.5">
                             MASUK
                         </button>
                     </div>

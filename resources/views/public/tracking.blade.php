@@ -11,8 +11,8 @@
             <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
                 <form action="{{ route('public.tracking') }}" method="GET" class="flex w-full md:w-80">
                     <input type="text" name="ticket" placeholder="Cari No. Tiket..." value="{{ request('ticket') }}" 
-                        class="w-full rounded-l-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700 transition">
+                        class="w-full rounded-l-lg border-gray-300 focus:border-green-500 focus:ring-green-500 text-sm">
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-r-lg hover:bg-green-700 transition">
                         Cari
                     </button>
                 </form>
