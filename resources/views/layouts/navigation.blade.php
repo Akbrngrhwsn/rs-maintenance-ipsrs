@@ -38,7 +38,7 @@
                             <span id="badge-admin-procurements" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-green-600 text-white hidden">0</span>
                         </x-nav-link>
                         <x-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Catatan IT') }}
+                            {{ __('Catatan IPS RS') }}
                         </x-nav-link>
                     @endif
 
@@ -216,7 +216,7 @@
                 <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')" class="rounded-lg font-bold text-[13px] text-gray-500">{{ __('Ruangan') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.procurements.index')" :active="request()->routeIs('admin.procurements.*')" class="rounded-lg font-bold text-[13px]">{{ __('Pengadaan') }}</x-responsive-nav-link>
                 <span id="badge-admin-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-green-600 text-white hidden">0</span>
-                <x-responsive-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')" class="rounded-lg font-bold text-[13px]">{{ __('Catatan IT') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('it-notes.index')" :active="request()->routeIs('it-notes.index')" class="rounded-lg font-bold text-[13px]">{{ __('Catatan IPS RS') }}</x-responsive-nav-link>
             @endif
 
             {{-- DIREKTUR MOBILE --}}

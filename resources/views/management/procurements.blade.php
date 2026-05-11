@@ -8,7 +8,7 @@
             <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200">
                 
                 <div class="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-800">Pengajuan dari Admin IT & Kepala Ruang</h3>
+                    <h3 class="text-lg font-bold text-gray-800">Pengajuan dari Admin IPS RS & Kepala Ruang</h3>
                 </div>
 
                 <div class="p-6 border-b border-gray-100">
