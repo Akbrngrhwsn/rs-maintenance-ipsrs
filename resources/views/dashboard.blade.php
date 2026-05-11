@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row justify-between items-center">
-            <h2 class="font-bold text-2xl text-blue-900 leading-tight">
+            <h2 class="font-bold text-2xl text-green-900 leading-tight">
                 {{ __('Dashboard Pemeliharaan') }}
             </h2>
             <span class="text-sm text-gray-500 mt-2 md:mt-0 bg-white px-3 py-1 rounded-full shadow-sm border border-gray-100">
@@ -11,15 +11,15 @@
     </x-slot>
 
     {{-- BANNER TEKNISI BERTUGAS --}}
-            <div class="bg-blue-900 rounded-xl shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center text-white">
+            <div class="bg-green-900 rounded-xl shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center text-white">
                 <div class="flex items-center gap-3">
-                    <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <svg class="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     <div>
-                        <p class="text-sm text-blue-200">Teknisi Bertugas (On-Duty) Saat Ini:</p>
+                        <p class="text-sm text-green-200">Teknisi Bertugas (On-Duty) Saat Ini:</p>
                         <p class="font-bold text-lg">{{ $onDutyStaff->nama ?? 'Belum ada teknisi yang dipilih' }}</p>
                     </div>
                 </div>
-                <a href="{{ route('admin.it_staff.index') }}" class="mt-3 sm:mt-0 px-4 py-2 bg-blue-800 hover:bg-blue-700 border border-blue-600 rounded-lg text-sm font-bold transition">
+                <a href="{{ route('admin.it_staff.index') }}" class="mt-3 sm:mt-0 px-4 py-2 bg-green-800 hover:bg-green-700 border border-green-600 rounded-lg text-sm font-bold transition">
                     Ubah Teknisi Jaga
                 </a>
             </div>
@@ -85,8 +85,8 @@
 
                                 {{-- FITUR BARU: Info Pengadaan Langsung --}}
                                 @if($report->needs_procurement && $report->procurement_items_request)
-                                <div class="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                                    <div class="flex items-center gap-1 mb-2 text-blue-800">
+                                <div class="mb-4 p-3 bg-green-50 border border-green-100 rounded-lg">
+                                    <div class="flex items-center gap-1 mb-2 text-green-800">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                                         <span class="text-xs font-bold uppercase tracking-wider">Permintaan Pengadaan</span>
                                     </div>
@@ -117,7 +117,7 @@
                                                 $itemQty = trim((string)$itemQty);
                                             @endphp
                                             @if($itemName)
-                                            <li class="text-xs text-blue-700 flex justify-between">
+                                            <li class="text-xs text-green-700 flex justify-between">
                                                 <span>• {{ $itemName }}</span>
                                                 @if($itemQty)<span class="font-bold">x{{ $itemQty }}</span>@endif
                                             </li>
@@ -133,7 +133,7 @@
                                     {{-- Tombol ACC Biasa --}}
                                     <form action="{{ route('admin.acc', $report->id) }}" method="POST">
                                         @csrf @method('PATCH')
-                                        <button type="submit" class="inline-flex items-center gap-1 bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition shadow-sm hover:shadow">
+                                        <button type="submit" class="inline-flex items-center gap-1 bg-green-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-800 transition shadow-sm hover:shadow">
                                             ACC & Proses
                                         </button>
                                     </form>
@@ -164,19 +164,19 @@
                     {{-- Header --}}
                     <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 flex-shrink-0">
                         <div class="flex items-center gap-2">
-                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                             </span>
                             <h3 class="text-lg font-bold text-gray-800">Sedang Dikerjakan</h3>
                         </div>
                         {{-- PERBAIKAN: Gunakan ->total() --}}
-                        <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2 py-1 rounded-full">{{ $processedReports->total() }} Unit</span>
+                        <span class="text-xs font-semibold bg-green-100 text-green-800 px-2 py-1 rounded-full">{{ $processedReports->total() }} Unit</span>
                     </div>
 
                     {{-- List Scrollable --}}
                     <div class="p-6 space-y-6 flex-1 overflow-y-auto">
                         @forelse($processedReports as $report)
-                            <div class="bg-white rounded-xl p-5 border border-blue-100 shadow-sm relative">
+                            <div class="bg-white rounded-xl p-5 border border-green-100 shadow-sm relative">
                                 <div class="absolute top-4 right-4 flex gap-1 z-20">
                                     <a href="{{ route('admin.report.edit', $report->id) }}" class="text-amber-500 hover:text-amber-700 p-1.5 bg-amber-50 rounded hover:bg-amber-100" title="Edit">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -191,12 +191,12 @@
                                 <div class="relative z-10">
                                     <div class="flex flex-col gap-1 mb-2">
                                         @if($report->ticket_number)
-                                            <span class="text-[10px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 w-fit">{{ $report->ticket_number }}</span>
+                                            <span class="text-[10px] font-mono font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded border border-green-100 w-fit">{{ $report->ticket_number }}</span>
                                         @endif
                                         <div class="flex items-center gap-2 flex-wrap">
-                                            <h4 class="font-bold text-blue-900 text-lg">{{ $report->ruangan }}</h4>
-                                            <p class="text-sm text-gray-600 mb-4 border-l-2 border-blue-300 pl-2 italic">"{{ $report->keluhan }}"</p>
-                                            <p class="text-xs font-bold text-blue-700 mb-3 bg-blue-50 px-2 py-1 rounded w-fit border border-blue-100">
+                                            <h4 class="font-bold text-green-900 text-lg">{{ $report->ruangan }}</h4>
+                                            <p class="text-sm text-gray-600 mb-4 border-l-2 border-green-300 pl-2 italic">"{{ $report->keluhan }}"</p>
+                                            <p class="text-xs font-bold text-green-700 mb-3 bg-green-50 px-2 py-1 rounded w-fit border border-green-100">
                                                 Ditangani oleh: {{ $report->itStaff->nama ?? 'Tim IT' }}
                                             </p>
                                             @if(isset($report->urgency))
@@ -205,12 +205,12 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-600 mb-4 border-l-2 border-blue-300 pl-2 italic">"{{ $report->keluhan }}"</p>
+                                    <p class="text-sm text-gray-600 mb-4 border-l-2 border-green-300 pl-2 italic">"{{ $report->keluhan }}"</p>
                                     <form action="{{ route('admin.validate', $report->id) }}" method="POST">
                                         @csrf @method('PATCH')
                                         <div class="mb-3">
                                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Laporan Keterangan</label>
-                                            <textarea name="tindakan_teknisi" required class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" rows="2" placeholder="Jelaskan perbaikan..."></textarea>
+                                            <textarea name="tindakan_teknisi" required class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500" rows="2" placeholder="Jelaskan perbaikan..."></textarea>
                                         </div>
                                         
                                         <div class="flex gap-3">  
@@ -250,7 +250,7 @@
                 <div class="p-6 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/30">
                     <h3 class="text-lg font-bold text-gray-800">
                         @if(request('date'))
-                            Riwayat Tanggal: <span class="text-blue-600">{{ \Carbon\Carbon::parse(request('date'))->locale('id')->isoFormat('D MMMM Y') }}</span>
+                            Riwayat Tanggal: <span class="text-green-600">{{ \Carbon\Carbon::parse(request('date'))->locale('id')->isoFormat('D MMMM Y') }}</span>
                         @else
                             Riwayat Laporan & Pengadaan
                         @endif
@@ -260,7 +260,7 @@
                     <form action="{{ route('dashboard') }}#riwayat" method="GET" class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
                         <div class="relative w-full md:w-64">
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Tiket / Ruangan..." 
-                                class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full pl-10">
+                                class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 w-full pl-10">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -271,11 +271,11 @@
                         <div class="flex items-center gap-2 w-full md:w-auto">
                             <label for="date" class="text-sm text-gray-600 font-medium whitespace-nowrap">Tanggal:</label>
                             <input type="date" name="date" id="date" value="{{ request('date') }}" 
-                                class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full md:w-auto">
+                                class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 w-full md:w-auto">
                         </div>
 
                         <div class="flex items-center gap-2 w-full md:w-auto">
-                            <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition shadow-sm w-full md:w-auto">
+                            <button type="submit" class="bg-green-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-800 transition shadow-sm w-full md:w-auto">
                                 Cari
                             </button>
                             @if(request('date') || request('search'))
@@ -391,8 +391,8 @@
 
                             @forelse($groupedHistory as $date => $reports)
                                 {{-- Sub-Header Tanggal --}}
-                                <tr class="bg-blue-50/50">
-                                    <td colspan="6" class="px-6 py-3 text-sm font-bold text-blue-800 border-l-4 border-blue-500">
+                                <tr class="bg-green-50/50">
+                                    <td colspan="6" class="px-6 py-3 text-sm font-bold text-green-800 border-l-4 border-green-500">
                                         📅 {{ \Carbon\Carbon::parse($date)->locale('id')->isoFormat('dddd, D MMMM Y') }}
                                         <span class="ml-2 text-xs font-normal text-gray-500 bg-white px-2 py-0.5 rounded-full border border-gray-200">
                                             {{ count($reports) }} Laporan
@@ -401,7 +401,7 @@
                                 </tr>
 
                                 @foreach($reports as $report)
-                                <tr class="transition-colors duration-150 {{ ($report->procurement && $report->procurement->status === 'approved_by_director') ? 'bg-blue-50 hover:bg-blue-100' : ($report->status == 'Tidak Selesai' ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50') }}">
+                                <tr class="transition-colors duration-150 {{ ($report->procurement && $report->procurement->status === 'approved_by_director') ? 'bg-green-50 hover:bg-green-100' : ($report->status == 'Tidak Selesai' ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50') }}">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm {{ $report->status == 'Tidak Selesai' ? 'text-red-600' : 'text-gray-500' }} pl-10">
                                         {{ $report->created_at->format('H:i') }} WIB
                                     </td>
@@ -419,7 +419,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600">
                                         <div class="flex flex-col gap-2 w-full md:w-auto">
-                                            <button type="button" onclick="document.getElementById('detail-modal-{{ $report->id }}').classList.remove('hidden')" class="bg-blue-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-800 transition shadow-sm w-full text-center">Lihat Detail</button>
+                                            <button type="button" onclick="document.getElementById('detail-modal-{{ $report->id }}').classList.remove('hidden')" class="bg-green-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-800 transition shadow-sm w-full text-center">Lihat Detail</button>
                                             <div class="flex gap-2">
                                                 <a href="{{ route('admin.report.edit', $report->id) }}" class="bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-amber-600 transition shadow-sm w-full text-center">Edit</a>
                                                 <form action="{{ route('admin.report.destroy', $report->id) }}" method="POST" onsubmit="return confirm('Yakin hapus laporan ini? Pengadaan terkait (jika ada) juga akan dihapus.')" class="w-full">
@@ -444,7 +444,7 @@
 
                                                     <div>
                                                         <h4 class="font-semibold text-gray-700">Keterangan</h4>
-                                                        <p class="text-xs font-bold text-blue-600 mb-1">Ditangani oleh: {{ $report->itStaff->nama ?? 'Tim IT' }}</p>
+                                                        <p class="text-xs font-bold text-green-600 mb-1">Ditangani oleh: {{ $report->itStaff->nama ?? 'Tim IT' }}</p>
                                                         <p class="text-sm text-gray-600">{{ $report->tindakan_teknisi ?? '-' }}</p>
                                                     </div>
 
@@ -480,9 +480,9 @@
                                                                     @endforeach
                                                                 </tbody>
                                                                 <tfoot>
-                                                                    <tr class="bg-blue-50">
-                                                                        <td colspan="4" class="px-3 py-2 text-right font-bold text-blue-800">Total</td>
-                                                                        <td class="px-3 py-2 text-right font-bold text-blue-800">Rp {{ number_format($pTotal, 0, ',', '.') }}</td>
+                                                                    <tr class="bg-green-50">
+                                                                        <td colspan="4" class="px-3 py-2 text-right font-bold text-green-800">Total</td>
+                                                                        <td class="px-3 py-2 text-right font-bold text-green-800">Rp {{ number_format($pTotal, 0, ',', '.') }}</td>
                                                                     </tr>
                                                                 </tfoot>
                                                             </table>
@@ -493,7 +493,7 @@
                                                             @endif
                                                             @if($report->procurement->status === 'rejected')
                                                                 <div class="mt-3">
-                                                                    <a href="{{ route('procurement.create', $report->id) }}" class="inline-flex items-center gap-2 bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-blue-800">
+                                                                    <a href="{{ route('procurement.create', $report->id) }}" class="inline-flex items-center gap-2 bg-green-700 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-green-800">
                                                                         Ajukan Ulang Pengadaan
                                                                     </a>
                                                                 </div>

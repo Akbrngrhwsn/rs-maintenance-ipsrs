@@ -14,8 +14,8 @@
                 <div class="p-6 border-b border-gray-100">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div class="flex items-center gap-3">
-                            <a href="{{ route('kepala-ruang.procurements.index', array_merge(request()->all(), ['tab' => 'pending'])) }}" class="px-3 py-1 rounded-md {{ (isset($tab) && $tab==='pending') || !isset($tab) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' }}">Sedang Diproses</a>
-                            <a href="{{ route('kepala-ruang.procurements.index', array_merge(request()->all(), ['tab' => 'history'])) }}" class="px-3 py-1 rounded-md {{ isset($tab) && $tab==='history' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700' }}">Riwayat</a>
+                            <a href="{{ route('kepala-ruang.procurements.index', array_merge(request()->all(), ['tab' => 'pending'])) }}" class="px-3 py-1 rounded-md {{ (isset($tab) && $tab==='pending') || !isset($tab) ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700' }}">Sedang Diproses</a>
+                            <a href="{{ route('kepala-ruang.procurements.index', array_merge(request()->all(), ['tab' => 'history'])) }}" class="px-3 py-1 rounded-md {{ isset($tab) && $tab==='history' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700' }}">Riwayat</a>
                         </div>
 
                         <div class="flex items-center gap-2">
@@ -23,7 +23,7 @@
                                 <input type="hidden" name="tab" value="{{ $tab ?? 'pending' }}">
                                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Search tiket/ruangan/nama/merk" class="text-sm border-gray-300 rounded-md px-3 py-1">
                                 <input type="date" name="date" value="{{ request('date') }}" class="text-sm border-gray-300 rounded-md px-2 py-1">
-                                <button type="submit" class="px-3 py-1 bg-blue-600 text-white rounded-md text-sm">Cari</button>
+                                <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded-md text-sm">Cari</button>
                             </form>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
 
                                             <div class="flex items-center gap-3">
                                                 <button type="button" onclick="document.getElementById('modal-{{ $proc->id }}').classList.remove('hidden')" 
-                                                    class="bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1 rounded-md text-sm font-bold hover:bg-blue-100 transition">
+                                                    class="bg-green-50 text-green-600 border border-green-200 px-3 py-1 rounded-md text-sm font-bold hover:bg-green-100 transition">
                                                     Lihat Detail
                                                 </button>
                                                 <span class="text-xs text-gray-400">({{ count($proc->items) }} item)</span>
@@ -129,9 +129,9 @@
                                                                 @endforeach
                                                             </tbody>
                                                             <tfoot>
-                                                                <tr class="bg-blue-50">
-                                                                    <td colspan="4" class="px-4 py-3 text-right font-bold text-blue-800 uppercase text-xs">Total Pengajuan</td>
-                                                                    <td class="px-4 py-3 text-right font-bold text-blue-800 text-lg">Rp {{ number_format($total ?? 0, 0, ',', '.') }}</td>
+                                                                <tr class="bg-green-50">
+                                                                    <td colspan="4" class="px-4 py-3 text-right font-bold text-green-800 uppercase text-xs">Total Pengajuan</td>
+                                                                    <td class="px-4 py-3 text-right font-bold text-green-800 text-lg">Rp {{ number_format($total ?? 0, 0, ',', '.') }}</td>
                                                                 </tr>
                                                             </tfoot>
                                                         </table>
@@ -147,7 +147,7 @@
                                             @php
                                                 $statusClass = match($proc->status) {
                                                     'submitted_to_kepala_ruang' => 'bg-amber-100 text-amber-700 border-amber-200',
-                                                    'submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director' => 'bg-blue-100 text-blue-700 border-blue-200',
+                                                    'submitted_to_management', 'submitted_to_bendahara', 'submitted_to_director' => 'bg-green-100 text-green-700 border-green-200',
                                                     'completed' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
                                                     'approved_by_director' => 'bg-green-100 text-green-700 border-green-200',
                                                     'rejected' => 'bg-red-100 text-red-700 border-red-200',
@@ -305,7 +305,7 @@
                                             <td class="px-6 py-4 align-top text-center">
                                                 @php
                                                     $statusClassNew = match($itemReq->status) {
-                                                        'pending_admin', 'pending_management', 'pending_bendahara', 'pending_director' => 'bg-blue-100 text-blue-700 border-blue-200',
+                                                        'pending_admin', 'pending_management', 'pending_bendahara', 'pending_director' => 'bg-green-100 text-green-700 border-green-200',
                                                         'approved' => 'bg-green-100 text-green-700 border-green-200',
                                                         'completed' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
                                                         'rejected' => 'bg-red-100 text-red-700 border-red-200',
@@ -331,7 +331,7 @@
                                                 @elseif($itemReq->status === 'rejected')
                                                     <span class="text-red-500 text-sm italic">Ditolak</span>
                                                 @else
-                                                    <span class="text-blue-500 text-sm italic">Menunggu Validasi Pihak Terkait</span>
+                                                    <span class="text-green-500 text-sm italic">Menunggu Validasi Pihak Terkait</span>
                                                 @endif
                                             </td>
                                         </tr>

@@ -44,9 +44,6 @@
 
                     {{-- === 2. MENU DIREKTUR === --}}
                     @if(Auth::check() && Auth::user()->role === 'direktur')
-                        <x-nav-link :href="route('director.reports')" :active="request()->routeIs('director.reports')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Monitoring') }}
-                        </x-nav-link>
                         <x-nav-link :href="route('director.procurements.index')" :active="request()->routeIs('director.procurements.*')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Pengadaan') }}
                             {{-- Badge untuk Pengadaan Barang Umum --}}
@@ -58,16 +55,13 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-grey-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
 
                     {{-- === 3. MENU MANAGEMENT === --}}
                     @if(Auth::check() && Auth::user()->role === 'management')
-                        <x-nav-link :href="route('management.reports')" :active="request()->routeIs('management.reports')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Monitoring') }}
-                        </x-nav-link>
                         
                         <x-nav-link :href="route('management.procurements')" :active="request()->routeIs('management.procurements')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Persetujuan') }}
@@ -76,17 +70,13 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-grey-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
 
                     {{-- === 4. MENU BENDAHARA === --}}
                     @if(Auth::check() && Auth::user()->role === 'bendahara')
-                        <x-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="text-[13px] font-bold tracking-tight">
-                            {{ __('Monitoring') }}
-                        </x-nav-link>
-
                         <x-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Validasi Keuangan') }}
                             <span id="badge-bendahara-procurements" class="ml-1 px-1.5 py-0.5 text-[10px] rounded-full bg-red-600 text-white hidden">0</span>
@@ -96,7 +86,7 @@
                             {{ __('Tracking') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-grey-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -116,7 +106,7 @@
                         <x-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="text-[13px] font-bold tracking-tight">
                             {{ __('Tracking') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-green-700">
+                        <x-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="text-[13px] font-bold tracking-tight text-grey-700">
                             {{ __('Laporan Baru') }}
                         </x-nav-link>
                     @endif
@@ -221,8 +211,6 @@
 
             {{-- DIREKTUR MOBILE --}}
             @if(Auth::user()->role === 'direktur')
-                <x-responsive-nav-link :href="route('director.reports')" :active="request()->routeIs('director.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                
                 <div class="flex items-center justify-between px-3 py-2">
                     <x-responsive-nav-link :href="route('director.procurements.index')" :active="request()->routeIs('director.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Pengadaan') }}</x-responsive-nav-link>
                     <div class="flex gap-1">
@@ -232,27 +220,21 @@
                 </div>
 
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-grey-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- MANAGEMENT MOBILE --}}
             @if(Auth::user()->role === 'management')
-                <x-responsive-nav-link :href="route('management.reports')" :active="request()->routeIs('management.reports')" class="rounded-lg font-bold text-[13px]">{{ __('Monitoring') }}</x-responsive-nav-link>
-                            
                 <div class="flex items-center justify-between px-3 py-2">
                     <x-responsive-nav-link :href="route('management.procurements')" :active="request()->routeIs('management.procurements')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">{{ __('Persetujuan') }}</x-responsive-nav-link>
                     <span id="badge-management-procurements-mobile" class="px-1.5 py-0.5 text-[10px] rounded-full bg-emerald-600 text-white hidden">0</span>
                 </div>
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-grey-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- BENDAHARA MOBILE --}}
 @if(Auth::check() && Auth::user()->role === 'bendahara')
-    <x-responsive-nav-link :href="route('bendahara.reports')" :active="request()->routeIs('bendahara.reports')" class="rounded-lg font-bold text-[13px]">
-        {{ __('Monitoring') }}
-    </x-responsive-nav-link>
-
     <div class="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <x-responsive-nav-link :href="route('bendahara.procurements.index')" :active="request()->routeIs('bendahara.procurements.*')" class="rounded-lg font-bold text-[13px] flex-1 ps-0">
             {{ __('Validasi Keuangan') }}
@@ -264,7 +246,7 @@
         {{ __('Tracking') }}
     </x-responsive-nav-link>
 
-    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">
+    <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-grey-700">
         {{ __('Laporan Baru') }}
     </x-responsive-nav-link>
 @endif
@@ -282,7 +264,7 @@
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-grey-700">{{ __('Laporan Baru') }}</x-responsive-nav-link>
             @endif
 
             {{-- RESPONSIVE SETTINGS OPTIONS (LOGOUT & PROFILE) --}}
@@ -314,7 +296,7 @@
         @else
             {{-- MENU UNTUK GUEST --}}
             <x-responsive-nav-link :href="route('public.tracking')" :active="request()->routeIs('public.tracking')" class="rounded-lg font-bold text-[13px]">{{ __('Tracking Laporan') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-green-700">{{ __('Buat Laporan Baru') }}</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('public.home')" :active="request()->routeIs('public.home')" class="rounded-lg font-bold text-[13px] text-grey-700">{{ __('Buat Laporan Baru') }}</x-responsive-nav-link>
             
             {{-- TOMBOL LOGIN MOBILE --}}
             <div class="pt-4 pb-2 border-t border-gray-100 mt-2 px-4">

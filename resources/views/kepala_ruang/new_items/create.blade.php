@@ -38,7 +38,7 @@
 
                             @if($userRooms->count() > 1)
                                 <select name="room_id" required 
-                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm">
                                     <option value="" disabled selected>Pilih Ruangan</option>
                                     @foreach($userRooms as $room)
                                         <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
@@ -63,7 +63,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Tujuan / Alasan Pengadaan</label>
                             <input type="text" name="purpose" required 
-                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm" 
                                    placeholder="Contoh: Penambahan inventaris komputer staf baru" value="{{ old('purpose') }}">
                         </div>
 
@@ -72,7 +72,7 @@
                             <div class="flex items-center justify-between mb-3">
                                 <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider">Rincian Barang</h3>
                                 <button type="button" id="btn-add-item" 
-                                        class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                     + Tambah Baris
                                 </button>
                             </div>
@@ -81,18 +81,18 @@
                                 {{-- Baris Pertama --}}
                                 <div class="flex flex-col sm:flex-row gap-3 item-row p-4 bg-gray-50/50 rounded-lg border border-gray-100">
                                     <div class="flex-1">
-                                        <input type="text" name="items[0][nama]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Nama Barang" required>
+                                        <input type="text" name="items[0][nama]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500" placeholder="Nama Barang" required>
                                     </div>
                                     <div class="w-full sm:w-40">
                                         <div class="relative">
                                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <span class="text-gray-500 sm:text-sm">Rp</span>
                                             </div>
-                                            <input type="number" name="items[0][harga_satuan]" class="w-full pl-9 rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Harga" min="0" required>
+                                            <input type="number" name="items[0][harga_satuan]" class="w-full pl-9 rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500" placeholder="Harga" min="0" required>
                                         </div>
                                     </div>
                                     <div class="w-full sm:w-24">
-                                        <input type="number" name="items[0][jumlah]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 text-center" value="1" min="1" required>
+                                        <input type="number" name="items[0][jumlah]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500 text-center" value="1" min="1" required>
                                     </div>
                                     <div class="w-full sm:w-10 flex items-center justify-end">
                                         <button type="button" class="btn-remove-item text-gray-400 hover:text-red-500 transition hidden">
@@ -110,7 +110,7 @@
                             Batal
                         </a>
                         <button type="submit" 
-                                class="inline-flex items-center px-5 py-2.5 bg-indigo-600 border border-transparent rounded-md font-bold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
+                                class="inline-flex items-center px-5 py-2.5 bg-green-600 border border-transparent rounded-md font-bold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm">
                             Kirim Pengajuan
                         </button>
                     </div>
@@ -127,18 +127,18 @@
         const html = `
             <div class="flex flex-col sm:flex-row gap-3 item-row p-4 bg-gray-50/50 rounded-lg border border-gray-100 animate-fadeIn">
                 <div class="flex-1">
-                    <input type="text" name="items[${itemIndex}][nama]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Nama Barang" required>
+                    <input type="text" name="items[${itemIndex}][nama]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500" placeholder="Nama Barang" required>
                 </div>
                 <div class="w-full sm:w-40 text-left">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <span class="text-gray-500 sm:text-sm text-left">Rp</span>
                         </div>
-                        <input type="number" name="items[${itemIndex}][harga_satuan]" class="w-full pl-9 rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Harga" min="0" required>
+                        <input type="number" name="items[${itemIndex}][harga_satuan]" class="w-full pl-9 rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500" placeholder="Harga" min="0" required>
                     </div>
                 </div>
                 <div class="w-full sm:w-24 text-left">
-                    <input type="number" name="items[${itemIndex}][jumlah]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500 text-center" value="1" min="1" required>
+                    <input type="number" name="items[${itemIndex}][jumlah]" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm focus:ring-green-500 focus:border-green-500 text-center" value="1" min="1" required>
                 </div>
                 <div class="w-full sm:w-10 flex items-center justify-end text-left">
                     <button type="button" class="btn-remove-item text-gray-400 hover:text-red-500 transition">
