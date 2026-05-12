@@ -94,78 +94,52 @@
         </tbody>
     </table>
 
-    {{-- BAGIAN 2: PENGADAAN APLIKASI --}}
-    <!-- <div class="section-title">B. Pengadaan Pengembangan Aplikasi</div>
+    {{-- BAGIAN 2: PENGADAAN BARANG BARU --}}
+    <div class="section-title">B. Pengadaan Barang Baru (New Item Request)</div>
     <table>
         <thead>
             <tr>
                 <th width="5%">ID</th>
                 <th width="15%">Waktu Dibuat</th>
-                <th width="30%">Nama Aplikasi</th>
-                <th width="30%">Detail Barang (Jml x Harga)</th>
-                <th width="20%" class="text-right">Total Estimasi</th>
+                <th width="25%">Ruangan / Pemohon</th>
+                <th width="35%">Tujuan & Detail Barang (Jml x Harga)</th>
+                <th width="20%" class="text-right">Total</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($app_requests as $app)
+            @forelse($newItemRequests as $item)
+                @php $itemTotal = 0; @endphp
                 <tr>
-                    <td>{{ $app->id }}</td>
-                    <td>{{ optional($app->created_at)->format('d/m/Y H:i') }}</td>
+                    <td>{{ $item->id }}</td>
+                    <td>{{ optional($item->created_at)->format('d/m/Y H:i') }}</td>
                     <td>
-                        <strong>{{ $app->nama_aplikasi }}</strong>
+                        <strong>{{ $item->room->name ?? '-' }}</strong><br>
+                        <small>{{ $item->user->name ?? '-' }}</small>
                     </td>
                     <td>
-                        {{-- Menampilkan daftar item --}}
-                        @if(is_array($app->requested_items))
-                            @foreach($app->requested_items as $item)
-                                - {{ $item['nama'] ?? $item['name'] ?? '-' }} <br>
-                            @endforeach
-                        @elseif(!empty($app->requested_items))
-                            {{ $app->requested_items }}
-                        @else
-                            {{ $app->deskripsi }}
-                        @endif
-                        
-                        <br>
-                        
-                        {{-- LOGIKA WARNA STATUS --}}
-                        @php
-                            $rawStatus = $app->procurement_approval_status ?: 'Pending';
-                            $statusLower = strtolower($rawStatus);
-                            $statusColor = '#555'; // Warna default abu-abu gelap
-                            $statusWeight = 'normal';
-
-                            if (str_contains($statusLower, 'tolak') || str_contains($statusLower, 'reject')) {
-                                $statusColor = '#dc2626'; // Merah untuk ditolak
-                                $statusWeight = 'bold';
-                            } elseif (str_contains($statusLower, 'setuju') || str_contains($statusLower, 'approve')) {
-                                $statusColor = '#16a34a'; // Hijau untuk disetujui
-                                $statusWeight = 'bold';
-                            }
+                        <ul style="padding-left: 15px; margin: 5px 0;">
+                        @php 
+                            $items = is_array($item->items) ? $item->items : (json_decode($item->items, true) ?: []);
                         @endphp
-
-                        <div style="margin-top: 5px; color: {{ $statusColor }}; font-weight: {{ $statusWeight }}; font-size: 11px;">
-                            Status: {{ strtoupper($rawStatus) }}
-                        </div>
+                        @foreach($items as $it)
+                            @php
+                                $qty = isset($it['jumlah']) ? (int)$it['jumlah'] : 1;
+                                $price = isset($it['harga_satuan']) ? (float)$it['harga_satuan'] : 0;
+                                $name = $it['nama'] ?? '-';
+                                $subtotal = $qty * $price;
+                                $itemTotal += $subtotal;
+                            @endphp
+                            <li>{{ $name }} ({{ $qty }}x {{ number_format($price,0,',','.') }})</li>
+                        @endforeach
+                        </ul>
                     </td>
-                    <td class="text-right">
-                        {{-- Coret harga total jika ditolak --}}
-                        @if(str_contains($statusLower, 'tolak') || str_contains($statusLower, 'reject'))
-                            <span style="text-decoration: line-through; color: #999;">
-                                Rp {{ number_format($app->procurement_estimate, 0, ',', '.') }}
-                            </span>
-                        @else
-                            Rp {{ number_format($app->procurement_estimate, 0, ',', '.') }}
-                        @endif
-                    </td>
+                    <td class="text-right">Rp {{ number_format($itemTotal,0,',','.') }}</td>
                 </tr>
             @empty
-                <tr>
-                    <td colspan="5" style="text-align:center;">Tidak ada data pengadaan aplikasi bulan ini.</td>
-                </tr>
+                <tr><td colspan="5" style="text-align:center;">Tidak ada data pengadaan barang baru bulan ini.</td></tr>
             @endforelse
         </tbody>
-    </table> -->
+    </table>
 
     <p style="margin-top: 20px;">Demikian laporan pengadaan ini disusun sebagai dokumentasi aset dan pengeluaran sistem IT. 
     Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>
