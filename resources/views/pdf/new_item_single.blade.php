@@ -136,7 +136,7 @@
                         $passedAdmin = in_array($procurement->status, ['pending_management', 'pending_bendahara', 'pending_director', 'approved', 'completed']);
                         // Fallback: Jika data lama kosong tapi statusnya sudah lolos admin, buat QR dadakan
                         if(empty($showQrAdmin) && $passedAdmin) {
-                            $showQrAdmin = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Disetujui oleh Admin IT\nPengajuan: " . $procurement->purpose));
+                            $showQrAdmin = base64_encode((string) \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')->size(100)->generate("Disetujui oleh Admin IPSRS\nPengajuan: " . $procurement->purpose));
                         }
                     @endphp
                     @if(!empty($showQrAdmin))

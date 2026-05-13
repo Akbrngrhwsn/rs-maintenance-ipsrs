@@ -148,7 +148,7 @@
     <table style="border: none; width: 100%;">
         <tr style="border: none;">
             
-            {{-- ADMIN IT --}}
+            {{-- ADMIN --}}
             <td width="20%" class="text-center" style="border: none; vertical-align: top; padding: 5px;">
                 <p class="text-bold" style="margin-bottom: 8px; font-size: 9pt;">Diajukan Oleh</p>
                 <div style="width: 70px; height: 70px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: #f9f9f9; border: 1px solid #ddd;">

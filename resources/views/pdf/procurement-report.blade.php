@@ -178,7 +178,7 @@
                     </span>
                 </td>
 
-                {{-- 2. ADMIN IT --}}
+                {{-- 2. ADMIN --}}
                 <td class="text-center" style="border: none; vertical-align: top;">
                     <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">admin ipsrs</p>
                     <div style="height: 70px; margin: 0 auto 5px; width: 70px;">

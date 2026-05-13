@@ -34,7 +34,7 @@
             @else
                 <div style="text-align:center; margin-bottom:6px;">
                     <div style="font-weight:700; font-size:16px;">{{ config('app.name', 'RS MAINTENANCE SYSTEM') }}</div>
-                    <div style="font-size:12px;">Laporan Terpadu Pengadaan IT</div>
+                    <div style="font-size:12px;">Laporan Terpadu Pengadaan IPSRS</div>
                 </div>
                 <hr />
             @endif
@@ -141,7 +141,7 @@
         </tbody>
     </table>
 
-    <p style="margin-top: 20px;">Demikian laporan pengadaan ini disusun sebagai dokumentasi aset dan pengeluaran sistem IT. 
+    <p style="margin-top: 20px;">Demikian laporan pengadaan ini disusun sebagai dokumentasi aset dan pengeluaran sistem IPSRS. 
     Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>
 
     <div class="footer-signature">

@@ -83,7 +83,7 @@
         </tbody>
     </table>
 
-    <p style="margin-bottom: 6px">Demikian laporan ini disusun untuk memberikan gambaran mengenai Pemeliharaan Sistem IT periode ini.
+    <p style="margin-bottom: 6px">Demikian laporan ini disusun untuk memberikan gambaran mengenai Pemeliharaan IPSRS periode ini.
         Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>
 
     <div style="float: right; width: 200px; text-align: center; margin-top: 30px;">
